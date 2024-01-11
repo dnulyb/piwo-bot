@@ -80,7 +80,7 @@ def get_record_tuple(record):
     #Get map name
     for m in data.map_data:
         if m[0] == record[2]:
-            map = m[2]
+            map = m[3] #m[2]
 
     return (time, name, map)
 

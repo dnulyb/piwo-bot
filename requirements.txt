@@ -1,0 +1,2 @@
+pygsheets==2.0.6
+Requests==2.31.0
