@@ -1,6 +1,6 @@
 import config.data as data
 import config.settings as settings
-import src.db.db as db
+from src.db.db import *
 from src.ubi.authentication import *
 from src.ubi.records import *
 from src.gsheet import *
@@ -9,7 +9,21 @@ from datetime import datetime
 
 
 #testing sqlite
-db.init()
+#db.init()
+
+#after these nine queries we should have 1 testroster
+#   and 2 players (1,3)
+execute_query(add_roster, ["testroster"])
+execute_query(add_roster, ["testroster2"])
+execute_query(remove_roster, ["testroster2"])
+
+execute_query(remove_player, ["player one"])
+execute_query(remove_player, ["player two"])
+execute_query(remove_player, ["player three"])
+
+execute_query(add_player, ("player one", "1", None))
+execute_query(add_player, ("player two", "2", "test"))
+execute_query(add_player, ("player three", "3", "testroster"))
 quit()
 
 # Get access token

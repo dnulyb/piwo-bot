@@ -1,4 +1,8 @@
+#own stuff
 config/
+notes
+*.sqlite
+team.sqlite
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
