@@ -16,6 +16,17 @@ add_player =        """ INSERT INTO Player(nickname, account_id, roster)
 remove_player =     """ DELETE FROM Player
                         WHERE nickname=? """
 
+add_tournament =    """ INSERT INTO Tournament(name)
+                        VALUES(?) """
+
+remove_tournament = """ DELETE FROM Tournament
+                        WHERE name=? """
+
+def open_conn():
+    conn = sqlite3.connect(db_file)
+    conn.execute("PRAGMA foreign_keys = 1")
+    return conn
+
 # Creates the initial database structure
 def init():
 
@@ -28,20 +39,21 @@ def init():
     cursor.close()
     conn.close()
 
-def execute_query(sql, params):
+def execute_queries(conn, queries):
 
-    conn = sqlite3.connect(db_file)
-    conn.execute("PRAGMA foreign_keys = 1")
     cursor = conn.cursor()
 
-    try:
-        cursor.execute(sql, params)
-        conn.commit()
-    except sqlite3.Error as e:
-        print(e)
+    for [sql, param] in queries:
+            
+        try:
+            cursor.execute(sql, param)
+        except sqlite3.Error as e:
+            print(e, end="")
+            print(" : ", end="")
+            print(param)
 
+    conn.commit()
     cursor.close()
-    conn.close()
 
 
 """def add_player(nickname, account_id, roster=None):

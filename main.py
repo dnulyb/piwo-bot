@@ -13,17 +13,22 @@ from datetime import datetime
 
 #after these nine queries we should have 1 testroster
 #   and 2 players (1,3)
-execute_query(add_roster, ["testroster"])
-execute_query(add_roster, ["testroster2"])
-execute_query(remove_roster, ["testroster2"])
+queries = [
+    [add_roster, ["testroster"]],
+    [add_roster, ["testroster2"]],
+    [remove_roster, ["testroster2"]],
+    [remove_player, ["player one"]],
+    [remove_player, ["player two"]],
+    [remove_player, ["player three"]],
+    [add_player, ("player one", "1", None)],
+    [add_player, ("player two", "2", "test")],
+    [add_player, ("player three", "3", "testroster")]
+]
 
-execute_query(remove_player, ["player one"])
-execute_query(remove_player, ["player two"])
-execute_query(remove_player, ["player three"])
+conn = open_conn()
+execute_queries(conn, queries)
+conn.close()
 
-execute_query(add_player, ("player one", "1", None))
-execute_query(add_player, ("player two", "2", "test"))
-execute_query(add_player, ("player three", "3", "testroster"))
 quit()
 
 # Get access token
