@@ -21,23 +21,34 @@ CREATE TABLE IF NOT EXISTS "Participant" (
 	"id"	INTEGER,
 	"player_id"	INTEGER NOT NULL,
 	"tournament_id"	INTEGER NOT NULL,
-	UNIQUE("player_id","tournament_id"),
-	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id"),
 	FOREIGN KEY("player_id") REFERENCES "Player"("id"),
-	PRIMARY KEY("id" AUTOINCREMENT)
+	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id"),
+	PRIMARY KEY("id" AUTOINCREMENT),
+	UNIQUE("player_id","tournament_id")
 );
 CREATE TABLE IF NOT EXISTS "Map" (
 	"id"	INTEGER,
-	"name"	INTEGER NOT NULL UNIQUE,
-	"uid"	INTEGER NOT NULL UNIQUE,
+	"name"	TEXT NOT NULL UNIQUE,
+	"uid"	TEXT NOT NULL UNIQUE,
 	PRIMARY KEY("id" AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS "Mappack" (
+	"id"	INTEGER,
+	"tournament_id"	INTEGER,
+	"map_id"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id"),
+	FOREIGN KEY("map_id") REFERENCES "Map"("id"),
+	UNIQUE("tournament_id","map_id")
 );
 CREATE TABLE IF NOT EXISTS "Time" (
 	"id"	INTEGER,
 	"player_id"	INTEGER NOT NULL,
 	"map_id"	INTEGER NOT NULL,
 	"time"	TEXT NOT NULL,
-	UNIQUE("player_id","map_id"),
-	PRIMARY KEY("id" AUTOINCREMENT)
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("player_id") REFERENCES "Player"("id"),
+	FOREIGN KEY("map_id") REFERENCES "Map"("id"),
+	UNIQUE("player_id","map_id")
 );
 COMMIT;

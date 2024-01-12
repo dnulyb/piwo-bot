@@ -7,9 +7,8 @@ from src.gsheet import *
 from datetime import datetime
 
 
-
 #testing sqlite
-#db.init()
+init()
 
 #after these nine queries we should have 1 testroster
 #   and 2 players (1,3)
@@ -25,8 +24,19 @@ queries = [
     [add_player, ("player three", "3", "testroster")]
 ]
 
+queries2 = [
+    [add_map, ("firstmap", "19324-asd234")],
+    [add_time, (2,1,"goodtime")],
+    [add_time, (2,1,"evenbettertime")],
+    [add_tournament, ["wtt"]],
+    [add_participant, (1,1)],
+    [add_participant, (2,1)],
+    [remove_participant, (2,1)]
+
+]
+
 conn = open_conn()
-execute_queries(conn, queries)
+execute_queries(conn, queries2)
 conn.close()
 
 quit()
