@@ -22,6 +22,10 @@ add_tournament =        """ INSERT INTO Tournament(name)
 remove_tournament =     """ DELETE FROM Tournament
                             WHERE name=? """
 
+list_tournaments =       """ SELECT (name) 
+                            FROM Tournament 
+                            ORDER BY (name) """
+
 add_map =               """ INSERT INTO Map(name, uid)
                             VALUES(?,?) """
 
@@ -67,17 +71,24 @@ def init():
     cursor.close()
     conn.close()
 
-# Executes all queries provided, queries is a list of [sql, params]
+# Executes all queries provided, queries is a list of (sql, params)
 #   Single param has to be in the form [a]
 #   Multiple params has to be in the form (a,b,c) (for 3 parameters a, b and c) 
 def execute_queries(conn, queries):
 
     cursor = conn.cursor()
 
-    for [sql, param] in queries:
+    for (sql, param) in queries:
             
         try:
-            cursor.execute(sql, param)
+            # Check if there are parameters
+            if param == None:
+                print("none param")
+                cursor.execute(sql)
+            else:
+                cursor.execute(sql, param)
+        except sqlite3.IntegrityError as e:
+            raise Exception(e)
         except sqlite3.Error as e:
             print(e, end="")
             print(" : ", end="")
@@ -85,6 +96,29 @@ def execute_queries(conn, queries):
 
     conn.commit()
     cursor.close()
+
+def retrieve_data(conn, query):
+
+    cursor = conn.cursor()
+    (sql, param) = query
+
+    try:
+        # Check if there are parameters
+        if param == None:
+            cursor.execute(sql)
+        else:
+            cursor.execute(sql, param)
+    except sqlite3.Error as e:
+        print(e, end="")
+        print(" : ", end="")
+        print(param)
+
+    conn.commit()
+
+    res = cursor.fetchall()
+    cursor.close()
+
+    return res
 
 
 

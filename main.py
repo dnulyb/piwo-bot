@@ -35,8 +35,18 @@ queries2 = [
 
 ]
 
+queries3 = [
+    add_tournament, ["first tournament"]
+]
+
+queries4 = [(add_tournament, ["lol"])]
+#print(queries3)
+
 conn = open_conn()
-execute_queries(conn, queries2)
+execute_queries(conn, queries4)
+res = retrieve_data(conn, (list_tournaments, None))
+print(res)
+
 conn.close()
 
 quit()
