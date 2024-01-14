@@ -8,7 +8,10 @@ from interactions import (
     slash_option, 
     SlashContext,
     SlashCommandChoice,
-    OptionType
+    OptionType,
+    check, 
+    is_owner,
+    BaseContext
 )
 
 import src.db.db as db
@@ -31,13 +34,32 @@ db.init()
 
 #Commands start
 
+"""
+#custom check example
+async def my_check(ctx: BaseContext):
+    return ctx.author.username.startswith("a")
+
+@slash_command(name="my_command")
+@check(my_check)
+async def command(ctx: SlashContext):
+    await ctx.send("Your username starts with an 'a'!", ephemeral=True)
+"""
+
+@slash_command(
+    name="shutdown",
+    description="Shuts down the bot."
+)
+@check(is_owner())
+async def shutdown(ctx: SlashContext):
+    await ctx.send("Shutting down the bot.", ephemeral=True)
+    await bot.stop()
+
 @slash_command(
     name="ping",
     description="Replies to pings",
 )
 async def ping(ctx: SlashContext):
     await ctx.send("pong")
-
 
 @slash_command(
     name="tournament",
@@ -51,7 +73,9 @@ async def ping(ctx: SlashContext):
     choices=[
         SlashCommandChoice(name="create", value="create"),
         SlashCommandChoice(name="delete", value="delete"),
-        SlashCommandChoice(name="list", value="list")
+        SlashCommandChoice(name="list", value="list"),
+        SlashCommandChoice(name="auto update ON", value="autoon"),
+        SlashCommandChoice(name="auto update OFF", value="autooff")
     ]
 )
 @slash_option(
@@ -64,45 +88,36 @@ async def tournament(ctx: SlashContext, action: str, name: str = ""):
 
     conn = db.open_conn()
 
-    match action:
-
-        case "create":
-            query = [(db.add_tournament, [name])]
-            try:
-                db.execute_queries(conn, query)
-                await ctx.send("Created tournament: " + name)
-            except Exception as e:
-                await ctx.send(f"Error occurred while running command: {e}")
-            finally:
-                conn.close()
-
-        case "delete":
-            query = [(db.remove_tournament, [name])]
-            try:
-                db.execute_queries(conn, query)
-                await ctx.send("Deleted tournament: " + name)
-            except Exception as e:
-                await ctx.send(f"Error occurred while running command: {e}")
-            finally:
-                conn.close()     
-
-        case "list":
-            query = (db.list_tournaments, None)
-            try:
+    try:
+        match action:
+            case "create":
+                query = [(db.add_tournament, [name])]
+                res = "Created tournament: " + name
+            case "delete":
+                query = [(db.remove_tournament, [name])]
+                res = "Deleted tournament: " + name
+            case "autoon":
+                query = [(db.auto_update_tournament, (1, name))]
+                res = "Turned ON auto update for tournament: " + name
+            case "autooff":
+                query = [(db.auto_update_tournament, (0, name))]
+                res = "Turned OFF auto update for tournament: " + name
+            case "list":
+                query = (db.list_tournaments, None)
                 res = db.retrieve_data(conn, query)
-                await ctx.send(f"{res}")
-            except Exception as e:
-                await ctx.send(f"Error occurred while running command: {e}")
-            finally:
-                conn.close()
+            case _:
+                res = "invalid tournament action"
 
-        case _:
-            await ctx.send("invalid tournament action")
+        # always send reply
+        await ctx.send(f"{res}")
 
+    except Exception as e:
+        await ctx.send(f"Error occurred while running command: {e}")
 
+    finally:
+        conn.close() 
 
-
-
+    
 #Commands end
 
 

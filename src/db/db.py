@@ -22,9 +22,14 @@ add_tournament =        """ INSERT INTO Tournament(name)
 remove_tournament =     """ DELETE FROM Tournament
                             WHERE name=? """
 
-list_tournaments =       """ SELECT (name) 
+list_tournaments =      """ SELECT name, auto_update
                             FROM Tournament 
                             ORDER BY (name) """
+
+auto_update_tournament = """ UPDATE Tournament
+                             SET auto_update=?
+                             WHERE name=? """
+
 
 add_map =               """ INSERT INTO Map(name, uid)
                             VALUES(?,?) """
@@ -48,6 +53,7 @@ tournament_mappack_add =    """ INSERT INTO Mappack(tournament_id, map_id)
 
 tournament_mappack_remove = """ DELETE FROM Mappack
                                 WHERE tournament_id=? AND map_id=? """
+
 
 def open_conn():
     conn = sqlite3.connect(db_file)

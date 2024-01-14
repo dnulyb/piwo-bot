@@ -39,7 +39,8 @@ queries3 = [
     add_tournament, ["first tournament"]
 ]
 
-queries4 = [(add_tournament, ["lol"])]
+queries4 = [(add_tournament, ["lol2"]),
+            (auto_update_tournament, (1, "lol"))]
 #print(queries3)
 
 conn = open_conn()
