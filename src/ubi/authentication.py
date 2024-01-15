@@ -1,15 +1,25 @@
-from config.settings import *
 import requests
 from requests.auth import HTTPBasicAuth
-
-#TODO: implement .env saving/loading
+from dotenv import find_dotenv, load_dotenv, set_key
+import os
+import base64
+import json
 
 ubi_url = "https://public-ubiservices.ubi.com/v3/profiles/sessions"
 ubi_appid = "86263886-327a-4328-ac69-527f0d20a237"
 nadeo_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices"
 nadeo_refresh_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh"
 
+# Authenticates with Ubisoft and stores Nadeo access token
+#   in .env
 def authenticate():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    user_agent = os.getenv("USER_AGENT")
+    login = os.getenv("UBI_LOGIN")
+    password = os.getenv("UBI_PASSWORD")
 
     # Get ubisoft authentication ticket
     ubi_headers = {
@@ -39,11 +49,19 @@ def authenticate():
 
     access_token = nadeo_res['accessToken']
     refresh_token = nadeo_res['refreshToken']
+    set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
+    set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
-    return (access_token, refresh_token)
+    expiration = get_refreshtoken_expiration()
+    set_key(dotenv_path, "NADEO_TOKEN_EXP", expiration)
 
-#not working atm
+# Updates the nadeo access token in .env
 def refresh_access_token():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    user_agent = os.getenv("USER_AGENT")
 
     nadeo_headers = {
         'Content-Type': 'application/json',
@@ -57,5 +75,30 @@ def refresh_access_token():
 
     access_token = nadeo_res['accessToken']
     refresh_token = nadeo_res['refreshToken']
+    set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
+    set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
-    return (access_token, refresh_token)
+    expiration = get_refreshtoken_expiration()
+    set_key(dotenv_path, "NADEO_TOKEN_EXP", expiration)
+
+# Decodes the nadeo refresh token stored in .env, and returns the 
+#   refresh token expiration time as a string
+def get_refreshtoken_expiration():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    refresh_token = os.getenv("NADEO_REFRESH_TOKEN")
+
+    [_, payload, _] = refresh_token.split(".")
+
+    # payload might need padding to be able to be decoded
+    if len(payload) % 4:
+        payload += '=' * (4 - len(payload) % 4) 
+
+    # decode
+    decodedPayload = base64.b64decode(payload)
+    jsonPayload = json.loads(decodedPayload)
+    expiration = str(jsonPayload['exp'])
+
+    return expiration

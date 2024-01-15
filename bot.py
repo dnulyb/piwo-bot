@@ -241,7 +241,7 @@ def update():
         decodedPayload = base64.b64decode(payload)
         jsonPayload = json.loads(decodedPayload)
         #curr_nadeo_time = jsonPayload['iat'] # this is basically datetime.now() from nadeo
-        expiration = jsonPayload['exp']
+        expiration = str(jsonPayload['exp'])
         # then do this: set_key(dotenv_path, "NADEO_TOKEN_EXP", expiration)
 
 
