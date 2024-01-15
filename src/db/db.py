@@ -10,11 +10,15 @@ add_roster =            """ INSERT INTO Roster(name)
 remove_roster =         """ DELETE FROM Roster
                             WHERE name=? """
 
-add_player =            """ INSERT INTO Player(nickname, account_id, roster)
-                            VALUES(?,?,?) """
+add_player =            """ INSERT INTO Player(nickname, account_id)
+                            VALUES(?,?) """
 
 remove_player =         """ DELETE FROM Player
                             WHERE nickname=? """
+
+list_players =          """ SELECT nickname
+                            FROM Player 
+                            ORDER BY (nickname) """
 
 add_tournament =        """ INSERT INTO Tournament(name)
                             VALUES(?) """
