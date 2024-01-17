@@ -4,6 +4,7 @@ from dotenv import find_dotenv, load_dotenv, set_key
 import os
 import base64
 import json
+from datetime import datetime
 
 ubi_url = "https://public-ubiservices.ubi.com/v3/profiles/sessions"
 ubi_appid = "86263886-327a-4328-ac69-527f0d20a237"
@@ -52,8 +53,6 @@ def authenticate():
     set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
-    expiration = get_refreshtoken_expiration()
-    set_key(dotenv_path, "NADEO_TOKEN_EXP", expiration)
 
 # Updates the nadeo access token in .env
 def refresh_access_token():
@@ -79,19 +78,16 @@ def refresh_access_token():
     set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
-    expiration = get_refreshtoken_expiration()
-    set_key(dotenv_path, "NADEO_TOKEN_EXP", expiration)
 
-# Decodes the nadeo refresh token stored in .env, and returns the 
-#   refresh token expiration time as a string
-def get_refreshtoken_expiration():
+# Decodes the stored nadeo access token,
+#   and refreshes it if possible.
+def check_token_refresh():
 
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
+    token = os.getenv("NADEO_ACCESS_TOKEN")
 
-    refresh_token = os.getenv("NADEO_REFRESH_TOKEN")
-
-    [_, payload, _] = refresh_token.split(".")
+    [_, payload, _] = token.split(".")
 
     # payload might need padding to be able to be decoded
     if len(payload) % 4:
@@ -100,6 +96,27 @@ def get_refreshtoken_expiration():
     # decode
     decodedPayload = base64.b64decode(payload)
     jsonPayload = json.loads(decodedPayload)
-    expiration = str(jsonPayload['exp'])
+    set_key(dotenv_path, "NADEO_TOKEN_RAT", str(jsonPayload['rat']))
+    set_key(dotenv_path, "NADEO_TOKEN_EXP", str(jsonPayload['exp']))
 
-    return expiration
+    current_time = int(datetime.now().timestamp())
+    expiration = int(os.getenv("NADEO_TOKEN_EXP"))
+    refresh_possible_after = int(os.getenv("NADEO_TOKEN_RAT"))
+
+    if(current_time > expiration):
+        #Authentication required
+        authenticate()
+        print("check_token_refresh: Authenticated")
+    elif(current_time > refresh_possible_after):
+        #Just refresh the token
+        refresh_access_token()
+        print("check_token_refresh: Token refreshed")
+    else:
+        print("check_token_refresh: No token refresh needed")
+
+
+def get_nadeo_access_token():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+    return os.getenv("NADEO_ACCESS_TOKEN")

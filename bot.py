@@ -1,6 +1,4 @@
 import os
-import base64
-import json
 from datetime import datetime
 
 import interactions
@@ -239,6 +237,10 @@ def update():
     # format everything nicely before sending to nadeo
         
     # send request to nadeo with all times & maps
+        
+    # get data from nadeo and format it nicely
+        
+    # update db 
 
 
 bot.start(TOKEN)
