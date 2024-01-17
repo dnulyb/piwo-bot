@@ -1,38 +1,18 @@
 import requests
-import config.data as data
-from config.settings import user_agent
+from dotenv import find_dotenv, load_dotenv
+import os
 
-map_info_url = "https://prod.trackmania.core.nadeo.online/maps/?mapUidList="
 map_record_url = "https://prod.trackmania.core.nadeo.online/mapRecords/"
-
-# Get map information from a map uid
-def get_map_data(map_uids, token):
-
-    # Build url
-    uid_str = ','.join(map_uids)
-    complete_url = map_info_url + uid_str
-
-    # Send get request
-
-    headers = {
-        'Authorization': "nadeo_v1 t=" + token,
-        'User-Agent': user_agent
-    }
-
-    res = requests.get(complete_url, headers=headers)
-    res = res.json()
-    
-    # Return the relevant data
-    map_data = [[elem["mapId"],
-                    elem["mapUid"],
-                    elem["name"]]
-                for elem in res]
-
-    return map_data
-
     
 # Get map records for a list of accounts and a list of map ids
 def get_map_records(account_ids, map_ids, token):
+
+    # Load variables from .env
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    token = os.getenv("NADEO_ACCESS_TOKEN")
+    user_agent = os.getenv("USER_AGENT")
 
     # Build url
     account_id_str = ','.join(account_ids)
@@ -61,7 +41,8 @@ def get_map_records(account_ids, map_ids, token):
                 for elem in res]
 
     # Convert ids to readable values, format the data correctly
-    records = list(map(get_record_tuple, records))
+    # not working atm
+    #records = list(map(get_record_tuple, records))
 
     return records
 
@@ -71,16 +52,20 @@ def format_map_record(record):
     return record[:-3] + "." + record[-3:]
 
 # Converts record ids to names, and formats everything nicely.
-def get_record_tuple(record):
+"""
+def get_record_tuple(record, players, maps):
+
+    #record is of the form (time, account_id, map_id)
 
     time = format_map_record(record[0])
-    name = data.player_data[record[1]]
+    name = players[record[1]]
     map = None
 
     #Get map name
-    for m in data.map_data:
+    for m in maps:
         if m[0] == record[2]:
             map = m[3] #m[2]
 
     return (time, name, map)
+"""
 

@@ -18,6 +18,7 @@ from interactions import (
 )
 
 import src.db.db as db
+from src.ubi.authentication import *
 
 
 
@@ -36,6 +37,8 @@ bot = interactions.Client(
 
 # set up db
 db.init()
+
+#TODO: Authenticate
 
 #Commands start
 
@@ -221,29 +224,21 @@ async def tournament(ctx: SlashContext, action: str, name: str = ""):
 #todo make this update a command
 def update():
 
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
     current_time = int(datetime.now().timestamp())
-    #expiration = load from .env
-    expiration = 0 #todo implement loading from dotenv
+    expiration = int(os.getenv("NADEO_TOKEN_EXP"))
 
     if(current_time > expiration):
         #nadeo token has expired, we need to refresh
+        refresh_access_token()
 
-        # first before starting the bot: (token, refreshtoken) = authenticate()
-        # then store token & refreshtoken in .env file
-        #refreshtoken = load from dotenv
-        refreshtoken = "not.implemented.justyet"
-        [prefix, payload, signature] = refreshtoken.split(".")
-
-        # payload might need padding to be able to be decoded
-        if len(payload) % 4:
-            payload += '=' * (4 - len(payload) % 4) 
-
-        decodedPayload = base64.b64decode(payload)
-        jsonPayload = json.loads(decodedPayload)
-        #curr_nadeo_time = jsonPayload['iat'] # this is basically datetime.now() from nadeo
-        expiration = str(jsonPayload['exp'])
-        # then do this: set_key(dotenv_path, "NADEO_TOKEN_EXP", expiration)
-
+    # load everything that should be updated from db
+    
+    # format everything nicely before sending to nadeo
+        
+    # send request to nadeo with all times & maps
 
 
 bot.start(TOKEN)

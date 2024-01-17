@@ -61,6 +61,7 @@ def refresh_access_token():
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
+    refresh_token = os.getenv("NADEO_REFRESH_TOKEN")
     user_agent = os.getenv("USER_AGENT")
 
     nadeo_headers = {
