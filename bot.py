@@ -222,15 +222,10 @@ async def tournament(ctx: SlashContext, action: str, name: str = ""):
 #todo make this update a command
 def update():
 
-    dotenv_path = find_dotenv()
-    load_dotenv(dotenv_path)
-
-    current_time = int(datetime.now().timestamp())
-    expiration = int(os.getenv("NADEO_TOKEN_EXP"))
-
-    if(current_time > expiration):
-        #nadeo token has expired, we need to refresh
-        refresh_access_token()
+    # Make sure we have a valid nadeo access token
+    # TODO: Move this check into a separate function that's on a timer,
+    #           so we never have an invalid token
+    check_token_refresh()
 
     # load everything that should be updated from db
     
@@ -239,8 +234,15 @@ def update():
     # send request to nadeo with all times & maps
         
     # get data from nadeo and format it nicely
+    res = [] #TODO: get nadeo data here
         
     # update db 
+    queries = []
+    for [time, player_id, map_id] in res:
+        queries.append((db.add_time, (player_id, map_id, time)))
+    conn = db.open_conn()
+    db.execute_queries(conn, queries)
+
 
 
 bot.start(TOKEN)

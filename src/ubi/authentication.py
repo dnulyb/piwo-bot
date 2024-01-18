@@ -83,9 +83,7 @@ def refresh_access_token():
 #   and refreshes it if possible.
 def check_token_refresh():
 
-    dotenv_path = find_dotenv()
-    load_dotenv(dotenv_path)
-    token = os.getenv("NADEO_ACCESS_TOKEN")
+    token = get_nadeo_access_token()
 
     [_, payload, _] = token.split(".")
 
@@ -96,12 +94,10 @@ def check_token_refresh():
     # decode
     decodedPayload = base64.b64decode(payload)
     jsonPayload = json.loads(decodedPayload)
-    set_key(dotenv_path, "NADEO_TOKEN_RAT", str(jsonPayload['rat']))
-    set_key(dotenv_path, "NADEO_TOKEN_EXP", str(jsonPayload['exp']))
 
     current_time = int(datetime.now().timestamp())
-    expiration = int(os.getenv("NADEO_TOKEN_EXP"))
-    refresh_possible_after = int(os.getenv("NADEO_TOKEN_RAT"))
+    expiration = jsonPayload['exp']
+    refresh_possible_after = jsonPayload['rat']
 
     if(current_time > expiration):
         #Authentication required
