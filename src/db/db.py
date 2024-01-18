@@ -4,11 +4,15 @@ import os.path
 db_file = os.path.join(os.path.dirname(__file__), "team.sqlite")
 db_init_sql = os.path.join(os.path.dirname(__file__), "team.sql")
 
-add_roster =            """ INSERT INTO Roster(name)
-                            VALUES(?) """
+add_roster =            """ INSERT INTO Roster(name, tournament)
+                            VALUES(?,?) """
 
 remove_roster =         """ DELETE FROM Roster
                             WHERE name=? """
+
+list_rosters =          """ SELECT name, tournament
+                            FROM Roster 
+                            ORDER BY tournament, name """
 
 add_player =            """ INSERT INTO Player(nickname, account_id)
                             VALUES(?,?) """
