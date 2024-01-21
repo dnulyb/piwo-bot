@@ -31,7 +31,7 @@ class Roster(Extension):
         try:
             query = [(db.add_roster, (name, tournament))]
             db.execute_queries(conn, query)
-            ctx.send("Created roster: " + name + ", for tournament: " + tournament)
+            await ctx.send("Created roster: " + name + ", for tournament: " + tournament)
 
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
@@ -54,7 +54,7 @@ class Roster(Extension):
         try:
             query = [(db.remove_roster, [name])]
             db.execute_queries(conn, query)
-            ctx.send("Deleted roster: " + name)
+            await ctx.send("Deleted roster: " + name)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
@@ -68,6 +68,87 @@ class Roster(Extension):
         conn = db.open_conn()
         try:
             query = (db.list_rosters, None)
+            res = db.retrieve_data(conn, query)
+            await ctx.send(f"{res}")
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+        finally:
+            conn.close() 
+
+    @slash_command(
+        name="roster_add",
+        description="Adds players to a roster. Separate player names by commas, example: 'p1,p2,p3'."
+    )
+    @slash_option(
+        name="roster",
+        description="Name of the roster you want to add players to",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="names",
+        description="Comma separated list of players you want to add to the roster.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def roster_add(self, ctx: SlashContext, roster: str, names: str):
+        
+        conn = db.open_conn()
+
+        try:
+            # Get roster id
+            roster_id = db.retrieve_data(conn, (db.get_roster_id, [roster]))
+
+            if(len(roster_id) == 0):
+                await ctx.send(f"Error occurred while running command: Roster '{roster}' not found")
+                conn.close()
+                return
+
+            roster_id = roster_id[0][0]
+
+            # Get player ids and build queries
+            player_names = names.split(',')
+            queries = []
+            for player in player_names:
+
+                player_id = db.retrieve_data(conn, (db.get_player_id, [player]))
+                if(len(player_id) == 0):
+                    await ctx.send(f"Error occurred while running command: Player '{player}' not found")
+                    conn.close()
+                    return
+                
+                player_id = player_id[0][0]
+                
+                queries.append((db.add_participant, (player_id, roster_id)))
+
+
+            db.execute_queries(conn, queries)
+            await ctx.send("Added players to roster '" + roster + "': " + names)
+
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+        finally:
+            conn.close() 
+
+    @slash_command(
+        name="registered_players",
+        description="Shows all players registered to a roster."
+    )
+    @slash_option(
+        name="tournament",
+        description="Name of the tournament you want to see roster players for",
+        required=False,
+        opt_type = OptionType.STRING
+    )
+    async def registered_players(self, ctx: SlashContext, tournament: str = None):
+
+        conn = db.open_conn()
+        try:
+            if(tournament == None):
+                query = (db.get_roster_players, None)
+            else:
+                query = (db.get_tournament_roster_players, [tournament])
+
             res = db.retrieve_data(conn, query)
             await ctx.send(f"{res}")
         except Exception as e:

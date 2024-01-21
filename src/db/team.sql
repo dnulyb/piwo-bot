@@ -2,11 +2,11 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS "Participant" (
 	"id"	INTEGER,
 	"player_id"	INTEGER NOT NULL,
-	"tournament_id"	INTEGER NOT NULL,
-	UNIQUE("player_id","tournament_id"),
+	"roster_id"	INTEGER NOT NULL,
+	UNIQUE("player_id","roster_id"),
 	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("player_id") REFERENCES "Player"("id"),
-	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id")
+	FOREIGN KEY("roster_id") REFERENCES "Roster"("id")
 );
 CREATE TABLE IF NOT EXISTS "Map" (
 	"id"	INTEGER,

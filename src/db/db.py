@@ -14,6 +14,26 @@ list_rosters =          """ SELECT name, tournament
                             FROM Roster 
                             ORDER BY tournament, name """
 
+get_roster_players =    """ SELECT Player.nickname, Roster.name
+                            FROM Participant
+                            JOIN Player ON Participant.player_id = Player.id
+                            JOIN Roster ON Participant.roster_id = Roster.id
+                            ORDER BY Roster.name, Player.nickname
+                        """
+
+get_tournament_roster_players = """ 
+                                SELECT Player.nickname, Roster.name
+                                FROM Participant
+                                JOIN Player ON Participant.player_id = Player.id
+                                JOIN Roster ON Participant.roster_id = Roster.id
+                                WHERE Roster.tournament=?
+                                ORDER BY Roster.name, Player.nickname
+                                """
+
+get_roster_id =         """ SELECT id
+                            FROM Roster
+                            WHERE name=? """
+
 add_player =            """ INSERT INTO Player(nickname, account_id)
                             VALUES(?,?) """
 
@@ -23,6 +43,10 @@ remove_player =         """ DELETE FROM Player
 list_players =          """ SELECT nickname
                             FROM Player 
                             ORDER BY (nickname) """
+
+get_player_id =         """ SELECT id
+                            FROM Player
+                            WHERE nickname=? """
 
 add_tournament =        """ INSERT INTO Tournament(name)
                             VALUES(?) """
@@ -45,11 +69,11 @@ add_map =               """ INSERT INTO Map(name, uid)
 remove_map =            """ DELETE FROM Map(name)
                             WHERE name=? """
 
-add_participant =       """ INSERT INTO Participant(player_id, tournament_id)
+add_participant =       """ INSERT INTO Participant(player_id, roster_id)
                             VALUES(?,?) """
 
 remove_participant =    """ DELETE FROM Participant
-                            WHERE player_id=? AND tournament_id=? """
+                            WHERE player_id=? AND roster_id=? """
 
 add_time =              """ INSERT INTO Time(player_id, map_id, time)
                             VALUES(?,?,?) 
@@ -73,6 +97,7 @@ def init():
 
     try:
         f = open(db_file, "x")
+        print("db file created")
     except FileExistsError:
         print("db file already exists, no new file created")
 
