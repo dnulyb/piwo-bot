@@ -62,11 +62,19 @@ auto_update_tournament = """ UPDATE Tournament
                              SET auto_update=?
                              WHERE name=? """
 
+get_tournament_id =     """ SELECT id
+                            FROM Tournament
+                            WHERE name=? """
+
 
 add_map =               """ INSERT INTO Map(name, uid)
                             VALUES(?,?) """
 
-remove_map =            """ DELETE FROM Map(name)
+remove_map =            """ DELETE FROM Map
+                            WHERE name=? """
+
+get_map_id =            """ SELECT id
+                            FROM Map
                             WHERE name=? """
 
 add_participant =       """ INSERT INTO Participant(player_id, roster_id)
@@ -80,11 +88,27 @@ add_time =              """ INSERT INTO Time(player_id, map_id, time)
                                 ON CONFLICT (player_id, map_id) DO
                                 UPDATE SET time=excluded.time"""
 
-tournament_mappack_add =    """ INSERT INTO Mappack(tournament_id, map_id)
+add_to_mappack =        """ INSERT INTO Mappack(tournament_id, map_id)
                             VALUES(?,?) """
 
-tournament_mappack_remove = """ DELETE FROM Mappack
-                                WHERE tournament_id=? AND map_id=? """
+#only map_id needed
+remove_from_mappack =   """ DELETE FROM Mappack
+                            WHERE map_id=? """
+
+get_maps =              """ SELECT Map.name, Tournament.name
+                            FROM Mappack
+                            JOIN Map ON Mappack.map_id = Map.id
+                            JOIN Tournament ON Mappack.tournament_id = Tournament.id
+                            ORDER BY Tournament.name, Map.name
+                        """
+
+get_tournament_maps =   """ SELECT Map.name
+                            FROM Mappack
+                            JOIN Map ON Mappack.map_id = Map.id
+                            JOIN Tournament ON Mappack.tournament_id = Tournament.id
+                            WHERE Tournament.name=?
+                            ORDER BY Map.name
+                        """
 
 
 def open_conn():

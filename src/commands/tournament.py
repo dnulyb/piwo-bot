@@ -80,3 +80,4 @@ class Tournament(Extension):
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
             conn.close() 
+
