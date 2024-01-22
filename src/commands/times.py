@@ -14,7 +14,7 @@ from src.ubi.records import(
     get_map_records
 )
 
-class UpdateTimes(Extension):
+class Times(Extension):
 
     @slash_command(
         name="update",
@@ -120,6 +120,102 @@ class UpdateTimes(Extension):
 
             await ctx.send(f"Updated times for tournament: " + tournament)
 
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+        finally:
+            conn.close()
+
+
+    @slash_command(
+        name="top_x",
+        description="Retrieves the top X times for a map."
+    )
+    @slash_option(
+        name="map_name",
+        description="Name of the map you want retrieve times maps for",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="x",
+        description="How many times you want to retrieve.",
+        required=True,
+        opt_type = OptionType.INTEGER   
+    )
+    async def top_x(self, ctx: SlashContext, map_name: str, x: int):
+
+        conn = db.open_conn()
+
+        try:
+            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, x)))
+            await ctx.send(f"{res}")
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+        finally:
+            conn.close()
+
+    @slash_command(
+        name="top5",
+        description="Retrieves the top 5 times for a map."
+    )
+    @slash_option(
+        name="map_name",
+        description="Name of the map you want retrieve times maps for",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def top5(self, ctx: SlashContext, map_name: str):
+
+        conn = db.open_conn()
+
+        try:
+            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 5)))
+            await ctx.send(f"{res}")
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+        finally:
+            conn.close()
+
+    @slash_command(
+        name="top10",
+        description="Retrieves the top 10 times for a map."
+    )
+    @slash_option(
+        name="map_name",
+        description="Name of the map you want retrieve times maps for",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def top10(self, ctx: SlashContext, map_name: str):
+
+        conn = db.open_conn()
+
+        try:
+            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 10)))
+            await ctx.send(f"{res}")
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+        finally:
+            conn.close()
+
+
+    @slash_command(
+        name="leaderboard",
+        description="Retrieves all times for a map. A maximum of 50 times will be retrieved."
+    )
+    @slash_option(
+        name="map_name",
+        description="Name of the map you want retrieve times maps for",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def leaderboard(self, ctx: SlashContext, map_name: str):
+
+        conn = db.open_conn()
+
+        try:
+            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 50)))
+            await ctx.send(f"{res}")
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:

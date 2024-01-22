@@ -98,6 +98,14 @@ add_time =              """ INSERT INTO Time(player_id, map_id, time)
                                 UPDATE SET time=excluded.time"""
 
 #TODO: get times
+get_n_map_times =       """ SELECT Player.nickname, Time.time  
+                            FROM Map
+                            JOIN Time ON Time.map_id = Map.id
+                            JOIN Player ON Player.id = Time.id
+                            WHERE Map.name=?
+                            ORDER BY CAST (Time.time AS DECIMAL) ASC
+                            LIMIT ?
+                        """
 
 
 add_to_mappack =        """ INSERT INTO Mappack(tournament_id, map_id)
