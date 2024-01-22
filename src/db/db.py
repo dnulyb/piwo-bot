@@ -15,7 +15,7 @@ list_rosters =          """ SELECT Roster.name, Tournament.name
                             JOIN Tournament ON Roster.tournament_id = Tournament.id 
                             ORDER BY Tournament.name, Roster.name """
 
-get_roster_players =    """ SELECT Player.nickname, Roster.name
+get_roster_players =    """ SELECT Player.nickname, Player.account_id, Roster.name
                             FROM Participant
                             JOIN Player ON Participant.player_id = Player.id
                             JOIN Roster ON Participant.roster_id = Roster.id
@@ -49,6 +49,10 @@ get_player_id =         """ SELECT id
                             FROM Player
                             WHERE nickname=? """
 
+get_player_id_by_account_id = """ SELECT id
+                            FROM Player
+                            WHERE account_id=? """
+
 add_tournament =        """ INSERT INTO Tournament(name)
                             VALUES(?) """
 
@@ -78,6 +82,10 @@ get_map_id =            """ SELECT id
                             FROM Map
                             WHERE name=? """
 
+get_map_db_id_by_map_id = """ SELECT id
+                            FROM Map
+                            WHERE uid=? """
+
 add_participant =       """ INSERT INTO Participant(player_id, roster_id)
                             VALUES(?,?) """
 
@@ -88,6 +96,9 @@ add_time =              """ INSERT INTO Time(player_id, map_id, time)
                             VALUES(?,?,?) 
                                 ON CONFLICT (player_id, map_id) DO
                                 UPDATE SET time=excluded.time"""
+
+#TODO: get times
+
 
 add_to_mappack =        """ INSERT INTO Mappack(tournament_id, map_id)
                             VALUES(?,?) """

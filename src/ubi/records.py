@@ -39,6 +39,9 @@ def get_map_records(account_ids, map_ids, token):
                     elem["accountId"],
                     elem["mapId"]] 
                 for elem in res]
+    
+    for record in records:
+        record[0] = format_map_record(record[0])
 
     # Convert ids to readable values, format the data correctly
     # not working atm

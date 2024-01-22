@@ -141,6 +141,61 @@ class Roster(Extension):
             conn.close() 
 
     @slash_command(
+        name="roster_remove",
+        description="Removes players from a roster. Separate player names by commas, example: 'p1,p2,p3'."
+    )
+    @slash_option(
+        name="roster",
+        description="Name of the roster you want to remove players from",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="names",
+        description="Comma separated list of players you want to add to the roster.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def roster_remove(self, ctx: SlashContext, roster: str, names: str):
+        
+        conn = db.open_conn()
+
+        try:
+            # Get roster id
+            roster_id = db.retrieve_data(conn, (db.get_roster_id, [roster]))
+
+            if(len(roster_id) == 0):
+                await ctx.send(f"Error occurred while running command: Roster '{roster}' not found")
+                conn.close()
+                return
+
+            roster_id = roster_id[0][0]
+
+            # Get player ids and build queries
+            player_names = names.split(',')
+            queries = []
+            for player in player_names:
+
+                player_id = db.retrieve_data(conn, (db.get_player_id, [player]))
+                if(len(player_id) == 0):
+                    await ctx.send(f"Error occurred while running command: Player '{player}' not found")
+                    conn.close()
+                    return
+                
+                player_id = player_id[0][0]
+                
+                queries.append((db.remove_participant, (player_id, roster_id)))
+
+
+            db.execute_queries(conn, queries)
+            await ctx.send("Added players to roster '" + roster + "': " + names)
+
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+        finally:
+            conn.close() 
+
+    @slash_command(
         name="registered_players",
         description="Shows all players registered to a roster."
     )

@@ -97,6 +97,9 @@ def check_token_refresh():
 
     current_time = int(datetime.now().timestamp())
     expiration = jsonPayload['exp']
+    #print("current: ", current_time)
+    #print("expiration: ", expiration)
+
     refresh_possible_after = jsonPayload['rat']
 
     if(current_time > expiration):

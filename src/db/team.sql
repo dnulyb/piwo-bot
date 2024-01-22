@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS "Participant" (
 	"roster_id"	INTEGER NOT NULL,
 	UNIQUE("player_id","roster_id"),
 	PRIMARY KEY("id" AUTOINCREMENT),
-	FOREIGN KEY("player_id") REFERENCES "Player"("id"),
-	FOREIGN KEY("roster_id") REFERENCES "Roster"("id")
+	FOREIGN KEY("player_id") REFERENCES "Player"("id") ON DELETE CASCADE,
+	FOREIGN KEY("roster_id") REFERENCES "Roster"("id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "Map" (
 	"id"	INTEGER,
@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS "Mappack" (
 	"map_id"	INTEGER,
 	UNIQUE("tournament_id","map_id"),
 	PRIMARY KEY("id" AUTOINCREMENT),
-	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id"),
-	FOREIGN KEY("map_id") REFERENCES "Map"("id")
+	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id") ON DELETE CASCADE,
+	FOREIGN KEY("map_id") REFERENCES "Map"("id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "Time" (
 	"id"	INTEGER,
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS "Time" (
 	"time"	TEXT NOT NULL,
 	UNIQUE("player_id","map_id"),
 	PRIMARY KEY("id" AUTOINCREMENT),
-	FOREIGN KEY("player_id") REFERENCES "Player"("id"),
-	FOREIGN KEY("map_id") REFERENCES "Map"("id")
+	FOREIGN KEY("player_id") REFERENCES "Player"("id") ON DELETE CASCADE,
+	FOREIGN KEY("map_id") REFERENCES "Map"("id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "Tournament" (
 	"id"	INTEGER,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "Roster" (
 	"name"	TEXT NOT NULL UNIQUE,
 	"tournament_id"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT),
-	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id")
+	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "Player" (
 	"id"	INTEGER,
