@@ -4,15 +4,16 @@ import os.path
 db_file = os.path.join(os.path.dirname(__file__), "team.sqlite")
 db_init_sql = os.path.join(os.path.dirname(__file__), "team.sql")
 
-add_roster =            """ INSERT INTO Roster(name, tournament)
+add_roster =            """ INSERT INTO Roster(name, tournament_id)
                             VALUES(?,?) """
 
 remove_roster =         """ DELETE FROM Roster
                             WHERE name=? """
 
-list_rosters =          """ SELECT name, tournament
-                            FROM Roster 
-                            ORDER BY tournament, name """
+list_rosters =          """ SELECT Roster.name, Tournament.name
+                            FROM Roster
+                            JOIN Tournament ON Roster.tournament_id = Tournament.id 
+                            ORDER BY Tournament.name, Roster.name """
 
 get_roster_players =    """ SELECT Player.nickname, Roster.name
                             FROM Participant
@@ -22,11 +23,11 @@ get_roster_players =    """ SELECT Player.nickname, Roster.name
                         """
 
 get_tournament_roster_players = """ 
-                                SELECT Player.nickname, Roster.name
+                                SELECT Player.nickname, Player.account_id, Roster.name
                                 FROM Participant
                                 JOIN Player ON Participant.player_id = Player.id
                                 JOIN Roster ON Participant.roster_id = Roster.id
-                                WHERE Roster.tournament=?
+                                WHERE Roster.tournament_id=?
                                 ORDER BY Roster.name, Player.nickname
                                 """
 
@@ -102,11 +103,11 @@ get_maps =              """ SELECT Map.name, Tournament.name
                             ORDER BY Tournament.name, Map.name
                         """
 
-get_tournament_maps =   """ SELECT Map.name
+get_tournament_maps =   """ SELECT Map.name, Map.uid
                             FROM Mappack
                             JOIN Map ON Mappack.map_id = Map.id
                             JOIN Tournament ON Mappack.tournament_id = Tournament.id
-                            WHERE Tournament.name=?
+                            WHERE Tournament.id=?
                             ORDER BY Map.name
                         """
 

@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS "Tournament" (
 CREATE TABLE IF NOT EXISTS "Roster" (
 	"id"	INTEGER,
 	"name"	TEXT NOT NULL UNIQUE,
-	"tournament"	TEXT NOT NULL,
+	"tournament_id"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT),
-	FOREIGN KEY("tournament") REFERENCES "Tournament"("name")
+	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id")
 );
 CREATE TABLE IF NOT EXISTS "Player" (
 	"id"	INTEGER,

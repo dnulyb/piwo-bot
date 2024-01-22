@@ -8,6 +8,7 @@ from interactions import (
 )
 import src.db.db as db
 
+
 class Tournament(Extension):
 
     @slash_command(
@@ -80,4 +81,8 @@ class Tournament(Extension):
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
             conn.close() 
+
+    
+    
+
 

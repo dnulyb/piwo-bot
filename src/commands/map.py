@@ -6,6 +6,9 @@ from interactions import (
     OptionType
 )
 import src.db.db as db
+from src.ubi.authentication import(
+    check_token_refresh
+)
 
 class Map(Extension):
 
@@ -128,5 +131,56 @@ class Map(Extension):
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
             conn.close() 
+
+
+
+    #todo make this update a command
+    async def update(self, ctx: SlashContext, tournament: str = None):
+
+        # Make sure we have a valid nadeo access token
+        # TODO: Move this check into a separate function that's on a timer,
+        #           so we never have an invalid token
+        check_token_refresh()
+
+        try:
+
+            # load everything that should be updated from db:
+            # Get tournament map ids
+            tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
+
+            if(len(tournament_id) == 0):
+                print(f"Error occurred while running command: Tournament '{tournament}' not found")
+                conn.close()
+                quit()
+
+            tournament_id = tournament_id[0][0]
+            maps = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
+
+            map_names = []
+            map_ids = []
+            for (map_name, map_id) in maps:
+                map_names.append(map_name)
+                map_ids.append(map_id)
+            
+            print(map_names)
+            print(map_ids)
+            # Get tournament player ids 
+            player_ids = []
+                    
+            # get data from nadeo and format it nicely
+            #res = get_map_records(player_ids, map_ids, token)
+            res = []
+                
+            # update db 
+            queries = []
+            for [time, player_id, map_id] in res:
+                queries.append((db.add_time, (player_id, map_id, time)))
+            conn = db.open_conn()
+            db.execute_queries(conn, queries)
+            conn.close()
+        except Exception as e:
+            print(e)
+        finally:
+            conn.close()
 
 

@@ -80,7 +80,7 @@ def refresh_access_token():
 
 
 # Decodes the stored nadeo access token,
-#   and refreshes it if possible.
+#   and refreshes it if needed.
 def check_token_refresh():
 
     token = get_nadeo_access_token()
