@@ -1,7 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from dotenv import find_dotenv, load_dotenv, set_key
-import os
+from dotenv import find_dotenv, load_dotenv, set_key, get_key
 import base64
 import json
 from datetime import datetime
@@ -18,9 +17,9 @@ def authenticate():
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    user_agent = os.getenv("USER_AGENT")
-    login = os.getenv("UBI_LOGIN")
-    password = os.getenv("UBI_PASSWORD")
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+    login = get_key(dotenv_path, ("UBI_LOGIN"))
+    password = get_key(dotenv_path, ("UBI_PASSWORD"))
 
     # Get ubisoft authentication ticket
     ubi_headers = {
@@ -60,8 +59,8 @@ def refresh_access_token():
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    refresh_token = os.getenv("NADEO_REFRESH_TOKEN")
-    user_agent = os.getenv("USER_AGENT")
+    refresh_token = get_key(dotenv_path, ("NADEO_REFRESH_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
 
     nadeo_headers = {
         'Content-Type': 'application/json',
@@ -118,4 +117,4 @@ def get_nadeo_access_token():
 
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
-    return os.getenv("NADEO_ACCESS_TOKEN")
+    return get_key(dotenv_path, ("NADEO_ACCESS_TOKEN"))

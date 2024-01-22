@@ -3,6 +3,7 @@ config/
 notes
 *.sqlite
 main.py
+*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,6 +1,5 @@
 import requests
-from dotenv import find_dotenv, load_dotenv
-import os
+from dotenv import find_dotenv, load_dotenv, get_key
 
 map_record_url = "https://prod.trackmania.core.nadeo.online/mapRecords/"
     
@@ -11,8 +10,8 @@ def get_map_records(account_ids, map_ids, token):
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    token = os.getenv("NADEO_ACCESS_TOKEN")
-    user_agent = os.getenv("USER_AGENT")
+    token = get_key(dotenv_path, ("NADEO_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
 
     # Build url
     account_id_str = ','.join(account_ids)
