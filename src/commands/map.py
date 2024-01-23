@@ -6,9 +6,6 @@ from interactions import (
     OptionType
 )
 import src.db.db as db
-from src.ubi.authentication import(
-    check_token_refresh
-)
 
 class Map(Extension):
 

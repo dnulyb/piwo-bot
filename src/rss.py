@@ -3,53 +3,60 @@ from dateutil import parser
 from dotenv import find_dotenv, load_dotenv, set_key, get_key
 import io
 
-#TODO: Make this into a command that runs every 30 minutes
-
 #url = "https://lorem-rss.herokuapp.com/feed" #test url
 
-dotenv_path = find_dotenv()
-load_dotenv(dotenv_path)
+def check_for_new_tweets():
 
-latest_tweet = parser.parse(get_key(dotenv_path, "LATEST_TWEET_DATE"))
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
 
-base_url = get_key(dotenv_path, ("NITTER_BASE_URL"))
-account_url = get_key(dotenv_path, ("NITTER_ACCOUNT_URL"))
-complete_url = base_url + account_url + "/rss"
+    latest_tweet = parser.parse(get_key(dotenv_path, "LATEST_TWEET_DATE"))
 
-#feed = fp.parse(complete_url) # Use this to get from url
+    base_url = get_key(dotenv_path, ("NITTER_BASE_URL"))
+    account_url = get_key(dotenv_path, ("NITTER_ACCOUNT_URL"))
+    complete_url = base_url + account_url + "/rss"
 
-# Use this to get from file
-f = open("src/test_rss_feed.txt", "r")
-text = f.read()
-f.close()
-feed = fp.parse(io.BytesIO(bytes(text, 'utf-8')))
+    feed = fp.parse(complete_url) # Use this to get from url
 
-entries = feed.entries
+    """
+    # Use this to get from file
+    f = open("src/test_rss_feed.txt", "r")
+    text = f.read()
+    f.close()
+    feed = fp.parse(io.BytesIO(bytes(text, 'utf-8')))
+    """
 
-latest_of_new_tweets = latest_tweet
-# Reverse the entries to process older tweets first,
-#   in case there are multiple new ones
-for entry in reversed(entries):
+    entries = feed.entries
 
-    link = entry.link
+    latest_of_new_tweets = latest_tweet
+    # Reverse the entries to process older tweets first,
+    #   in case there are multiple new ones
+    new_tweets = []
+    for entry in reversed(entries):
 
-    # Ignore retweets
-    if account_url not in link:
-        continue
+        link = entry.link
 
-    # Ignore old tweets
-    #   Note: When comparing parsed dates, Greater = later.
-    time = parser.parse(entry.published)
-    if latest_tweet >= time:
-        continue
+        # Ignore retweets
+        if account_url not in link:
+            continue
 
-    # Update the latest known tweet
-    if time > latest_of_new_tweets:
-        set_key(dotenv_path, "LATEST_TWEET_DATE", str(time))
-        latest_of_new_tweets = parser.parse(get_key(dotenv_path, "LATEST_TWEET_DATE"))
+        # Ignore old tweets
+        #   Note: When comparing parsed dates, Greater = later.
+        time = parser.parse(entry.published)
+        if latest_tweet >= time:
+            continue
 
-    replacement_url = get_key(dotenv_path, "FXTWITTER_URL")
-    replaced_link = link.replace(base_url, replacement_url)
+        # Update the latest known tweet
+        if time > latest_of_new_tweets:
+            set_key(dotenv_path, "LATEST_TWEET_DATE", str(time))
+            latest_of_new_tweets = parser.parse(get_key(dotenv_path, "LATEST_TWEET_DATE"))
 
-    # Send the replaced link to discord
+        replacement_url = get_key(dotenv_path, "FXTWITTER_URL")
+        final_link = link.replace(base_url, replacement_url)
+        # clean trailing '#m' in links
+        final_link = final_link.replace('#m', '')
+
+        new_tweets.append(final_link)
+    
+    return new_tweets
 

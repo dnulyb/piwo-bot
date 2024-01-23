@@ -39,12 +39,9 @@ def get_map_records(account_ids, map_ids, token):
                     elem["mapId"]] 
                 for elem in res]
     
+    # Format time correctly
     for record in records:
         record[0] = format_map_record(record[0])
-
-    # Convert ids to readable values, format the data correctly
-    # not working atm
-    #records = list(map(get_record_tuple, records))
 
     return records
 
@@ -53,21 +50,4 @@ def format_map_record(record):
     record = str(record)
     return record[:-3] + "." + record[-3:]
 
-# Converts record ids to names, and formats everything nicely.
-"""
-def get_record_tuple(record, players, maps):
-
-    #record is of the form (time, account_id, map_id)
-
-    time = format_map_record(record[0])
-    name = players[record[1]]
-    map = None
-
-    #Get map name
-    for m in maps:
-        if m[0] == record[2]:
-            map = m[3] #m[2]
-
-    return (time, name, map)
-"""
 

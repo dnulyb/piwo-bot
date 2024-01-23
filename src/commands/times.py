@@ -7,7 +7,6 @@ from interactions import (
 )
 import src.db.db as db
 from src.ubi.authentication import(
-    check_token_refresh,
     get_nadeo_access_token
 )
 from src.ubi.records import(
@@ -80,11 +79,6 @@ class Times(Extension):
                     
             # get data from nadeo and format it nicely
             print("Retrieving nadeo data for tournament: " + tournament)
-
-            # Make sure we have a valid nadeo access token
-            # TODO: Move this check into a separate function that's on a timer,
-            #           so we never have an invalid token
-            check_token_refresh()
 
             token = get_nadeo_access_token()
             res = get_map_records(player_ids, map_ids, token)
