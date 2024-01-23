@@ -64,6 +64,19 @@ def authenticate():
     set_key(dotenv_path, "NADEO_CLUBSERVICES_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
 
+    #Another nadeo request with "NadeoLiveServices" audience
+    nadeo_body = {
+        'audience':'NadeoLiveServices'
+    }
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
+    nadeo_res = nadeo_res.json()
+
+    access_token = nadeo_res['accessToken']
+    refresh_token = nadeo_res['refreshToken']
+    set_key(dotenv_path, "NADEO_LIVESERVICES_ACCESS_TOKEN", str(access_token))
+    set_key(dotenv_path, "NADEO_LIVESERVICES_REFRESH_TOKEN", str(refresh_token))
+
+
 
 # Updates the nadeo access token in .env
 def refresh_access_tokens():
@@ -104,12 +117,36 @@ def refresh_access_tokens():
     nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
     nadeo_res = nadeo_res.json()
 
-    access_token = nadeo_res['accessToken']
-    refresh_token = nadeo_res['refreshToken']
-    set_key(dotenv_path, "NADEO_CLUBSERVICES_ACCESS_TOKEN", str(access_token))
-    set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
-    
+    try:
+        access_token = nadeo_res['accessToken']
+        refresh_token = nadeo_res['refreshToken']
+        set_key(dotenv_path, "NADEO_CLUBSERVICES_ACCESS_TOKEN", str(access_token))
+        set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
+    except KeyError as e:
+        print(f"Refresh club services token: {e}")
 
+    # LiveServices
+    refresh_token = get_key(dotenv_path, ("NADEO_LIVESERVICES_REFRESH_TOKEN"))
+    nadeo_headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'nadeo_v1 t=' + refresh_token,
+        'User-Agent': user_agent
+    }
+
+    nadeo_body = {
+        'audience':'NadeoLiveServices'
+    }
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
+    nadeo_res = nadeo_res.json()
+
+    try:
+        access_token = nadeo_res['accessToken']
+        refresh_token = nadeo_res['refreshToken']
+        set_key(dotenv_path, "NADEO_LIVESERVICES_ACCESS_TOKEN", str(access_token))
+        set_key(dotenv_path, "NADEO_LIVESERVICES_REFRESH_TOKEN", str(refresh_token))
+
+    except KeyError as e:
+        print(f"Refresh live services token: {e}")
 
 # Decodes the stored nadeo access token,
 #   and refreshes it if needed.

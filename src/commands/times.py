@@ -24,7 +24,7 @@ class Times(Extension):
     )
     @slash_option(
         name="tournament",
-        description="Name of the tournament you want to see maps for",
+        description="Name of the tournament you want update times for",
         required=True,
         opt_type = OptionType.STRING
     )

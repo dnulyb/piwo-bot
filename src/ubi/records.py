@@ -2,6 +2,7 @@ import requests
 from dotenv import find_dotenv, load_dotenv, get_key
 
 map_record_url = "https://prod.trackmania.core.nadeo.online/mapRecords/"
+map_info_url = "https://prod.trackmania.core.nadeo.online/maps/?mapUidList="
     
 # Get map records for a list of accounts and a list of map ids
 def get_map_records(account_ids, map_ids, token):
@@ -51,3 +52,36 @@ def format_map_record(record):
     return record[:-3] + "." + record[-3:]
 
 
+
+# Get map information from a map uid
+def get_map_data(map_uids):
+
+    # Load variables from .env
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    token = get_key(dotenv_path, ("NADEO_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Build url
+    uid_str = ','.join(map_uids)
+    complete_url = map_info_url + uid_str
+    print(complete_url)
+
+    # Send get request
+
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(complete_url, headers=headers)
+    res = res.json()
+    
+    # Return the relevant data
+    map_data = [[elem["mapId"],
+                    elem["mapUid"],
+                    elem["name"]]
+                for elem in res]
+
+    return map_data
