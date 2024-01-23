@@ -110,11 +110,7 @@ def refresh_access_tokens():
         'Authorization': 'nadeo_v1 t=' + refresh_token,
         'User-Agent': user_agent
     }
-
-    nadeo_body = {
-        'audience':'NadeoClubServices'
-    }
-    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers)
     nadeo_res = nadeo_res.json()
 
     try:
@@ -133,10 +129,7 @@ def refresh_access_tokens():
         'User-Agent': user_agent
     }
 
-    nadeo_body = {
-        'audience':'NadeoLiveServices'
-    }
-    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers)
     nadeo_res = nadeo_res.json()
 
     try:

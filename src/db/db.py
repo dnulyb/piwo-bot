@@ -15,6 +15,14 @@ list_rosters =          """ SELECT Roster.name, Tournament.name
                             JOIN Tournament ON Roster.tournament_id = Tournament.id 
                             ORDER BY Tournament.name, Roster.name """
 
+get_specific_roster_players = """   SELECT Player.nickname, Player.account_id
+                                    FROM Participant
+                                    JOIN Player ON Participant.player_id = Player.id
+                                    JOIN Roster ON Participant.roster_id = Roster.id
+                                    WHERE Roster.name=?
+                                    ORDER BY Player.nickname
+                                """
+
 get_roster_players =    """ SELECT Player.nickname, Player.account_id, Roster.name
                             FROM Participant
                             JOIN Player ON Participant.player_id = Player.id
