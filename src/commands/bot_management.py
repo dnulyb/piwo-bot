@@ -7,7 +7,9 @@ from interactions import (
     Client,
     listen,
     Task,
-    IntervalTrigger
+    IntervalTrigger,
+    cooldown,
+    Buckets
 )
 from interactions.api.events import Startup
 
@@ -58,6 +60,7 @@ class BotManagement(Extension):
         name="ping",
         description="Replies to pings",
     )
+    @cooldown(Buckets.GUILD, 1, 60)
     async def ping(self, ctx: SlashContext):
         await ctx.send("pong")
 

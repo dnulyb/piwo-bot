@@ -3,7 +3,10 @@ from interactions import (
     slash_command, 
     slash_option, 
     SlashContext,
-    OptionType
+    OptionType,
+    Embed,
+    cooldown,
+    Buckets
 )
 import src.db.db as db
 from src.ubi.authentication import(
@@ -25,6 +28,7 @@ class Times(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
+    @cooldown(Buckets.GUILD, 1, 60)
     async def update(self, ctx: SlashContext, tournament: str = None):
 
         await ctx.defer()
@@ -209,8 +213,40 @@ class Times(Extension):
 
         try:
             res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 50)))
-            await ctx.send(f"{res}")
+
+            if len(res) == 0:
+                await ctx.send("Error retrieving leaderboard times: No times found.")
+                conn.close()
+                return
+            
+            embed = format_leaderboard_embed(map_name, res)
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
             conn.close()
+
+
+#times: [(player, time)]
+#   where the first entry is the best time
+def format_leaderboard_embed(map_name, times):
+
+    embed = Embed()
+    embed.title = map_name
+    all_positions = ""
+    all_players = ""
+    all_times = ""
+
+    for i, time in enumerate(times, start=1):
+
+        (nickname, record) = time
+        pos = str(i) + "."
+        all_positions += pos + "\n"
+        all_players += nickname + "\n"
+        all_times += record + "\n"
+
+    embed.add_field(name="Pos", value=all_positions, inline=True)
+    embed.add_field(name="Player", value=all_players, inline=True)
+    embed.add_field(name="Time", value=all_times, inline=True)
+
+    return embed
