@@ -52,9 +52,21 @@ def authenticate():
     set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
+    #Another nadeo request with "NadeoClubServices" audience
+    nadeo_body = {
+        'audience':'NadeoClubServices'
+    }
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
+    nadeo_res = nadeo_res.json()
+
+    access_token = nadeo_res['accessToken']
+    refresh_token = nadeo_res['refreshToken']
+    set_key(dotenv_path, "NADEO_CLUBSERVICES_ACCESS_TOKEN", str(access_token))
+    set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
+
 
 # Updates the nadeo access token in .env
-def refresh_access_token():
+def refresh_access_tokens():
 
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
@@ -76,6 +88,27 @@ def refresh_access_token():
     refresh_token = nadeo_res['refreshToken']
     set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
+
+
+    # ClubServices
+    refresh_token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_REFRESH_TOKEN"))
+    nadeo_headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'nadeo_v1 t=' + refresh_token,
+        'User-Agent': user_agent
+    }
+
+    nadeo_body = {
+        'audience':'NadeoClubServices'
+    }
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
+    nadeo_res = nadeo_res.json()
+
+    access_token = nadeo_res['accessToken']
+    refresh_token = nadeo_res['refreshToken']
+    set_key(dotenv_path, "NADEO_CLUBSERVICES_ACCESS_TOKEN", str(access_token))
+    set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
+    
 
 
 # Decodes the stored nadeo access token,
@@ -107,7 +140,7 @@ def check_token_refresh():
         print("check_token_refresh: Authenticated")
     elif(current_time > refresh_possible_after):
         #Just refresh the token
-        refresh_access_token()
+        refresh_access_tokens()
         print("check_token_refresh: Token refreshed")
     else:
         print("check_token_refresh: No token refresh needed")
