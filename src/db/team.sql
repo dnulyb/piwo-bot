@@ -50,6 +50,9 @@ CREATE TABLE IF NOT EXISTS "Player" (
 	"id"	INTEGER,
 	"nickname"	TEXT NOT NULL UNIQUE,
 	"account_id"	TEXT NOT NULL UNIQUE,
+	"country"	TEXT,
+	"official_roster"	TEXT,
+	"extra"	TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 COMMIT;

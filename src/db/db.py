@@ -43,15 +43,28 @@ get_roster_id =         """ SELECT id
                             FROM Roster
                             WHERE name=? """
 
-add_player =            """ INSERT INTO Player(nickname, account_id)
-                            VALUES(?,?) """
+add_player =            """ INSERT INTO Player(nickname, account_id, country, official_roster, extra)
+                            VALUES(?,?,?,?,?) """
 
 remove_player =         """ DELETE FROM Player
                             WHERE nickname=? """
 
-list_players =          """ SELECT nickname
+list_players =          """ SELECT nickname, country, official_roster
                             FROM Player 
-                            ORDER BY (nickname) """
+                            ORDER BY (Player.id) """
+
+update_player_country = """ UPDATE Player
+                            SET country=?
+                            WHERE nickname=? """
+
+update_player_official_roster = """ UPDATE Player
+                                    SET official_roster=?
+                                    WHERE nickname=? """
+
+update_player_extra =           """ UPDATE Player
+                                    SET extra=?
+                                    WHERE nickname=? """
+                            
 
 get_player_id =         """ SELECT id
                             FROM Player
@@ -161,6 +174,17 @@ def init():
 
     cursor.close()
     conn.close()
+
+def run_script(script):
+
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+
+    cursor.executescript(script)
+
+    cursor.close()
+    conn.close()
+
 
 # Executes all queries provided, queries is a list of (sql, params)
 #   Single param has to be in the form [a]

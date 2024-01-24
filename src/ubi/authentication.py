@@ -4,6 +4,7 @@ from dotenv import find_dotenv, load_dotenv, set_key, get_key
 import base64
 import json
 from datetime import datetime
+import time
 
 ubi_url = "https://public-ubiservices.ubi.com/v3/profiles/sessions"
 ubi_appid = "86263886-327a-4328-ac69-527f0d20a237"
@@ -194,6 +195,9 @@ def check_token_refresh():
     else:
         print("check_token_refresh: No token refresh needed")
 
+    #stagger requests a bit
+    time.sleep(0.5)
+
     #club
     token = get_nadeo_club_access_token()
 
@@ -224,6 +228,9 @@ def check_token_refresh():
         print("check_token_refresh: CLUB token refreshed")
     else:
         print("check_token_refresh: No CLUB token refresh needed")
+
+    #stagger requests a bit
+    time.sleep(0.5)
 
     #live
     token = get_nadeo_live_access_token()
