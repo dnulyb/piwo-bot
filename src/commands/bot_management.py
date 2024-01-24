@@ -180,9 +180,7 @@ class BotManagement(Extension):
             await ctx.send("No cotd quali could be found, try again around cotd time.")
             return
 
-        (map_id, _, map_name) = get_totd_map_info()
-        set_key(dotenv_path, "TOTD_MAP_ID", map_id)
-        set_key(dotenv_path, "TOTD_MAP_NAME", map_name)
+        (_, _, map_name) = get_totd_map_info()
         
         embed = format_cotd_quali_results(map_name, results)
 

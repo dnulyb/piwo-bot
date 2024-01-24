@@ -28,6 +28,8 @@ class Cotd(Extension):
     @cooldown(Buckets.GUILD, 1, 60)
     async def totd_leaderboard(self, ctx: SlashContext):
 
+        await ctx.defer()
+
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
 
@@ -53,15 +55,19 @@ class Cotd(Extension):
         print("Retrieving nadeo TOTD data")
 
         token = get_nadeo_access_token()
-        res = get_map_records(player_ids, map_ids, token)
+        totd_data = get_map_records(player_ids, map_ids, token)
 
-        print(res)
+        totd_results = []
+        for (player_time, player_id, _) in totd_data:
+            for (cotd_player_name, cotd_player_id) in cotd_players:
+                if player_id == cotd_player_id:
+                    totd_results.append((cotd_player_name, player_time))
 
-        await ctx.send("Finished retrieving TOTD data.")
+        sorted_results = sorted(totd_results, key=lambda x:x[1])
 
+        embed = format_totd_leaderboard(totd_name, sorted_results)
 
-
-        return
+        await ctx.send(embed=embed)
 
 
 
@@ -124,3 +130,30 @@ def format_cotd_quali_results(map_name, results):
 
 def div(pos):
     return math.ceil(pos/64)
+
+
+def format_totd_leaderboard(map_name, players):
+
+
+    embed = Embed()
+    embed.title = "TOTD internal leaderboard:"
+    embed.description = "Map: " + map_name
+
+    #Format everything nicely inside a code block
+    header_format = "{:^3s} {:^15s} {:^10s} \n"
+    format =        "{:^3s} {:15s} {:^10s} \n"
+
+    everything = "```\n"
+    everything += header_format.format("Pos", "Player", "Time")
+
+    for i, player in enumerate(players, start=1):
+        (name, time) = player
+        pos = str(i) + "."
+        everything += format.format(pos, name, time)
+        
+    everything += "```"
+
+    field_name = '\u200b'
+    embed.add_field(name=field_name, value=everything, inline=True)
+
+    return embed
