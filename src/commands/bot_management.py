@@ -1,6 +1,9 @@
 from interactions import (
     Extension,
     slash_command, 
+    slash_option,
+    OptionType,
+    SlashCommandChoice,
     SlashContext,
     check, 
     is_owner,
@@ -10,7 +13,7 @@ from interactions import (
     IntervalTrigger,
     TimeTrigger,
     cooldown,
-    Buckets
+    Buckets,
 )
 from interactions.api.events import Startup
 
@@ -21,6 +24,13 @@ from dotenv import find_dotenv, load_dotenv, get_key
 import src.db.db as db
 from src.ubi.authentication import check_token_refresh
 from src.rss import check_for_new_tweets
+from src.cotd import (
+    get_cotd_quali_results, 
+    format_cotd_quali_results,
+)
+from src.ubi.cotd_totd_data import (
+    get_totd_map_info
+)
 
 """
 #custom check example
@@ -99,34 +109,84 @@ class BotManagement(Extension):
 
         print("Finished checking for new tweets.")
 
+    @slash_command(
+        name="tweets_toggle",
+        description="Turn tweets ON or OFF."
+    )
+    @slash_option(
+        name="toggle",
+        description="ON/OFF",
+        required=True,
+        opt_type = OptionType.STRING,
+        choices=[
+            SlashCommandChoice(name="ON", value="ON"),
+            SlashCommandChoice(name="OFF", value="OFF"),
+        ]
+    )
+    async def tweets_toggle(self, ctx: SlashContext, toggle: str):
+
+        if toggle == "ON":
+            self.check_tweets.start(ctx.client)
+            await ctx.send("Tweets toggled ON.")
+        elif toggle == "OFF":
+            self.check_tweets.stop()
+            await ctx.send("Tweets toggled OFF.")
+        else:
+            await ctx.send("ERROR: Couldn't toggle tweets.")
+
+
     # Time trigger is UTC by default
-    @Task.create(TimeTrigger(hour=18, minute=1))
-    async def cotd_trigger(self):
-        print("It's cotd time right now.")
+    #@Task.create(TimeTrigger(hour=18, minute=1))
+    @Task.create(TimeTrigger(hour=18, minute=17))
+    async def cotd_trigger(self, bot: Client):
 
-        """
-        conn = db.open_conn()
-        query = (db.get_specific_roster_players, ["cotd"])
-        cotd_players = db.retrieve_data(conn, query)
-        conn.close()
+        print("Cotd quali should be over now.")
 
-        cotd_player_ids = [player[1] for player in cotd_players]
-        players = get_all_cotd_players()
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
 
-        cotd_players_today = []
-        # Might be slow since players has length of 320
-        for (player_id, player_rank, player_score) in players:
-            for (cotd_player_name, cotd_player_id) in cotd_players:
-                if player_id == cotd_player_id:
-                    cotd_players_today.append((cotd_player_name, player_rank, player_score))
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = bot.get_channel(channel_id)
 
-        # Now we have info about cotd performance for players that are registered
-        #   to cotd roster, in cotd_players_today
+        results = get_cotd_quali_results()
+        if(results == None):
+            await channel.send("Error retrieving cotd quali results: No quali could be found.")
+            return
 
-        # So just make a pretty leaderboard style discord embed
-        #   and send it in the main channel
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_quali_results(map_name, results)
 
-        """
+        print("Sending cotd quali results to channel")
+        await channel.send(embed=embed)
+
+
+    @slash_command(
+        name="cotd_test",
+        description="test for cotd."
+    )
+    async def cotd_test(self, ctx: SlashContext):
+
+        await ctx.defer()
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = ctx.client.get_channel(channel_id)
+
+        results = get_cotd_quali_results()
+        if(results == None):
+            await ctx.send("No cotd quali could be found, try again around cotd time.")
+            return
+
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_quali_results(map_name, results)
+
+        await ctx.send("Posting cotd quali results:")
+        await channel.send(embed=embed)
+
 
     @listen(Startup)
     async def on_startup(self, event: Startup):
@@ -136,9 +196,9 @@ class BotManagement(Extension):
 
         # Initial checks
         await self.update_nadeo_token()
-        await self.check_tweets(event.client)
+        #await self.check_tweets(event.client)
 
         # Start tasks
         self.update_nadeo_token.start()
         self.check_tweets.start(event.client)
-        self.cotd_trigger.start()
+        self.cotd_trigger.start(event.client)

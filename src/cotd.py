@@ -6,7 +6,7 @@ import src.db.db as db
 from src.ubi.cotd_totd_data import get_all_cotd_players
 import math
 
-
+# Players have to be in the roster "cotd" to be included in results
 def get_cotd_quali_results():
 
     conn = db.open_conn()
@@ -15,6 +15,8 @@ def get_cotd_quali_results():
     conn.close()
 
     players = get_all_cotd_players()
+    if(players == None):
+        return None
 
     cotd_quali_results = []
     # Might be slow since players has length of 320
@@ -38,25 +40,27 @@ def get_cotd_quali_results():
 def format_cotd_quali_results(map_name, results):
 
     embed = Embed()
-    embed.title = map_name
+    embed.title = "COTD Qualification results:"
+    embed.description = "Map: " + map_name
 
-    all_positions = ""
-    all_players = ""
-    all_times = ""
-    all_divs = ""
+    #Format everything nicely inside a code block
+    header_format = "{:^3s} {:^5s} {:^15s} {:^10s} \n"
+    format =        "{:^3s} {:^5s} {:15s} {:^10s} \n"
+
+    everything = "```\n"
+    everything += header_format.format("Div", "Rank", "Player", "Time")
 
     for result in results:
         (name, rank, time) = result
         division = div(rank)
-        all_positions += str(rank) + "\n"
-        all_players += name + "\n"
-        all_times += time + "\n"
-        all_divs += str(division) + "\n"
+        everything += format.format(str(division), str(rank), name, time)
+        
+    everything += "```"
 
-    embed.add_field(name="Rank", value=all_positions, inline=True)
-    embed.add_field(name="Player", value=all_players, inline=True)
-    embed.add_field(name="Time", value=all_times, inline=True)
-    embed.add_field(name="Division", value=all_divs, inline=True)
+    field_name = '\u200b'
+    embed.add_field(name=field_name, value=everything, inline=True)
+
+    return embed
 
 
 def div(pos):

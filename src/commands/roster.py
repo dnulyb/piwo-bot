@@ -152,7 +152,7 @@ class Roster(Extension):
     )
     @slash_option(
         name="names",
-        description="Comma separated list of players you want to add to the roster.",
+        description="Comma separated list of players you want to remove from the roster.",
         required=True,
         opt_type = OptionType.STRING
     )
@@ -188,7 +188,7 @@ class Roster(Extension):
 
 
             db.execute_queries(conn, queries)
-            await ctx.send("Added players to roster '" + roster + "': " + names)
+            await ctx.send("Removed players from roster '" + roster + "': " + names)
 
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")

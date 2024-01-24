@@ -233,6 +233,7 @@ def format_leaderboard_embed(map_name, times):
 
     embed = Embed()
     embed.title = map_name
+    embed.description = "Leaderboard for map: " + map_name
     all_positions = ""
     all_players = ""
     all_times = ""

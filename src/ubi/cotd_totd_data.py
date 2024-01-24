@@ -21,6 +21,8 @@ def get_all_cotd_players():
     # Adding some sleeps in between requests.
 
     id = get_cotd_challenge_id()
+    if(id == None):
+        return None
     #id = 7169 # main cotd 2024-01-23 
 
     top100 = get_cotd_players(id, 100, 0)
@@ -71,6 +73,7 @@ def get_cotd_players(challenge_id, length, offset):
 # Cotd challenge is the qualification.
 # This switches to the next cotd quali when the last one 
 #   has finished a while ago, maybe 3-4 hours after.
+# Beware that it will get response 204 - no content, if there's no recent quali.
 def get_cotd_challenge_id():
 
     dotenv_path = find_dotenv()
@@ -87,9 +90,11 @@ def get_cotd_challenge_id():
     }
 
     res = requests.get(cotd_url, headers=headers)
-    res = res.json()
-
-    print(res)
+    try:
+        res = res.json()
+    except Exception as e:
+        print("get_cotd_challenge_id did not receive valid json, returning None. Exception: ",e)
+        return None
 
     challenge_id = res['challenge']['id']
     return challenge_id
@@ -101,7 +106,7 @@ def get_totd_map_info():
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    # Using the NadeoClubServices audience
+    # Using the NadeoLiveServices audience
     token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
     user_agent = get_key(dotenv_path, ("USER_AGENT"))
 

@@ -66,7 +66,6 @@ def get_map_data(map_uids):
     # Build url
     uid_str = ','.join(map_uids)
     complete_url = map_info_url + uid_str
-    print(complete_url)
 
     # Send get request
 

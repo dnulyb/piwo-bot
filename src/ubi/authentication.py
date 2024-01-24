@@ -79,7 +79,7 @@ def authenticate():
 
 
 # Updates the nadeo access token in .env
-def refresh_access_tokens():
+def refresh_access_token():
 
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
@@ -103,6 +103,17 @@ def refresh_access_tokens():
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
 
+    
+
+    
+
+def refresh_club_access_token():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
     # ClubServices
     refresh_token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_REFRESH_TOKEN"))
     nadeo_headers = {
@@ -120,6 +131,13 @@ def refresh_access_tokens():
         set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
     except KeyError as e:
         print(f"Refresh club services token: {e}")
+
+def refresh_live_access_token():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
 
     # LiveServices
     refresh_token = get_key(dotenv_path, ("NADEO_LIVESERVICES_REFRESH_TOKEN"))
@@ -140,6 +158,7 @@ def refresh_access_tokens():
 
     except KeyError as e:
         print(f"Refresh live services token: {e}")
+
 
 # Decodes the stored nadeo access token,
 #   and refreshes it if needed.
@@ -170,10 +189,72 @@ def check_token_refresh():
         print("check_token_refresh: Authenticated")
     elif(current_time > refresh_possible_after):
         #Just refresh the token
-        refresh_access_tokens()
+        refresh_access_token()
         print("check_token_refresh: Token refreshed")
     else:
         print("check_token_refresh: No token refresh needed")
+
+    #club
+    token = get_nadeo_club_access_token()
+
+    [_, payload, _] = token.split(".")
+
+    # payload might need padding to be able to be decoded
+    if len(payload) % 4:
+        payload += '=' * (4 - len(payload) % 4) 
+
+    # decode
+    decodedPayload = base64.b64decode(payload)
+    jsonPayload = json.loads(decodedPayload)
+
+    current_time = int(datetime.now().timestamp())
+    expiration = jsonPayload['exp']
+    #print("current: ", current_time)
+    #print("expiration: ", expiration)
+
+    refresh_possible_after = jsonPayload['rat']
+
+    if(current_time > expiration):
+        #Authentication required
+        authenticate()
+        print("check_token_refresh: Authenticated")
+    elif(current_time > refresh_possible_after):
+        #Just refresh the token
+        refresh_club_access_token()
+        print("check_token_refresh: CLUB token refreshed")
+    else:
+        print("check_token_refresh: No CLUB token refresh needed")
+
+    #live
+    token = get_nadeo_live_access_token()
+
+    [_, payload, _] = token.split(".")
+
+    # payload might need padding to be able to be decoded
+    if len(payload) % 4:
+        payload += '=' * (4 - len(payload) % 4) 
+
+    # decode
+    decodedPayload = base64.b64decode(payload)
+    jsonPayload = json.loads(decodedPayload)
+
+    current_time = int(datetime.now().timestamp())
+    expiration = jsonPayload['exp']
+    #print("current: ", current_time)
+    #print("expiration: ", expiration)
+
+    refresh_possible_after = jsonPayload['rat']
+
+    if(current_time > expiration):
+        #Authentication required
+        authenticate()
+        print("check_token_refresh: Authenticated")
+    elif(current_time > refresh_possible_after):
+        #Just refresh the token
+        refresh_live_access_token()
+        print("check_token_refresh: LIVE token refreshed")
+    else:
+        print("check_token_refresh: No LIVE token refresh needed")
 
 
 def get_nadeo_access_token():
@@ -181,3 +262,15 @@ def get_nadeo_access_token():
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
     return get_key(dotenv_path, ("NADEO_ACCESS_TOKEN"))
+
+def get_nadeo_club_access_token():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+    return get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
+
+def get_nadeo_live_access_token():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+    return get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
