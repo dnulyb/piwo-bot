@@ -19,12 +19,12 @@ from interactions.api.events import Startup
 
 import pkgutil
 import asyncio
-from dotenv import find_dotenv, load_dotenv, get_key
+from dotenv import find_dotenv, load_dotenv, get_key, set_key
 
 import src.db.db as db
 from src.ubi.authentication import check_token_refresh
 from src.rss import check_for_new_tweets
-from src.cotd import (
+from src.commands.cotd import (
     get_cotd_quali_results, 
     format_cotd_quali_results,
 )
@@ -136,7 +136,7 @@ class BotManagement(Extension):
 
 
     # Time trigger is UTC by default
-    #@Task.create(TimeTrigger(hour=18, minute=1))
+    #@Task.create(TimeTrigger(hour=18, minute=1)) #cotd start date
     @Task.create(TimeTrigger(hour=18, minute=17))
     async def cotd_trigger(self, bot: Client):
 
@@ -180,7 +180,9 @@ class BotManagement(Extension):
             await ctx.send("No cotd quali could be found, try again around cotd time.")
             return
 
-        (_, _, map_name) = get_totd_map_info()
+        (map_id, _, map_name) = get_totd_map_info()
+        set_key(dotenv_path, "TOTD_MAP_ID", map_id)
+        set_key(dotenv_path, "TOTD_MAP_NAME", map_name)
         
         embed = format_cotd_quali_results(map_name, results)
 

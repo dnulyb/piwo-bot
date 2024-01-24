@@ -1,6 +1,6 @@
 
 import requests
-from dotenv import find_dotenv, load_dotenv, get_key
+from dotenv import find_dotenv, load_dotenv, get_key, set_key
 import re
 import time
 
@@ -133,6 +133,10 @@ def get_totd_map_info():
     # Use map uid to get the map id from nadeo
     res = get_map_data([totd_mapUid])
     [[map_id, map_uid, map_name]] = res
+    map_name = clean_map_name(map_name)
+
+    set_key(dotenv_path, "TOTD_MAP_ID", map_id)
+    set_key(dotenv_path, "TOTD_MAP_NAME", map_name)
 
     return (map_id, map_uid, clean_map_name(map_name))
 
