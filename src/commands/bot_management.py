@@ -8,6 +8,7 @@ from interactions import (
     listen,
     Task,
     IntervalTrigger,
+    TimeTrigger,
     cooldown,
     Buckets
 )
@@ -98,6 +99,35 @@ class BotManagement(Extension):
 
         print("Finished checking for new tweets.")
 
+    # Time trigger is UTC by default
+    @Task.create(TimeTrigger(hour=18, minute=1))
+    async def cotd_trigger(self):
+        print("It's cotd time right now.")
+
+        """
+        conn = db.open_conn()
+        query = (db.get_specific_roster_players, ["cotd"])
+        cotd_players = db.retrieve_data(conn, query)
+        conn.close()
+
+        cotd_player_ids = [player[1] for player in cotd_players]
+        players = get_all_cotd_players()
+
+        cotd_players_today = []
+        # Might be slow since players has length of 320
+        for (player_id, player_rank, player_score) in players:
+            for (cotd_player_name, cotd_player_id) in cotd_players:
+                if player_id == cotd_player_id:
+                    cotd_players_today.append((cotd_player_name, player_rank, player_score))
+
+        # Now we have info about cotd performance for players that are registered
+        #   to cotd roster, in cotd_players_today
+
+        # So just make a pretty leaderboard style discord embed
+        #   and send it in the main channel
+
+        """
+
     @listen(Startup)
     async def on_startup(self, event: Startup):
 
@@ -111,3 +141,4 @@ class BotManagement(Extension):
         # Start tasks
         self.update_nadeo_token.start()
         self.check_tweets.start(event.client)
+        self.cotd_trigger.start()
