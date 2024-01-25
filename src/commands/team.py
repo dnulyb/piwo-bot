@@ -24,7 +24,7 @@ class Team(Extension):
 
         roster_channel_id = get_key(dotenv_path, ("DISCORD_ROSTER_CHANNEL"))
         roster_channel_message_id = get_key(dotenv_path, ("DISCORD_ROSTER_MESSAGE"))
-        channel = ctx.client.get_channel(roster_channel_id)
+        channel = self.bot.get_channel(roster_channel_id)
         message = await channel.fetch_message(roster_channel_message_id)
 
         embed = format_team_intro_embed()
@@ -42,7 +42,7 @@ class Team(Extension):
         load_dotenv(dotenv_path)
 
         roster_channel_id = get_key(dotenv_path, ("DISCORD_ROSTER_CHANNEL"))
-        channel = ctx.client.get_channel(roster_channel_id)
+        channel = self.bot.get_channel(roster_channel_id)
 
         await channel.send("[this message will be edited with the full team roster]")
         await ctx.send("message sent to roster channel.")

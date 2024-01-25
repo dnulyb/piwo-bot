@@ -5,7 +5,6 @@ from interactions import (
     OptionType,
     SlashCommandChoice,
     SlashContext,
-    Client,
     Task,
     IntervalTrigger,
     listen
@@ -20,13 +19,13 @@ from dotenv import find_dotenv, load_dotenv, set_key, get_key
 class Twitter(Extension):
 
     @Task.create(IntervalTrigger(minutes=30))
-    async def check_tweets(bot: Client):
+    async def check_tweets(self):
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
 
         channel_id = get_key(dotenv_path, ("DISCORD_TWITTER_CHANNEL"))
-        channel = bot.get_channel(channel_id)
+        channel = self.bot.get_channel(channel_id)
 
         print("Checking for new tweets...")
         tweets = check_for_new_tweets()
@@ -64,7 +63,7 @@ class Twitter(Extension):
     async def tweets_toggle(self, ctx: SlashContext, toggle: str):
 
         if toggle == "ON":
-            self.check_tweets.start(ctx.client)
+            self.check_tweets.start()
             await ctx.send("Tweets toggled ON.")
         elif toggle == "OFF":
             self.check_tweets.stop()

@@ -6,7 +6,6 @@ from interactions import (
     OptionType,
     Task,
     IntervalTrigger,
-    Client,
     listen
 )
 from interactions.api.events import Startup
@@ -104,7 +103,7 @@ class Twitch(Extension):
 
 
     @Task.create(IntervalTrigger(minutes=10))
-    async def check_recently_started_streams(self, bot: Client):
+    async def check_recently_started_streams(self):
 
         print("Checking for recently started streams...")
 
@@ -112,7 +111,7 @@ class Twitch(Extension):
         load_dotenv(dotenv_path)
 
         channel_id = get_key(dotenv_path, ("DISCORD_TWITCH_CHANNEL"))
-        channel = bot.get_channel(channel_id)
+        channel = self.bot.get_channel(channel_id)
 
         streams = get_streams()
         for stream in streams:

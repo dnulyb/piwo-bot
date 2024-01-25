@@ -9,7 +9,6 @@ from interactions import (
     is_owner,
     Task,
     TimeTrigger,
-    Client,
     listen
 )
 from interactions.api.events import Startup
@@ -96,7 +95,7 @@ class Cotd(Extension):
         load_dotenv(dotenv_path)
 
         channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
-        channel = ctx.client.get_channel(channel_id)
+        channel = self.bot.get_channel(channel_id)
 
         results = get_cotd_quali_results()
         if(results == None):
@@ -113,7 +112,7 @@ class Cotd(Extension):
     # Time trigger is UTC by default
     #@Task.create(TimeTrigger(hour=18, minute=1)) #cotd start time
     @Task.create(TimeTrigger(hour=18, minute=17)) #cotd quali end time
-    async def cotd_trigger(self, bot: Client):
+    async def cotd_trigger(self):
 
         print("Cotd quali should be over now.")
 
@@ -121,7 +120,7 @@ class Cotd(Extension):
         load_dotenv(dotenv_path)
 
         channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
-        channel = bot.get_channel(channel_id)
+        channel = self.bot.get_channel(channel_id)
 
         results = get_cotd_quali_results()
         if(results == None):
