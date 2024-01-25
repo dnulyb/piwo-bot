@@ -115,7 +115,7 @@ class BotManagement(Extension):
                 url = twitch_url + stream
                 await channel.send(f"{stream} recently went live! Watch here: {url}")
                 # Add some delay between posting streams
-                await asyncio.sleep(10)
+                await asyncio.sleep(1)
 
         print("Finished checking for recently started streams.")
         
