@@ -4,7 +4,8 @@ from interactions import (
     slash_option, 
     SlashContext,
     OptionType,
-    SlashCommandChoice
+    SlashCommandChoice,
+    Embed
 )
 import src.db.db as db
 
@@ -105,9 +106,10 @@ class Player(Extension):
 
             query = [db.list_players, None]
             res = db.retrieve_data(conn, query)
+            embed = format_player_list(res)
 
             # always send reply
-            await ctx.send(f"{res}")
+            await ctx.send(embed=embed, ephemeral=True)
 
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
@@ -180,3 +182,20 @@ class Player(Extension):
 
         finally:
             conn.close() 
+
+
+def format_player_list(players):
+
+    embed = Embed()
+    embed.title = "List of all players:"
+
+    value = ""
+
+    for (player, country, roster) in players:
+        if (roster == None):
+            roster = "None"
+        value += player + ", " + country + ", " + roster + "\n"
+
+    embed.add_field(name="\u200b", value=value, inline=False)
+
+    return embed
