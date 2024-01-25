@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS "Roster" (
 );
 CREATE TABLE IF NOT EXISTS "Player" (
 	"id"	INTEGER,
-	"nickname"	TEXT NOT NULL UNIQUE,
+	"nickname"	TEXT NOT NULL COLLATE NOCASE UNIQUE,
 	"account_id"	TEXT NOT NULL UNIQUE,
 	"country"	TEXT,
 	"official_roster"	TEXT,
