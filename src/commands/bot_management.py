@@ -28,6 +28,11 @@ from src.commands.cotd import (
     get_cotd_quali_results, 
     format_cotd_quali_results,
 )
+from src.commands.twitch import (
+    get_streams,
+    stream_recently_live,
+    twitch_url
+)
 from src.ubi.cotd_totd_data import (
     get_totd_map_info
 )
@@ -56,16 +61,26 @@ class BotManagement(Extension):
         await self.bot.stop()
 
     @slash_command(
-        name="reload_extensions",
-        description="Reloads all bot extensions."
+        name="reload_extension",
+        description="Reloads a bot extension."
+    )
+    @slash_option(
+        name="name",
+        description="Name of the extension to reload.",
+        required=True,
+        opt_type = OptionType.STRING
     )
     @check(is_owner())
-    async def reload_extensions(self, ctx: SlashContext):
+    async def reload_extension(self, ctx: SlashContext, name: str):
         extensions = [m.name for m in pkgutil.iter_modules(["src/commands"], prefix="src.commands.")]
         for extension in extensions:
-            self.bot.reload_extension(extension)
+            if(extension.name == name):
+                self.bot.reload_extension(extension)
+                await ctx.send("Reloaded bot extension.", ephemeral=True)
+                return
 
-        await ctx.send("Reloaded bot extensions.", ephemeral=True)
+
+        await ctx.send("Could not reload extension: name not found.", ephemeral=True)
 
     @slash_command(
         name="ping",
@@ -80,6 +95,30 @@ class BotManagement(Extension):
     async def update_nadeo_token(self):
         print("Checking if Nadeo access token needs an update...")
         check_token_refresh()
+
+    
+    @Task.create(IntervalTrigger(minutes=10))
+    async def check_recently_started_streams(self, bot: Client):
+
+        print("Checking for recently started streams...")
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_TWITCH_CHANNEL"))
+        channel = bot.get_channel(channel_id)
+
+        streams = get_streams()
+        for stream in streams:
+            await asyncio.sleep(0.2) # Don't spam the api too hard
+            if(stream_recently_live(stream)):
+                url = twitch_url + stream
+                await channel.send(f"{stream} recently went live! Watch here: {url}")
+                # Add some delay between posting streams
+                await asyncio.sleep(10)
+
+        print("Finished checking for recently started streams.")
+        
 
     @Task.create(IntervalTrigger(minutes=30))
     async def check_tweets(self, bot: Client):
@@ -199,6 +238,7 @@ class BotManagement(Extension):
         opt_type = OptionType.STRING,
         choices=[
             SlashCommandChoice(name="twitter_channel_id", value="twitter_channel_id"),
+            SlashCommandChoice(name="twitch_channel_id", value="twitch_channel_id"),
             SlashCommandChoice(name="cotd_channel_id", value="cotd_channel_id"),
             SlashCommandChoice(name="roster_channel_id", value="roster_channel_id"),
             SlashCommandChoice(name="roster_message_id", value="roster_message_id")
@@ -218,6 +258,8 @@ class BotManagement(Extension):
         match action:
             case "twitter_channel_id":
                 set_key(dotenv_path, "DISCORD_TWITTER_CHANNEL", value)
+            case "twitch_channel_id":
+                set_key(dotenv_path, "DISCORD_TWITCH_CHANNEL", value)
             case "cotd_channel_id":
                 set_key(dotenv_path, "DISCORD_COTD_CHANNEL", value)
             case "roster_channel_id":
@@ -239,9 +281,12 @@ class BotManagement(Extension):
 
         # Initial checks
         await self.update_nadeo_token()
-        #await self.check_tweets(event.client)
+        await self.check_recently_started_streams(event.client)
+        await self.check_tweets(event.client)
 
         # Start tasks
         self.update_nadeo_token.start()
         self.check_tweets.start(event.client)
         self.cotd_trigger.start(event.client)
+        self.check_recently_started_streams.start(event.client)
+
