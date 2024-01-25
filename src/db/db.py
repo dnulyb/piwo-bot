@@ -53,6 +53,14 @@ list_players =          """ SELECT nickname, country, official_roster
                             FROM Player 
                             ORDER BY (Player.id) """
 
+update_player_name= """ UPDATE Player
+                            SET nickname=?
+                            WHERE nickname=? """
+
+update_player_account_id= """ UPDATE Player
+                            SET account_id=?
+                            WHERE nickname=? """
+
 update_player_country = """ UPDATE Player
                             SET country=?
                             WHERE nickname=? """

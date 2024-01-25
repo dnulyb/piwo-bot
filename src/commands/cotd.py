@@ -12,7 +12,7 @@ from interactions import (
 import src.db.db as db
 from src.ubi.cotd_totd_data import get_all_cotd_players
 import math
-from dotenv import find_dotenv, load_dotenv, get_key, set_key
+from dotenv import find_dotenv, load_dotenv, get_key
 from src.ubi.authentication import get_nadeo_access_token
 from src.ubi.records import get_map_records
 

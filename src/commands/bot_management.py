@@ -187,6 +187,49 @@ class BotManagement(Extension):
         await ctx.send("Posting cotd quali results:")
         await channel.send(embed=embed)
 
+    
+    @slash_command(
+        name="bot_discord_info_update",
+        description="Update discord channels etc. that the bot will use for various purposes."
+    )
+    @slash_option(
+        name="action",
+        description="Which bot discord info to update.",
+        required=True,
+        opt_type = OptionType.STRING,
+        choices=[
+            SlashCommandChoice(name="twitter_channel_id", value="twitter_channel_id"),
+            SlashCommandChoice(name="cotd_channel_id", value="cotd_channel_id"),
+            SlashCommandChoice(name="roster_channel_id", value="roster_channel_id"),
+            SlashCommandChoice(name="roster_message_id", value="roster_message_id")
+        ]
+    )
+    @slash_option(
+        name="value",
+        description="The info to update",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def bot_discord_info_update(self, ctx: SlashContext, action: str, value: str):
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        match action:
+            case "twitter_channel_id":
+                set_key(dotenv_path, "DISCORD_TWITTER_CHANNEL", value)
+            case "cotd_channel_id":
+                set_key(dotenv_path, "DISCORD_COTD_CHANNEL", value)
+            case "roster_channel_id":
+                set_key(dotenv_path, "DISCORD_ROSTER_CHANNEL", value)
+            case "roster_message_id":
+                set_key(dotenv_path, "DISCORD_ROSTER_MESSAGE", value)
+            case _:
+                await ctx.send("Invalid info name")
+
+        await ctx.send("Updated: " + action +", with: " + value)
+        
+
 
     @listen(Startup)
     async def on_startup(self, event: Startup):

@@ -131,6 +131,8 @@ class Player(Extension):
         required=True,
         opt_type = OptionType.STRING,
         choices=[
+            SlashCommandChoice(name="nickname", value="nickname"),
+            SlashCommandChoice(name="account_id", value="account_id"),
             SlashCommandChoice(name="country", value="country"),
             SlashCommandChoice(name="official_roster", value="official_roster"),
             SlashCommandChoice(name="extra", value="extra")        ]
@@ -147,6 +149,14 @@ class Player(Extension):
 
         try:
             match action:
+                case "nickname":
+                    query = [(db.update_player_name, (value, nickname))]
+                    db.execute_queries(conn, query)
+                    res = "Updated nickname for player: " + nickname + "," + value
+                case "account_id":
+                    query = [(db.update_player_account_id, (value, nickname))]
+                    db.execute_queries(conn, query)
+                    res = "Updated account_id for player: " + nickname + "," + value
                 case "country":
                     query = [(db.update_player_country, (value, nickname))]
                     db.execute_queries(conn, query)
