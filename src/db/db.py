@@ -74,6 +74,12 @@ get_player_id_by_account_id = """ SELECT id
                             FROM Player
                             WHERE account_id=? """
 
+get_players_by_official_roster = """ SELECT nickname, country, extra
+                                     FROM Player
+                                     WHERE official_roster=?
+                                     ORDER BY (Player.id)
+                                 """
+
 add_tournament =        """ INSERT INTO Tournament(name)
                             VALUES(?) """
 
@@ -150,6 +156,23 @@ get_tournament_maps =   """ SELECT Map.name, Map.uid
                             WHERE Tournament.id=?
                             ORDER BY Map.name
                         """
+
+add_to_teaminfo =       """ INSERT INTO TeamInfo(name, info)
+                            VALUES(?,?) 
+                                ON CONFLICT (name) DO
+                                UPDATE SET info=excluded.info """
+
+remove_teaminfo =       """ DELETE FROM TeamInfo
+                            WHERE name=? """
+
+get_teaminfo =          """ SELECT info
+                            FROM TeamInfo
+                            WHERE name=? """
+
+get_teaminfo_list =     """ SELECT name, info
+                            FROM TeamInfo
+                        """
+
 
 
 def open_conn():

@@ -122,7 +122,7 @@ def refresh_club_access_token():
         'Authorization': 'nadeo_v1 t=' + refresh_token,
         'User-Agent': user_agent
     }
-    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers)
+    nadeo_res = requests.post(nadeo_refresh_url, headers=nadeo_headers)
     nadeo_res = nadeo_res.json()
 
     try:
@@ -148,7 +148,7 @@ def refresh_live_access_token():
         'User-Agent': user_agent
     }
 
-    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers)
+    nadeo_res = requests.post(nadeo_refresh_url, headers=nadeo_headers)
     nadeo_res = nadeo_res.json()
 
     try:

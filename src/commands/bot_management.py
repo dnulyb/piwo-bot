@@ -13,7 +13,7 @@ from interactions import (
     IntervalTrigger,
     TimeTrigger,
     cooldown,
-    Buckets,
+    Buckets
 )
 from interactions.api.events import Startup
 
