@@ -9,12 +9,9 @@ from interactions import (
     Buckets
 )
 import src.db.db as db
-from src.ubi.authentication import(
-    get_nadeo_access_token
-)
-from src.ubi.records import(
-    get_map_records
-)
+from src.ubi.authentication import get_nadeo_access_token
+from src.commands.map import get_map_records
+from src.commands.tournament import get_tournament_id
 
 class Times(Extension):
 
@@ -43,14 +40,13 @@ class Times(Extension):
 
             # load everything that should be updated from db:
             # Get tournament map ids
-            tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
+            tournament_id = get_tournament_id(conn, tournament)
 
-            if(len(tournament_id) == 0):
+            if tournament_id == None:
                 await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
                 conn.close()
                 return
-                
-            tournament_id = tournament_id[0][0]
+            
             maps = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
             if(len(maps) == 0):
                 await ctx.send(f"Error occurred while running command: No maps found for tournament '{tournament}'")

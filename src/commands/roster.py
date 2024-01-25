@@ -7,6 +7,7 @@ from interactions import (
     Embed
 )
 import src.db.db as db
+from src.commands.tournament import get_tournament_id
 
 class Roster(Extension):
 
@@ -31,14 +32,12 @@ class Roster(Extension):
         conn = db.open_conn()
         try:
 
-            tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
+            tournament_id = get_tournament_id(conn, tournament)
 
-            if(len(tournament_id) == 0):
+            if tournament_id == None:
                 await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
                 conn.close()
                 return
-
-            tournament_id = tournament_id[0][0]
 
             query = [(db.add_roster, (name, tournament_id))]
             db.execute_queries(conn, query)
@@ -214,15 +213,13 @@ class Roster(Extension):
                 query = (db.get_roster_players, None)
             else:
 
-                #TODO: make this tournament id check into a separate function
-                tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
+                tournament_id = get_tournament_id(conn, tournament)
 
-                if(len(tournament_id) == 0):
+                if tournament_id == None:
                     await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
                     conn.close()
                     return
 
-                tournament_id = tournament_id[0][0]
                 query = (db.get_tournament_roster_players, [tournament_id])
 
             res = db.retrieve_data(conn, query)

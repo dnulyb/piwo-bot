@@ -6,8 +6,11 @@ from interactions import (
     OptionType,
     Task,
     IntervalTrigger,
-    Client
+    Client,
+    listen
 )
+from interactions.api.events import Startup
+
 import src.db.db as db
 import requests
 from dotenv import find_dotenv, load_dotenv, get_key
@@ -18,8 +21,6 @@ twitch_url = "https://www.twitch.tv/"
 twitch_uptime_url = "https://decapi.me/twitch/uptime/"
 
 class Twitch(Extension):
-
-
 
     @slash_command(
     name="twitch_add",
@@ -101,6 +102,32 @@ class Twitch(Extension):
         finally:
             conn.close() 
 
+
+    @Task.create(IntervalTrigger(minutes=10))
+    async def check_recently_started_streams(self, bot: Client):
+
+        print("Checking for recently started streams...")
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_TWITCH_CHANNEL"))
+        channel = bot.get_channel(channel_id)
+
+        streams = get_streams()
+        for stream in streams:
+            await asyncio.sleep(0.2) # Don't spam the api too hard
+            if(stream_recently_live(stream)):
+                url = twitch_url + stream
+                await channel.send(f"{stream} recently went live! Watch here: {url}")
+                # Add some delay between posting streams
+                await asyncio.sleep(1)
+
+        print("Finished checking for recently started streams.")
+
+    @listen(Startup)
+    async def on_startup(self, event: Startup):
+        self.check_recently_started_streams.start()
 
 
 

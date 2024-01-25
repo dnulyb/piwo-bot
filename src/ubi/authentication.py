@@ -78,7 +78,6 @@ def authenticate():
     set_key(dotenv_path, "NADEO_LIVESERVICES_REFRESH_TOKEN", str(refresh_token))
 
 
-
 # Updates the nadeo access token in .env
 def refresh_access_token():
 
@@ -103,10 +102,6 @@ def refresh_access_token():
     set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
-
-    
-
-    
 
 def refresh_club_access_token():
 
@@ -165,25 +160,11 @@ def refresh_live_access_token():
 #   and refreshes it if needed.
 def check_token_refresh():
 
+    # Normal token
     token = get_nadeo_access_token()
-
-    [_, payload, _] = token.split(".")
-
-    # payload might need padding to be able to be decoded
-    if len(payload) % 4:
-        payload += '=' * (4 - len(payload) % 4) 
-
-    # decode
-    decodedPayload = base64.b64decode(payload)
-    jsonPayload = json.loads(decodedPayload)
+    (expiration, refresh_possible_after) = decode_access_token(token)
 
     current_time = int(datetime.now().timestamp())
-    expiration = jsonPayload['exp']
-    #print("current: ", current_time)
-    #print("expiration: ", expiration)
-
-    refresh_possible_after = jsonPayload['rat']
-
     if(current_time > expiration):
         #Authentication required
         authenticate()
@@ -200,24 +181,9 @@ def check_token_refresh():
 
     #club
     token = get_nadeo_club_access_token()
-
-    [_, payload, _] = token.split(".")
-
-    # payload might need padding to be able to be decoded
-    if len(payload) % 4:
-        payload += '=' * (4 - len(payload) % 4) 
-
-    # decode
-    decodedPayload = base64.b64decode(payload)
-    jsonPayload = json.loads(decodedPayload)
-
+    (expiration, refresh_possible_after) = decode_access_token(token)
+    
     current_time = int(datetime.now().timestamp())
-    expiration = jsonPayload['exp']
-    #print("current: ", current_time)
-    #print("expiration: ", expiration)
-
-    refresh_possible_after = jsonPayload['rat']
-
     if(current_time > expiration):
         #Authentication required
         authenticate()
@@ -234,24 +200,9 @@ def check_token_refresh():
 
     #live
     token = get_nadeo_live_access_token()
-
-    [_, payload, _] = token.split(".")
-
-    # payload might need padding to be able to be decoded
-    if len(payload) % 4:
-        payload += '=' * (4 - len(payload) % 4) 
-
-    # decode
-    decodedPayload = base64.b64decode(payload)
-    jsonPayload = json.loads(decodedPayload)
-
+    (expiration, refresh_possible_after) = decode_access_token(token)
+    
     current_time = int(datetime.now().timestamp())
-    expiration = jsonPayload['exp']
-    #print("current: ", current_time)
-    #print("expiration: ", expiration)
-
-    refresh_possible_after = jsonPayload['rat']
-
     if(current_time > expiration):
         #Authentication required
         authenticate()
@@ -281,3 +232,21 @@ def get_nadeo_live_access_token():
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
     return get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
+
+
+def decode_access_token(token):
+
+    [_, payload, _] = token.split(".")
+
+    # payload might need padding to be able to be decoded
+    if len(payload) % 4:
+        payload += '=' * (4 - len(payload) % 4) 
+
+    # decode
+    decodedPayload = base64.b64decode(payload)
+    jsonPayload = json.loads(decodedPayload)
+
+    expiration = jsonPayload['exp']
+    refresh_possible_after = jsonPayload['rat']
+
+    return (expiration, refresh_possible_after)

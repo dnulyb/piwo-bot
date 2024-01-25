@@ -1,22 +1,35 @@
 from interactions import (
     Extension,
     slash_command, 
-    slash_option, 
     SlashContext,
-    OptionType,
     Embed,
     cooldown,
-    Buckets
+    Buckets,
+    check,
+    is_owner,
+    Task,
+    TimeTrigger,
+    Client,
+    listen
 )
+from interactions.api.events import Startup
 
 import src.db.db as db
-from src.ubi.cotd_totd_data import get_all_cotd_players
-import math
-from dotenv import find_dotenv, load_dotenv, get_key
 from src.ubi.authentication import get_nadeo_access_token
-from src.ubi.records import get_map_records
+from src.commands.map import get_map_records, get_map_data, format_map_record
+
+from dotenv import find_dotenv, load_dotenv, get_key, set_key
+import requests
+import re
+import time
+import math
 
 
+totd_url = "https://live-services.trackmania.nadeo.live/api/token/campaign/month?length=1&offset=0"
+cotd_url = "https://meet.trackmania.nadeo.club/api/cup-of-the-day/current"
+challenge_url = "https://meet.trackmania.nadeo.club/api/challenges/"
+
+map_name_regex = r"(?i)(?<!\$)((?P<d>\$+)(?P=d))?((?<=\$)(?!\$)|(\$([a-f\d]{1,3}|[ionmwsztg<>]|[lhp](\[[^\]]+\])?)))"
 
 class Cotd(Extension):
 
@@ -68,6 +81,63 @@ class Cotd(Extension):
         embed = format_totd_leaderboard(totd_name, sorted_results)
 
         await ctx.send(embed=embed)
+
+    @check(is_owner())
+    @cooldown(Buckets.GUILD, 1, 60)
+    @slash_command(
+        name="cotd_test",
+        description="test for cotd."
+    )
+    async def cotd_test(self, ctx: SlashContext):
+
+        await ctx.defer()
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = ctx.client.get_channel(channel_id)
+
+        results = get_cotd_quali_results()
+        if(results == None):
+            await ctx.send("No cotd quali could be found, try again around cotd time.")
+            return
+
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_quali_results(map_name, results)
+
+        await ctx.send("Posting cotd quali results:")
+        await channel.send(embed=embed)
+
+    # Time trigger is UTC by default
+    #@Task.create(TimeTrigger(hour=18, minute=1)) #cotd start time
+    @Task.create(TimeTrigger(hour=18, minute=17)) #cotd quali end time
+    async def cotd_trigger(self, bot: Client):
+
+        print("Cotd quali should be over now.")
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = bot.get_channel(channel_id)
+
+        results = get_cotd_quali_results()
+        if(results == None):
+            await channel.send("Error retrieving cotd quali results: No quali could be found.")
+            return
+
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_quali_results(map_name, results)
+
+        print("Sending cotd quali results to channel")
+        await channel.send(embed=embed)
+
+    @listen(Startup)
+    async def on_startup(self, event: Startup):
+        self.cotd_trigger.start()
 
 
 
@@ -157,3 +227,142 @@ def format_totd_leaderboard(map_name, players):
     embed.add_field(name=field_name, value=everything, inline=True)
 
     return embed
+
+
+# Retrieves all cotd players that got div5 or better in quali
+#   (div5 or better is 64*5=320 people)
+# This function can be quite slow due to sleeps
+def get_all_cotd_players():
+
+    # Let's say div5 or better, so 320 players
+    # We need 4 requests, 100 + 100 + 100 + 20
+    # Adding some sleeps in between requests.
+
+    id = get_cotd_challenge_id()
+    if(id == None):
+        return None
+    #id = 7169 # main cotd 2024-01-23 
+
+    top100 = get_cotd_players(id, 100, 0)
+    time.sleep(1)
+    top101_200 = get_cotd_players(id, 100, 100)
+    time.sleep(1)
+    top201_300 = get_cotd_players(id, 100, 200)
+    time.sleep(1)
+    top301_320 = get_cotd_players(id, 20, 300)
+
+    return top100 + top101_200 + top201_300 + top301_320
+
+
+# Gets 'length' cotd players from the Nadeo leaderboards.
+#   Nadeo has a limit of max 100 players at once
+# length = how many players, maximum 100
+# offset = where to start retrieving players
+def get_cotd_players(challenge_id, length, offset):
+
+    if(length > 100):
+        length = 100
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Using the NadeoClubServices audience
+    token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    complete_challenge_url = challenge_url + str(challenge_id) + \
+                            "/leaderboard?length=" + str(length) + \
+                            "&offset=" + str(offset)
+    
+    # Send get request
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(complete_challenge_url, headers=headers)
+    res = res.json()
+
+    results = res['results']
+    players = [[elem["player"],
+                elem["rank"],
+                format_map_record(elem["score"])]
+                for elem in results]
+    
+    return players
+
+
+
+# Cotd challenge is the qualification.
+# This switches to the next cotd quali when the last one 
+#   has finished a while ago, maybe 3-4 hours after.
+# Beware that it will get response 204 - no content, if there's no recent quali.
+def get_cotd_challenge_id():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Using the NadeoClubServices audience
+    token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Send get request
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(cotd_url, headers=headers)
+    try:
+        res = res.json()
+    except Exception as e:
+        print("get_cotd_challenge_id did not receive valid json, returning None. Exception: ",e)
+        return None
+
+    challenge_id = res['challenge']['id']
+    return challenge_id
+
+
+# Return: (map_id, map_uid, map_name)
+def get_totd_map_info():
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Using the NadeoLiveServices audience
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Send get request
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(totd_url, headers=headers)
+    res = res.json()
+
+    # Get the map uid
+    days = res['monthList'][0]['days']
+    filtered_days = [day for day in days if day['mapUid'] != ""]
+
+    totd = []
+    for day in reversed(filtered_days):
+        totd = day
+        break
+
+    totd_mapUid = totd['mapUid']
+
+    # Use map uid to get the map id from nadeo
+    res = get_map_data([totd_mapUid])
+    [[map_id, map_uid, map_name]] = res
+    map_name = clean_map_name(map_name)
+
+    set_key(dotenv_path, "TOTD_MAP_ID", map_id)
+    set_key(dotenv_path, "TOTD_MAP_NAME", map_name)
+
+    return (map_id, map_uid, clean_map_name(map_name))
+
+
+def clean_map_name(map_name):
+    return re.sub(map_name_regex, "", map_name)

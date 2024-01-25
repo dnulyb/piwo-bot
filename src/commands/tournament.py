@@ -82,7 +82,16 @@ class Tournament(Extension):
         finally:
             conn.close() 
 
+# Returns None if the tournament cannot be found
+def get_tournament_id(conn, tournament):
+
+    tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
+    if(len(tournament_id == 0)):
+        return None
     
+    return tournament_id[0][0]
+
+
     
 
 

@@ -4,6 +4,7 @@ import os.path
 db_file = os.path.join(os.path.dirname(__file__), "team.sqlite")
 db_init_sql = os.path.join(os.path.dirname(__file__), "team.sql")
 
+#TODO: Figure out a better way to do this
 add_roster =            """ INSERT INTO Roster(name, tournament_id)
                             VALUES(?,?) """
 
@@ -132,7 +133,6 @@ add_time =              """ INSERT INTO Time(player_id, map_id, time)
                                 ON CONFLICT (player_id, map_id) DO
                                 UPDATE SET time=excluded.time"""
 
-#TODO: get times
 get_n_map_times =       """ SELECT Player.nickname, Time.time  
                             FROM Map
                             JOIN Time ON Time.map_id = Map.id

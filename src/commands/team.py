@@ -8,6 +8,7 @@ from interactions import (
 )
 
 import src.db.db as db
+
 from dotenv import find_dotenv, load_dotenv, get_key
 
 class Team(Extension):
@@ -33,7 +34,7 @@ class Team(Extension):
 
     @slash_command(
         name="send_message_to_roster_channel",
-        description="Does what it says it does."
+        description="Sends a placeholder message to the roster channel."
     )
     async def send_message_to_roster_channel(self, ctx: SlashContext):
 
@@ -174,18 +175,12 @@ def format_team_intro_embed():
 
     # Competitive roster
     embed.add_field(name="Competitive roster", value=competitive_final, inline=False)
-
     # Tech roster
     embed.add_field(name="Tech roster", value=tech_final, inline=False)
-
-
     # Ice roster
     embed.add_field(name="Ice roster", value=ice_final, inline=False)
-
-
     # Casual roster
     embed.add_field(name="Casual roster", value=casual_final, inline=False)
-
 
     return embed
 
@@ -200,14 +195,12 @@ def format_teaminfo_list(info_list):
         info_value = info_value.replace("\n", "[NEWLINE]")
         embed.add_field(name=info_name, value=info_value, inline=False)
 
-
     return embed
 
 
 def get_teaminfo_list():
 
     conn = db.open_conn()
-
     res = db.retrieve_data(conn, (db.get_teaminfo_list, None))
     conn.close()
 
@@ -216,7 +209,6 @@ def get_teaminfo_list():
 def get_teaminfo(name):
 
     conn = db.open_conn()
-
     res = db.retrieve_data(conn, (db.get_teaminfo, [name]))
     conn.close()
 
