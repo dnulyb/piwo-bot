@@ -94,6 +94,10 @@ class Twitch(Extension):
         try:
 
             res = get_streams()
+            if(len(res) == 0):
+                print("No streams in database")
+                return
+            
             embed = format_channel_list(res)
             await ctx.send(embed=embed)
 
