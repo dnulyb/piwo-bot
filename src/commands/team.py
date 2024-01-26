@@ -91,7 +91,7 @@ class Team(Extension):
             query = [(db.add_to_teaminfo, (name, value))]
             db.execute_queries(conn, query)
 
-            await ctx.send("Team info added: " + name)
+            await ctx.send("Team info updated: " + name)
 
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")

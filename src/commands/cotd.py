@@ -85,7 +85,7 @@ class Cotd(Extension):
     @slash_command(
         name="totd",
         sub_cmd_name="map_info",
-        description="Retrieves and stores info about todays TOTD in the bot."
+        sub_cmd_description="Retrieves and stores info about todays TOTD in the bot."
     )
     @cooldown(Buckets.GUILD, 1, 1800)
     async def map_info(self, ctx: SlashContext):
