@@ -17,8 +17,9 @@ map_info_url = "https://prod.trackmania.core.nadeo.online/maps/?mapUidList="
 class Map(Extension):
 
     @slash_command(
-        name="map_add",
-        description="Adds a map to a tournament."
+        name="map",
+        sub_cmd_name="add",
+        sub_cmd_description="Adds a map to a tournament."
     )
     @slash_option(
         name="tournament",
@@ -38,7 +39,7 @@ class Map(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def map_add(self, ctx: SlashContext, tournament: str, map_name: str, map_id: str):
+    async def add(self, ctx: SlashContext, tournament: str, map_name: str, map_id: str):
 
         conn = db.open_conn()
 
@@ -74,8 +75,9 @@ class Map(Extension):
             conn.close() 
 
     @slash_command(
-        name="map_delete",
-        description="Delete a map."
+        name="map",
+        sub_cmd_name="delete",
+        sub_cmd_description="Delete a map."
     )
     @slash_option(
         name="map_name",
@@ -83,7 +85,7 @@ class Map(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def map_delete(self, ctx: SlashContext, map_name: str):
+    async def delete(self, ctx: SlashContext, map_name: str):
 
         conn = db.open_conn()
         try:
@@ -109,8 +111,9 @@ class Map(Extension):
             conn.close() 
 
     @slash_command(
-        name="map_list",
-        description="Lists all maps."
+        name="map",
+        sub_cmd_name="list",
+        sub_cmd_description="Lists all maps."
     )
     @slash_option(
         name="tournament",
@@ -118,7 +121,7 @@ class Map(Extension):
         required=False,
         opt_type = OptionType.STRING
     )
-    async def map_list(self, ctx: SlashContext, tournament: str = None):
+    async def list(self, ctx: SlashContext, tournament: str = None):
         
         conn = db.open_conn()
         try:

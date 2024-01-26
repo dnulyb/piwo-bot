@@ -23,8 +23,9 @@ twitch_uptime_url = "https://decapi.me/twitch/uptime/"
 class Twitch(Extension):
 
     @slash_command(
-    name="twitch_add",
-    description="Add a twitch channel to track for live notifications."
+        name="twitch",
+        sub_cmd_name="add",
+        sub_cmd_description="Add a twitch channel to track for live notifications."
     )
     @slash_option(
         name="channel_name",
@@ -32,7 +33,7 @@ class Twitch(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def twitch_add(self, ctx: SlashContext, channel_name: str):
+    async def add(self, ctx: SlashContext, channel_name: str):
 
         conn = db.open_conn()
 
@@ -52,8 +53,9 @@ class Twitch(Extension):
             conn.close() 
 
     @slash_command(
-        name="twitch_remove",
-        description="Remove a twitch channel from live notifications tracking."
+        name="twitch",
+        sub_cmd_name="remove",
+        sub_cmd_description="Remove a twitch channel from live notifications tracking."
     )
     @slash_option(
         name="channel_name",
@@ -61,7 +63,7 @@ class Twitch(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def twitch_remove(self, ctx: SlashContext, channel_name: str):
+    async def remove(self, ctx: SlashContext, channel_name: str):
 
         conn = db.open_conn()
 
@@ -81,8 +83,9 @@ class Twitch(Extension):
             conn.close() 
 
     @slash_command(
-        name="twitch_list",
-        description="Lists all twitch channels in the database."
+        name="twitch",
+        sub_cmd_name="list",
+        sub_cmd_description="Lists all twitch channels in the database."
     )
     async def twitch_list(self, ctx: SlashContext):
 

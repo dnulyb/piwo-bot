@@ -14,10 +14,12 @@ from dotenv import find_dotenv, load_dotenv, get_key
 class Team(Extension):
 
     @slash_command(
-        name="team_roster_message_update",
-        description="Updates the roster message in the roster channel."
+        name="team",
+        sub_cmd_name="roster_message_update",
+        sub_cmd_description="Updates the roster message in the roster channel."
+
     )
-    async def team_roster_message_update(self, ctx: SlashContext):
+    async def roster_message_update(self, ctx: SlashContext):
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
@@ -33,8 +35,9 @@ class Team(Extension):
         await ctx.send("team roster message updated.")
 
     @slash_command(
-        name="send_message_to_roster_channel",
-        description="Sends a placeholder message to the roster channel."
+        name="team",
+        sub_cmd_name="send_message_to_roster_channel",
+        sub_cmd_description="Sends a placeholder message to the roster channel."
     )
     async def send_message_to_roster_channel(self, ctx: SlashContext):
 
@@ -49,10 +52,11 @@ class Team(Extension):
 
 
     @slash_command(
-        name="teaminfo_list",
-        description="Get all stored team info."
+        name="team",
+        sub_cmd_name="info_list",
+        sub_cmd_description="Get all stored team info."
     )
-    async def teaminfo_list(self, ctx: SlashContext):
+    async def info_list(self, ctx: SlashContext):
 
         info_list = get_teaminfo_list()
         embed = format_teaminfo_list(info_list)
@@ -60,8 +64,9 @@ class Team(Extension):
         await ctx.send(embed=embed, ephemeral=True)
 
     @slash_command(
-        name="teaminfo_update",
-        description="Add or update team info."
+        name="team",
+        sub_cmd_name="info_update",
+        sub_cmd_description="Add or update team info."
     )
     @slash_option(
         name="name",
@@ -75,7 +80,7 @@ class Team(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def teaminfo_update(self, ctx: SlashContext, name: str, value: str):
+    async def info_update(self, ctx: SlashContext, name: str, value: str):
 
         try:
 
@@ -94,8 +99,9 @@ class Team(Extension):
             conn.close()
 
     @slash_command(
-        name="teaminfo_remove",
-        description="Remove team info."
+        name="team",
+        sub_cmd_name="info_remove",
+        sub_cmd_description="Remove team info."
     )
     @slash_option(
         name="name",
@@ -103,7 +109,7 @@ class Team(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def teaminfo_remove(self, ctx: SlashContext, name: str):
+    async def info_remove(self, ctx: SlashContext, name: str):
 
         try:
 
@@ -119,10 +125,11 @@ class Team(Extension):
             conn.close()
 
     @slash_command(
-        name="team_introduction",
-        description="Get the full team introduction."
+        name="team",
+        sub_cmd_name="introduction",
+        sub_cmd_description="Get the full team introduction."
     )
-    async def team_introduction(self, ctx: SlashContext):
+    async def introduction(self, ctx: SlashContext):
 
         embed = format_team_intro_embed()
 

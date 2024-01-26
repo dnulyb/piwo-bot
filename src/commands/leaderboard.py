@@ -13,19 +13,20 @@ from src.ubi.authentication import get_nadeo_access_token
 from src.commands.map import get_map_records
 from src.commands.tournament import get_tournament_id
 
-class Times(Extension):
+class Leaderboard(Extension):
 
     @slash_command(
-        name="update",
-        description="Updates tournament times."
+        name="leaderboard",
+        sub_cmd_name="update",
+        sub_cmd_description="Updates tournament leaderboard."
     )
     @slash_option(
         name="tournament",
-        description="Name of the tournament you want update times for",
+        description="Name of the tournament you want update leaderboard for",
         required=True,
         opt_type = OptionType.STRING
     )
-    @cooldown(Buckets.GUILD, 1, 60)
+    @cooldown(Buckets.GUILD, 1, 300)
     async def update(self, ctx: SlashContext, tournament: str = None):
 
         await ctx.defer()
@@ -121,8 +122,9 @@ class Times(Extension):
 
 
     @slash_command(
-        name="top_x",
-        description="Retrieves the top X times for a map."
+        name="leaderboard",
+        sub_cmd_name="top_x",
+        sub_cmd_description="Retrieves the top X times for a map."
     )
     @slash_option(
         name="map_name",
@@ -154,8 +156,9 @@ class Times(Extension):
             conn.close()
 
     @slash_command(
-        name="top5",
-        description="Retrieves the top 5 times for a map."
+        name="leaderboard",
+        sub_cmd_name="top_5",
+        sub_cmd_description="Retrieves the top 5 times for a map."
     )
     @slash_option(
         name="map_name",
@@ -163,7 +166,7 @@ class Times(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def top5(self, ctx: SlashContext, map_name: str):
+    async def top_5(self, ctx: SlashContext, map_name: str):
 
         conn = db.open_conn()
 
@@ -181,8 +184,9 @@ class Times(Extension):
             conn.close()
 
     @slash_command(
-        name="top10",
-        description="Retrieves the top 10 times for a map."
+        name="leaderboard",
+        sub_cmd_name="top_10",
+        sub_cmd_description="Retrieves the top 10 times for a map."
     )
     @slash_option(
         name="map_name",
@@ -190,7 +194,7 @@ class Times(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def top10(self, ctx: SlashContext, map_name: str):
+    async def top_10(self, ctx: SlashContext, map_name: str):
 
         conn = db.open_conn()
 
@@ -210,7 +214,8 @@ class Times(Extension):
 
     @slash_command(
         name="leaderboard",
-        description="Retrieves all times for a map. A maximum of 50 times will be retrieved."
+        sub_cmd_name="map",
+        sub_cmd_description="Retrieves all times for a map, that exists in the database. A maximum of 50 times will be retrieved."
     )
     @slash_option(
         name="map_name",
@@ -218,7 +223,7 @@ class Times(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def leaderboard(self, ctx: SlashContext, map_name: str):
+    async def map(self, ctx: SlashContext, map_name: str):
 
         conn = db.open_conn()
 

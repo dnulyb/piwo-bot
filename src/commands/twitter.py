@@ -47,8 +47,9 @@ class Twitter(Extension):
         print("Finished checking for new tweets.")
 
     @slash_command(
-        name="tweets_toggle",
-        description="Turn tweets ON or OFF."
+        name="twitter",
+        sub_cmd_name="toggle",
+        sub_cmd_description="Toggle automatic tweets ON or OFF."
     )
     @slash_option(
         name="toggle",
@@ -60,7 +61,7 @@ class Twitter(Extension):
             SlashCommandChoice(name="OFF", value="OFF"),
         ]
     )
-    async def tweets_toggle(self, ctx: SlashContext, toggle: str):
+    async def toggle(self, ctx: SlashContext, toggle: str):
 
         if toggle == "ON":
             self.check_tweets.start()

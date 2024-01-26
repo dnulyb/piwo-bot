@@ -12,8 +12,9 @@ from src.commands.tournament import get_tournament_id
 class Roster(Extension):
 
     @slash_command(
-    name="roster_create",
-    description="Create a roster."
+        name="roster",
+        sub_cmd_name="create",
+        sub_cmd_description="Create a roster."
     )
     @slash_option(
         name="name",
@@ -27,7 +28,7 @@ class Roster(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def roster_create(self, ctx: SlashContext, name: str, tournament: str):
+    async def create(self, ctx: SlashContext, name: str, tournament: str):
 
         conn = db.open_conn()
         try:
@@ -49,8 +50,9 @@ class Roster(Extension):
             conn.close() 
 
     @slash_command(
-        name="roster_delete",
-        description="Delete a roster."
+        name="roster",
+        sub_cmd_name="delete",
+        sub_cmd_description="Delete a roster."
     )
     @slash_option(
         name="name",
@@ -58,7 +60,7 @@ class Roster(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def roster_delete(self, ctx: SlashContext, name: str):
+    async def delete(self, ctx: SlashContext, name: str):
 
         conn = db.open_conn()
         try:
@@ -71,10 +73,11 @@ class Roster(Extension):
             conn.close() 
 
     @slash_command(
-        name="roster_list",
-        description="Lists all rosters."
+        name="roster",
+        sub_cmd_name="list",
+        sub_cmd_description="Lists all rosters."
     )
-    async def roster_list(self, ctx: SlashContext):
+    async def list(self, ctx: SlashContext):
         conn = db.open_conn()
         try:
             query = (db.list_rosters, None)
@@ -87,8 +90,9 @@ class Roster(Extension):
             conn.close() 
 
     @slash_command(
-        name="roster_add",
-        description="Adds players to a roster. Separate player names by commas, example: 'p1,p2,p3'."
+        name="roster",
+        sub_cmd_name="add",
+        sub_cmd_description="Adds players to a roster. Separate player names by commas, example: 'p1,p2,p3'."
     )
     @slash_option(
         name="roster",
@@ -102,7 +106,7 @@ class Roster(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def roster_add(self, ctx: SlashContext, roster: str, names: str):
+    async def add(self, ctx: SlashContext, roster: str, names: str):
         
         conn = db.open_conn()
 
@@ -142,8 +146,9 @@ class Roster(Extension):
             conn.close() 
 
     @slash_command(
-        name="roster_remove",
-        description="Removes players from a roster. Separate player names by commas, example: 'p1,p2,p3'."
+        name="roster",
+        sub_cmd_name="remove_players",
+        sub_cmd_description="Removes players from a roster. Separate player names by commas, example: 'p1,p2,p3'."
     )
     @slash_option(
         name="roster",
@@ -157,7 +162,7 @@ class Roster(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def roster_remove(self, ctx: SlashContext, roster: str, names: str):
+    async def remove_players(self, ctx: SlashContext, roster: str, names: str):
         
         conn = db.open_conn()
 
@@ -196,6 +201,7 @@ class Roster(Extension):
         finally:
             conn.close() 
 
+    # Keep this as its own base command for now
     @slash_command(
         name="registered_players",
         description="Shows all players registered to a roster."

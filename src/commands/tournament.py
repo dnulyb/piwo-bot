@@ -14,7 +14,8 @@ class Tournament(Extension):
 
     @slash_command(
         name="tournament",
-        description="Tournament management"
+        sub_cmd_name="manage",
+        sub_cmd_description="Tournament management"
     )
     @slash_option(
         name="action",
@@ -69,8 +70,9 @@ class Tournament(Extension):
             conn.close() 
 
     @slash_command(
-        name="tournament_list",
-        description="Lists all tournaments."
+        name="tournament",
+        sub_cmd_name="list",
+        sub_cmd_description="Lists all tournaments."
     )
     async def tournament_list(self, ctx: SlashContext):
         conn = db.open_conn()

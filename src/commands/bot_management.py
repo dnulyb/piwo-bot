@@ -39,8 +39,9 @@ async def command(ctx: SlashContext):
 class BotManagement(Extension):
 
     @slash_command(
-        name="shutdown",
-        description="Shuts down the bot."
+        name="bot",
+        sub_cmd_name="shutdown",
+        sub_cmd_description="Shuts down the bot."
     )
     @check(is_owner())
     async def shutdown(self, ctx: SlashContext):
@@ -48,8 +49,9 @@ class BotManagement(Extension):
         await self.bot.stop()
 
     @slash_command(
-        name="reload_extension",
-        description="Reloads a bot extension."
+        name="bot",
+        sub_cmd_name="reload_extension",
+        sub_cmd_description="Reloads a bot extension."
     )
     @slash_option(
         name="name",
@@ -66,12 +68,12 @@ class BotManagement(Extension):
                 await ctx.send("Reloaded bot extension.", ephemeral=True)
                 return
 
-
         await ctx.send("Could not reload extension: name not found.", ephemeral=True)
 
     @slash_command(
-        name="ping",
-        description="Replies to pings",
+        name="bot",
+        sub_cmd_name="ping",
+        sub_cmd_description="Replies to pings."
     )
     @cooldown(Buckets.GUILD, 1, 60)
     async def ping(self, ctx: SlashContext):
@@ -82,14 +84,14 @@ class BotManagement(Extension):
         print("Checking if Nadeo access token needs an update...")
         check_token_refresh()
 
-    
     @slash_command(
-        name="bot_discord_info_update",
-        description="Update discord channels etc. that the bot will use for various purposes."
+        name="bot",
+        sub_cmd_name="discord_channel_id_update",
+        sub_cmd_description="Update discord channels etc. that the bot will use for various purposes."
     )
     @slash_option(
         name="action",
-        description="Which bot discord info to update.",
+        description="Which bot discord channel id to update.",
         required=True,
         opt_type = OptionType.STRING,
         choices=[
@@ -106,7 +108,7 @@ class BotManagement(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def bot_discord_info_update(self, ctx: SlashContext, action: str, value: str):
+    async def discord_channel_id_update(self, ctx: SlashContext, action: str, value: str):
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)

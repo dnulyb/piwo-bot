@@ -35,10 +35,11 @@ class Cotd(Extension):
     #Get updated totd leaderboard
     @slash_command(
         name="totd",
-        description="Updates TOTD times, and shows the current leaderboard."
+        sub_cmd_name="leaderboard",
+        sub_cmd_description="Updates TOTD times, and shows the current leaderboard."
     )
     @cooldown(Buckets.GUILD, 1, 60)
-    async def totd(self, ctx: SlashContext):
+    async def leaderboard(self, ctx: SlashContext):
 
         await ctx.defer()
 
@@ -82,11 +83,12 @@ class Cotd(Extension):
         await ctx.send(embed=embed)
 
     @slash_command(
-        name="totd_get_todays_map",
+        name="totd",
+        sub_cmd_name="map_info",
         description="Retrieves and stores info about todays TOTD in the bot."
     )
     @cooldown(Buckets.GUILD, 1, 1800)
-    async def totd_get_todays_map(self, ctx: SlashContext):
+    async def map_info(self, ctx: SlashContext):
 
         await ctx.defer()
 
@@ -97,24 +99,22 @@ class Cotd(Extension):
         totd_id = get_key(dotenv_path, ("TOTD_MAP_ID"))
         totd_name = get_key(dotenv_path, ("TOTD_MAP_NAME"))
 
-        await ctx.send("Retrieved info for today's totd: \nMap name: " + totd_name + "\nMap ID: " + totd_id)
+        await ctx.send("Today's TOTD: \nMap name: " + totd_name + "\nMap ID: " + totd_id)
     
 
     @check(is_owner())
-    @cooldown(Buckets.GUILD, 1, 60)
+    @cooldown(Buckets.GUILD, 1, 1800)
     @slash_command(
-        name="cotd_test",
-        description="test for cotd."
+        name="cotd",
+        sub_cmd_name="quali_results",
+        sub_cmd_description="Shows results for today's COTD qualification."
     )
-    async def cotd_test(self, ctx: SlashContext):
+    async def quali_results(self, ctx: SlashContext):
 
         await ctx.defer()
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
-
-        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
-        channel = self.bot.get_channel(channel_id)
 
         results = get_cotd_quali_results()
         if(results == None):
@@ -125,8 +125,9 @@ class Cotd(Extension):
         
         embed = format_cotd_quali_results(map_name, results)
 
-        await ctx.send("Posting cotd quali results:")
-        await channel.send(embed=embed)
+        #await ctx.send("Posting cotd quali results:")
+        print("Sending cotd quali results to channel")
+        await ctx.send(embed=embed)
 
     # Time trigger is UTC by default
     #@Task.create(TimeTrigger(hour=18, minute=1)) #cotd start time

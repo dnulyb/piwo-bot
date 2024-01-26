@@ -12,8 +12,9 @@ import src.db.db as db
 class Player(Extension):
 
     @slash_command(
-    name="player_add",
-    description="Add a player to the database."
+        name="player",
+        sub_cmd_name="add",
+        sub_cmd_description="Add a player to the database."
     )
     @slash_option(
         name="nickname",
@@ -45,7 +46,7 @@ class Player(Extension):
         required=False,
         opt_type = OptionType.STRING
     )
-    async def player_add(self, ctx: SlashContext, nickname: str, account_id: str, 
+    async def add(self, ctx: SlashContext, nickname: str, account_id: str, 
                          country: str = None, official_roster: str = None, extra: str = None):
 
         conn = db.open_conn()
@@ -66,8 +67,9 @@ class Player(Extension):
             conn.close() 
 
     @slash_command(
-        name="player_remove",
-        description="Remove a player from the database."
+        name="player",
+        sub_cmd_name="remove",
+        sub_cmd_description="Remove a player from the database."
     )
     @slash_option(
         name="nickname",
@@ -75,7 +77,7 @@ class Player(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def player_remove(self, ctx: SlashContext, nickname: str):
+    async def remove(self, ctx: SlashContext, nickname: str):
 
         conn = db.open_conn()
 
@@ -95,8 +97,9 @@ class Player(Extension):
             conn.close() 
 
     @slash_command(
-        name="player_list",
-        description="Lists all players in the database."
+        name="player",
+        sub_cmd_name="list",
+        sub_cmd_description="Lists all players in the database."
     )
     async def player_list(self, ctx: SlashContext):
 
@@ -118,8 +121,9 @@ class Player(Extension):
             conn.close() 
 
     @slash_command(
-        name="player_update",
-        description="Update info for a player."
+        name="player",
+        sub_cmd_name="update",
+        sub_cmd_description="Update info for a player."
     )
     @slash_option(
         name="nickname",
@@ -145,7 +149,7 @@ class Player(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    async def player_update(self, ctx: SlashContext, nickname: str, action: str, value: str):
+    async def update(self, ctx: SlashContext, nickname: str, action: str, value: str):
 
         conn = db.open_conn()
 
