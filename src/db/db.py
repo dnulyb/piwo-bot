@@ -32,7 +32,7 @@ get_roster_players =    """ SELECT Player.nickname, Roster.name
                         """
 
 get_tournament_roster_players = """ 
-                                SELECT Player.nickname, Roster.name
+                                SELECT Player.nickname, Player.account_id, Roster.name
                                 FROM Participant
                                 JOIN Player ON Participant.player_id = Player.id
                                 JOIN Roster ON Participant.roster_id = Roster.id
@@ -136,7 +136,7 @@ add_time =              """ INSERT INTO Time(player_id, map_id, time)
 get_n_map_times =       """ SELECT Player.nickname, Time.time  
                             FROM Map
                             JOIN Time ON Time.map_id = Map.id
-                            JOIN Player ON Player.id = Time.id
+                            JOIN Player ON Player.id = Time.player_id
                             WHERE Map.name=?
                             ORDER BY CAST (Time.time AS DECIMAL) ASC
                             LIMIT ?

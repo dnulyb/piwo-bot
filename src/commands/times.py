@@ -142,7 +142,12 @@ class Times(Extension):
 
         try:
             res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, x)))
-            await ctx.send(f"{res}")
+            if(len(res) == 0):
+                await ctx.send(f"Error occurred while running command: Times for map {map_name} not found")
+                return
+            
+            embed = format_leaderboard_embed(map_name, res)
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
@@ -164,7 +169,12 @@ class Times(Extension):
 
         try:
             res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 5)))
-            await ctx.send(f"{res}")
+            if(len(res) == 0):
+                await ctx.send(f"Error occurred while running command: Times for map {map_name} not found")
+                return
+
+            embed = format_leaderboard_embed(map_name, res)
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
@@ -186,7 +196,12 @@ class Times(Extension):
 
         try:
             res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 10)))
-            await ctx.send(f"{res}")
+            if(len(res) == 0):
+                await ctx.send(f"Error occurred while running command: Times for map {map_name} not found")
+                return
+            
+            embed = format_leaderboard_embed(map_name, res)
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
@@ -212,7 +227,6 @@ class Times(Extension):
 
             if len(res) == 0:
                 await ctx.send("Error retrieving leaderboard times: No times found.")
-                conn.close()
                 return
             
             embed = format_leaderboard_embed(map_name, res)

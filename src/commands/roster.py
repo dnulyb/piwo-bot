@@ -238,7 +238,7 @@ def format_registered_players(players):
     embed.title = "Registered players"
 
     res = {}
-    for (player, roster) in players:
+    for (player, _, roster) in players:
         if roster in res:
             res[roster].append(player)
         else:
