@@ -38,7 +38,7 @@ class Cotd(Extension):
         description="Updates TOTD times, and shows the current leaderboard."
     )
     @cooldown(Buckets.GUILD, 1, 60)
-    async def totd_leaderboard(self, ctx: SlashContext):
+    async def totd(self, ctx: SlashContext):
 
         await ctx.defer()
 
@@ -80,6 +80,25 @@ class Cotd(Extension):
         embed = format_totd_leaderboard(totd_name, sorted_results)
 
         await ctx.send(embed=embed)
+
+    @slash_command(
+        name="totd_get_todays_map",
+        description="Retrieves and stores info about todays TOTD in the bot."
+    )
+    @cooldown(Buckets.GUILD, 1, 1800)
+    async def totd_get_todays_map(self, ctx: SlashContext):
+
+        await ctx.defer()
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        get_totd_map_info()
+        totd_id = get_key(dotenv_path, ("TOTD_MAP_ID"))
+        totd_name = get_key(dotenv_path, ("TOTD_MAP_NAME"))
+
+        await ctx.send("Retrieved info for today's totd: \nMap name: " + totd_name + "\nMap ID: " + totd_id)
+    
 
     @check(is_owner())
     @cooldown(Buckets.GUILD, 1, 60)
@@ -360,7 +379,7 @@ def get_totd_map_info():
     set_key(dotenv_path, "TOTD_MAP_ID", map_id)
     set_key(dotenv_path, "TOTD_MAP_NAME", map_name)
 
-    return (map_id, map_uid, clean_map_name(map_name))
+    return (map_id, map_uid, map_name)
 
 
 def clean_map_name(map_name):
