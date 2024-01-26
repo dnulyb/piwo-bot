@@ -4,7 +4,8 @@ from interactions import (
     slash_option, 
     SlashContext,
     SlashCommandChoice,
-    OptionType
+    OptionType,
+    Embed
 )
 import src.db.db as db
 
@@ -76,7 +77,8 @@ class Tournament(Extension):
         try:
             query = (db.list_tournaments, None)
             res = db.retrieve_data(conn, query)
-            await ctx.send(f"{res}")
+            embed = format_tournament_list(res)
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
@@ -86,11 +88,31 @@ class Tournament(Extension):
 def get_tournament_id(conn, tournament):
 
     tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
-    if(len(tournament_id == 0)):
+    if(len(tournament_id) == 0):
         return None
     
     return tournament_id[0][0]
 
+def format_tournament_list(tournaments):
+
+    embed = Embed()
+    embed.title = "Tournaments:"
+
+    names = ""
+    autoupdates = ""
+    for (name, autoupdate) in tournaments:
+
+        names += name + "\n"
+        if autoupdate == 1:
+            autoupdates += "ON" + "\n"
+        else:
+            autoupdates += "OFF" + "\n"
+
+    embed.add_field(name="Tournament", value=names, inline=True)
+    embed.add_field(name="Auto update", value=autoupdates, inline=True)
+
+
+    return embed
 
     
 

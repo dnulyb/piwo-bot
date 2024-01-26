@@ -6,7 +6,8 @@ from interactions import (
     OptionType,
     Task,
     IntervalTrigger,
-    listen
+    listen,
+    Embed
 )
 from interactions.api.events import Startup
 
@@ -83,17 +84,15 @@ class Twitch(Extension):
         name="twitch_list",
         description="Lists all twitch channels in the database."
     )
-    async def player_list(self, ctx: SlashContext):
+    async def twitch_list(self, ctx: SlashContext):
 
         conn = db.open_conn()
 
         try:
 
-            query = [db.get_twitch_list, None]
-            res = db.retrieve_data(conn, query)
-
-            # always send reply
-            await ctx.send(f"{res}")
+            res = get_streams()
+            embed = format_channel_list(res)
+            await ctx.send(embed=embed)
 
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
@@ -166,3 +165,19 @@ def stream_recently_live(stream):
     
     except:
         return False
+    
+
+def format_channel_list(channels):
+
+    embed = Embed()
+    embed.title = "Twitch channels"
+    embed.description = "A message will be sent when these twitch channels go live."
+
+    value = ""
+
+    for channel in channels:
+        value += channel + "\n"
+
+    embed.add_field(name="Channels", value=value, inline=False)
+
+    return embed

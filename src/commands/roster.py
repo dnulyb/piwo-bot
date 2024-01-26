@@ -79,7 +79,8 @@ class Roster(Extension):
         try:
             query = (db.list_rosters, None)
             res = db.retrieve_data(conn, query)
-            await ctx.send(f"{res}")
+            embed = format_roster_list(res)
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
@@ -242,6 +243,26 @@ def format_registered_players(players):
             res[roster].append(player)
         else:
             res[roster] = [player]
+
+    for key in res:
+        value = ""
+        for val in res[key]:
+            value += val + "\n"
+        embed.add_field(name=key, value=value, inline=False)
+
+    return embed
+
+def format_roster_list(rosters):
+
+    embed = Embed()
+    embed.title = "Rosters for tournaments:"
+
+    res = {}
+    for (roster, tournament) in rosters:
+        if roster in res:
+            res[tournament].append(roster)
+        else:
+            res[tournament] = [roster]
 
     for key in res:
         value = ""

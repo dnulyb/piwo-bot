@@ -221,5 +221,5 @@ def get_map_data(map_uids):
                 for elem in res]
 
     return map_data
-    
+
 
