@@ -59,6 +59,10 @@ class Team(Extension):
     async def info_list(self, ctx: SlashContext):
 
         info_list = get_teaminfo_list()
+        if(len(info_list) == 0):
+            await ctx.send("Error: No team info found in database.")
+            return
+        
         embed = format_teaminfo_list(info_list)
 
         await ctx.send(embed=embed, ephemeral=True)
