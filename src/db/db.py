@@ -146,7 +146,6 @@ get_n_map_times =       """ SELECT Player.nickname, Time.time
 add_to_mappack =        """ INSERT INTO Mappack(tournament_id, map_id)
                             VALUES(?,?) """
 
-#only map_id needed
 remove_from_mappack =   """ DELETE FROM Mappack
                             WHERE map_id=? """
 

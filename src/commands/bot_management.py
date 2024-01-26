@@ -21,9 +21,6 @@ from src.ubi.authentication import check_token_refresh
 import pkgutil
 from dotenv import find_dotenv, load_dotenv, set_key
 
-
-
-
 """
 #custom check example
 async def my_check(ctx: BaseContext):
@@ -127,7 +124,7 @@ class BotManagement(Extension):
             case _:
                 await ctx.send("Invalid info name")
 
-        await ctx.send("Updated: " + action +", with: " + value)
+        await ctx.send("Updated: " + action + ", with: " + value)
 
     @listen(Startup)
     async def on_startup(self):

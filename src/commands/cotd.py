@@ -155,7 +155,7 @@ class Cotd(Extension):
         await channel.send(embed=embed)
 
     @listen(Startup)
-    async def on_startup(self, event: Startup):
+    async def on_startup(self):
         self.cotd_trigger.start()
 
 

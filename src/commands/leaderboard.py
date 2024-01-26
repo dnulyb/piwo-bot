@@ -9,9 +9,7 @@ from interactions import (
     Buckets,
     Task,
     IntervalTrigger,
-    listen,
-    OrTrigger,
-    TimeTrigger
+    listen
 )
 from interactions.api.events import Startup
 
@@ -35,7 +33,7 @@ class Leaderboard(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    @cooldown(Buckets.GUILD, 1, 300)
+    @cooldown(Buckets.GUILD, 1, 30)
     async def update(self, ctx: SlashContext, tournament: str = None):
 
         await ctx.defer()
