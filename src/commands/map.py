@@ -3,7 +3,8 @@ from interactions import (
     slash_command, 
     slash_option, 
     SlashContext,
-    OptionType
+    OptionType,
+    Embed
 )
 import src.db.db as db
 from src.commands.tournament import get_tournament_id
@@ -137,7 +138,9 @@ class Map(Extension):
                 query = (db.get_tournament_maps, [tournament_id])
 
             res = db.retrieve_data(conn, query)
-            await ctx.send(f"{res}")
+            embed = format_map_list(res)
+            await ctx.send(embed=embed)
+            
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
         finally:
@@ -224,5 +227,26 @@ def get_map_data(map_uids):
                 for elem in res]
 
     return map_data
+
+
+def format_map_list(maps):
+
+    embed = Embed()
+    embed.title = "Tournament maps:"
+
+    res = {}
+    for (map, tournament) in maps:
+        if map in res:
+            res[tournament].append(map)
+        else:
+            res[tournament] = [map]
+
+    for key in res:
+        value = ""
+        for val in res[key]:
+            value += val + "\n"
+        embed.add_field(name=key, value=value, inline=False)
+
+    return embed
 
 
