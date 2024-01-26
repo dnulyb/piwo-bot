@@ -6,12 +6,21 @@ from interactions import (
     OptionType,
     Embed,
     cooldown,
-    Buckets
+    Buckets,
+    Task,
+    IntervalTrigger,
+    listen,
+    OrTrigger,
+    TimeTrigger
 )
+from interactions.api.events import Startup
+
 import src.db.db as db
 from src.ubi.authentication import get_nadeo_access_token
 from src.commands.map import get_map_records
 from src.commands.tournament import get_tournament_id
+
+import asyncio
 
 class Leaderboard(Extension):
 
@@ -241,6 +250,99 @@ class Leaderboard(Extension):
         finally:
             conn.close()
 
+
+    @Task.create(IntervalTrigger(minutes=35))
+    async def update_tournaments_automatically(self):
+
+        print("Updating tournaments automatically: ")
+
+        conn = db.open_conn()
+        query = (db.list_tournaments, None)
+        tournaments = db.retrieve_data(conn, query)
+
+        for (tournament_name, autoupdate) in tournaments:
+            if autoupdate == 1:
+                
+                print("Trying to update tournament: " + tournament_name + "...")
+                #Perform update
+                try:
+
+                    # load everything that should be updated from db:
+                    # Get tournament map ids
+                    tournament_id = get_tournament_id(conn, tournament_name)
+
+                    if tournament_id == None:
+                        print("Error occurred in update_tournaments_automatically: Tournament id not found")
+                        continue
+                    
+                    maps = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
+                    if(len(maps) == 0):
+                        print("Error occurred in update_tournaments_automatically: Tournament maps not found")
+                        continue
+
+                    map_names = []
+                    map_ids = []
+                    for (map_name, map_id) in maps:
+                        map_names.append(map_name)
+                        map_ids.append(map_id)
+
+                    # Get tournament player ids 
+                    players = db.retrieve_data(conn, (db.get_tournament_roster_players, [tournament_id]))
+                    if(len(players) == 0):
+                        print("Error occurred in update_tournaments_automatically: Tournament players not found")
+                        continue
+
+                    player_names = []
+                    player_ids = []
+                    player_roster = []
+                    for (name, id, roster) in players:
+                        player_names.append(name)
+                        player_ids.append(id)
+                        player_roster.append(roster)
+
+                            
+                    # get data from nadeo and format it nicely
+                    token = get_nadeo_access_token()
+                    res = get_map_records(player_ids, map_ids, token)
+                        
+                    # update db 
+                    queries = []
+                    for [time, player_ubi_id, map_ubi_id] in res:
+
+                        player_id = db.retrieve_data(conn, (db.get_player_id_by_account_id, [player_ubi_id]))
+
+                        if(len(player_id) == 0):
+                            print("Error occurred in update_tournaments_automatically: Tournament player ids not found")
+                            continue
+                            
+                        player_id = player_id[0][0]
+
+                        map_id = db.retrieve_data(conn, (db.get_map_db_id_by_map_id, [map_ubi_id]))
+
+                        if(len(map_id) == 0):
+                            print("Error occurred in update_tournaments_automatically: Tournament maps not found")
+                            continue
+                            
+                        map_id = map_id[0][0]
+
+                        queries.append((db.add_time, (player_id, map_id, time)))
+
+                    db.execute_queries(conn, queries)
+
+                    print("Times for tournament updated: " + tournament_name)
+                    await asyncio.sleep(1) # Stagger next update slightly
+
+
+                except Exception as e:
+                    print(f"Exception occurred in update_tournaments_automatically: {e}")
+
+        conn.close()
+        print("Finished updating tournaments automatically.")
+
+    @listen(Startup)
+    async def on_startup(self):
+        self.update_tournaments_automatically.start()
+        
 
 #times: [(player, time)]
 #   where the first entry is the best time

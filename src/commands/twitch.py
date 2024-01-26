@@ -127,7 +127,7 @@ class Twitch(Extension):
         print("Finished checking for recently started streams.")
 
     @listen(Startup)
-    async def on_startup(self, event: Startup):
+    async def on_startup(self):
         self.check_recently_started_streams.start()
 
 

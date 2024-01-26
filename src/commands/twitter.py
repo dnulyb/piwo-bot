@@ -16,6 +16,8 @@ import feedparser as fp
 from dateutil import parser
 from dotenv import find_dotenv, load_dotenv, set_key, get_key
 
+fxtwitter_url="https://fxtwitter.com/"
+
 class Twitter(Extension):
 
     @Task.create(IntervalTrigger(minutes=30))
@@ -73,7 +75,7 @@ class Twitter(Extension):
             await ctx.send("ERROR: Couldn't toggle tweets.")
 
     @listen(Startup)
-    async def on_startup(self, event: Startup):
+    async def on_startup(self):
         self.check_tweets.start()
 
 def check_for_new_tweets():
@@ -124,8 +126,8 @@ def check_for_new_tweets():
             set_key(dotenv_path, "LATEST_TWEET_DATE", str(time))
             latest_of_new_tweets = parser.parse(get_key(dotenv_path, "LATEST_TWEET_DATE"))
 
-        replacement_url = get_key(dotenv_path, "FXTWITTER_URL")
-        final_link = link.replace(base_url, replacement_url)
+        # Replace twitter link with fxtwitter link, to get discord embeds working
+        final_link = link.replace(base_url, fxtwitter_url)
         # clean trailing '#m' in links
         final_link = final_link.replace('#m', '')
 

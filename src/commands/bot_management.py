@@ -130,7 +130,7 @@ class BotManagement(Extension):
         await ctx.send("Updated: " + action +", with: " + value)
 
     @listen(Startup)
-    async def on_startup(self, event: Startup):
+    async def on_startup(self):
 
         # Make sure db is set up
         db.init()

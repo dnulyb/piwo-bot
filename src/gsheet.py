@@ -1,4 +1,7 @@
+# TODO: Add google sheet updating functionality to the bot
+
 import pygsheets
+
 
 
 # Writes 'values' to the given 'range'.
