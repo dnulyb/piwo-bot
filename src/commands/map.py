@@ -19,6 +19,7 @@ class Map(Extension):
 
     @slash_command(
         name="map",
+        description="Map management commands.",
         sub_cmd_name="add",
         sub_cmd_description="Adds a map to a tournament."
     )

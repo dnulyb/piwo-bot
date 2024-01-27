@@ -37,6 +37,7 @@ class BotManagement(Extension):
 
     @slash_command(
         name="bot",
+        description="Bot management commands.",
         sub_cmd_name="shutdown",
         sub_cmd_description="Shuts down the bot."
     )

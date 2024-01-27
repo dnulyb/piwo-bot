@@ -15,6 +15,7 @@ class Team(Extension):
 
     @slash_command(
         name="team",
+        description="Team management, update team info etc.",
         sub_cmd_name="roster_message_update",
         sub_cmd_description="Updates the roster message in the roster channel."
     )

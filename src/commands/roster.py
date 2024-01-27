@@ -13,6 +13,7 @@ class Roster(Extension):
 
     @slash_command(
         name="roster",
+        description="Roster management commands.",
         sub_cmd_name="create",
         sub_cmd_description="Create a roster."
     )

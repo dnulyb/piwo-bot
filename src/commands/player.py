@@ -13,6 +13,7 @@ class Player(Extension):
 
     @slash_command(
         name="player",
+        description="Player management commands.",
         sub_cmd_name="add",
         sub_cmd_description="Add a player to the database."
     )
@@ -98,6 +99,7 @@ class Player(Extension):
 
     @slash_command(
         name="list",
+        description="List all database entries of a certain type.",
         sub_cmd_name="players",
         sub_cmd_description="Lists all players in the database."
     )
@@ -126,6 +128,7 @@ class Player(Extension):
 
     @slash_command(
         name="info",
+        description="Get info about various things in the database.",
         sub_cmd_name="player",
         sub_cmd_description="Get info about a player in the database."
     )

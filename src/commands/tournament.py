@@ -14,6 +14,7 @@ class Tournament(Extension):
 
     @slash_command(
         name="tournament",
+        description="Tournament management commands.",
         sub_cmd_name="manage",
         sub_cmd_description="Tournament management"
     )

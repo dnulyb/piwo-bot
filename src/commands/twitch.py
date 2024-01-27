@@ -24,6 +24,7 @@ class Twitch(Extension):
 
     @slash_command(
         name="twitch",
+        description="Manage Twitch channels to follow for updates when they go live.",
         sub_cmd_name="add",
         sub_cmd_description="Add a twitch channel to track for live notifications."
     )

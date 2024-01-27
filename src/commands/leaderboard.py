@@ -24,6 +24,7 @@ class Leaderboard(Extension):
 
     @slash_command(
         name="leaderboard",
+        description="Leaderboards for maps, tournaments etc.",
         sub_cmd_name="update",
         sub_cmd_description="Updates tournament leaderboard."
     )

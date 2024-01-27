@@ -50,6 +50,7 @@ class Twitter(Extension):
 
     @slash_command(
         name="twitter",
+        description="Set a Twitter account to get tweets posted in Discord.",
         sub_cmd_name="toggle",
         sub_cmd_description="Toggle automatic tweets ON or OFF."
     )

@@ -35,6 +35,7 @@ class Cotd(Extension):
     #Get updated totd leaderboard
     @slash_command(
         name="totd",
+        description="TOTD info.",
         sub_cmd_name="leaderboard",
         sub_cmd_description="Updates TOTD times, and shows the current leaderboard."
     )
@@ -106,6 +107,7 @@ class Cotd(Extension):
     @cooldown(Buckets.GUILD, 1, 1800)
     @slash_command(
         name="cotd",
+        description="COTD info.",
         sub_cmd_name="quali_results",
         sub_cmd_description="Shows results for today's COTD qualification."
     )
