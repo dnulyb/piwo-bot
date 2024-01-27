@@ -11,4 +11,4 @@ PIWO-bot is a Discord bot created for the PIWO Trackmania Team Discord server.
 * and more
 
 ## Self-host
-To host the bot yourself, ```git clone``` the repository to your machine, set up the .env file (example provided in .env_example), and run with ```python3 bot.py```.
+To host the bot yourself, ```git clone``` the repository to your machine, set up the .env file (example provided in .env_example), install the required libraries with ```pip install -r requirements.txt```, and finally start the bot with ```python3 bot.py```.
