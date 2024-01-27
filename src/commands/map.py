@@ -128,6 +128,13 @@ class Map(Extension):
         try:
             if(tournament == None):
                 query = (db.get_maps, None)
+                res = db.retrieve_data(conn, query)
+                if(len(res) == 0):
+                    await ctx.send("Error while retrieving maps: No maps found.")
+                    return
+                
+                embed = format_map_list(res)
+                await ctx.send(embed=embed)
             else:
                 tournament_id = get_tournament_id(conn, tournament)
 
@@ -136,10 +143,15 @@ class Map(Extension):
                     conn.close()
                     return
                 query = (db.get_tournament_maps, [tournament_id])
+                res = db.retrieve_data(conn, query)
+                if(len(res) == 0):
+                    await ctx.send("Error while retrieving maps: No maps found.")
+                    return
+                
+                embed = format_tournament_map_list(res)
+                await ctx.send(embed=embed)
 
-            res = db.retrieve_data(conn, query)
-            embed = format_map_list(res)
-            await ctx.send(embed=embed)
+
             
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
@@ -230,6 +242,18 @@ def get_map_data(map_uids):
 
 
 def format_map_list(maps):
+
+    embed = Embed()
+    embed.title = "All maps in the database"
+
+    value = ""
+    for map in maps:
+        value += map + "\n"
+    
+    embed.add_field(name="Map", value=value, inline=False)
+    return embed
+
+def format_tournament_map_list(maps):
 
     embed = Embed()
     embed.title = "Tournament maps:"

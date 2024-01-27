@@ -97,8 +97,8 @@ class Player(Extension):
             conn.close() 
 
     @slash_command(
-        name="player",
-        sub_cmd_name="list",
+        name="list",
+        sub_cmd_name="players",
         sub_cmd_description="Lists all players in the database."
     )
     async def list(self, ctx: SlashContext):
