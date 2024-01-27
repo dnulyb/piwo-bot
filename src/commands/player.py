@@ -141,12 +141,12 @@ class Player(Extension):
 
         try:
 
-            query = [(db.get_player_info, [nickname])]
+            query = (db.get_player_info, [nickname])
             res = db.retrieve_data(conn, query)
             if(len(res) == 0):
                 await ctx.send("Error retrieving player info: Player not found.")
                 return
-
+            
             embed = format_player(res)
 
             # always send reply
