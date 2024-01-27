@@ -16,7 +16,7 @@ GUILD_ID = get_key(dotenv_path, "GUILD_ID")
 
 bot = Client(
     # set debug_scope to not be in global scope
-    debug_scope=GUILD_ID,
+    #debug_scope=GUILD_ID,
     # any discord intents we need
     intents=Intents.GUILDS
 )
