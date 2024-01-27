@@ -73,6 +73,11 @@ update_player_official_roster = """ UPDATE Player
 update_player_extra =           """ UPDATE Player
                                     SET extra=?
                                     WHERE nickname=? """
+
+get_player_info =           """ SELECT nickname, account_id, country, official_roster
+                                FROM Player
+                                WHERE nickname=?
+                            """
                             
 
 get_player_id =         """ SELECT id

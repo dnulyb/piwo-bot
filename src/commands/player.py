@@ -109,7 +109,45 @@ class Player(Extension):
 
             query = [db.list_players, None]
             res = db.retrieve_data(conn, query)
+            if(len(res) == 0):
+                await ctx.send("Error retrieving players: No players found.")
+                return
+            
             embed = format_player_list(res)
+
+            # always send reply
+            await ctx.send(embed=embed, ephemeral=True)
+
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}")
+
+        finally:
+            conn.close() 
+
+    @slash_command(
+        name="info",
+        sub_cmd_name="player",
+        sub_cmd_description="Get info about a player in the database."
+    )
+    @slash_option(
+        name="nickname",
+        description="Nickname of the player you want info about.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def info_player(self, ctx: SlashContext, nickname: str):
+
+        conn = db.open_conn()
+
+        try:
+
+            query = [(db.get_player_info, [nickname])]
+            res = db.retrieve_data(conn, query)
+            if(len(res) == 0):
+                await ctx.send("Error retrieving player info: Player not found.")
+                return
+
+            embed = format_player(res)
 
             # always send reply
             await ctx.send(embed=embed, ephemeral=True)
@@ -199,6 +237,22 @@ def format_player_list(players):
         if (roster == None):
             roster = "None"
         value += player + ", " + country + ", " + roster + "\n"
+
+    embed.add_field(name="\u200b", value=value, inline=False)
+
+    return embed
+
+def format_player(player):
+
+    embed = Embed()
+    embed.title = "Player info"
+
+    (nickname, account_id, country, official_roster) = player
+    value = ""
+    value += "Nickname: " + nickname + "\n"
+    value += "Account id: " + account_id + "\n"
+    value += "Country: " + country + "\n"
+    value += "Official roster: " + official_roster + "\n"
 
     embed.add_field(name="\u200b", value=value, inline=False)
 
