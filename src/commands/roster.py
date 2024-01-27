@@ -73,8 +73,8 @@ class Roster(Extension):
             conn.close() 
 
     @slash_command(
-        name="roster",
-        sub_cmd_name="list",
+        name="list",
+        sub_cmd_name="rosters",
         sub_cmd_description="Lists all rosters."
     )
     async def list(self, ctx: SlashContext):

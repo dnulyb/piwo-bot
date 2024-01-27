@@ -70,11 +70,11 @@ class Tournament(Extension):
             conn.close() 
 
     @slash_command(
-        name="tournament",
-        sub_cmd_name="list",
+        name="list",
+        sub_cmd_name="tournaments",
         sub_cmd_description="Lists all tournaments."
     )
-    async def tournament_list(self, ctx: SlashContext):
+    async def list(self, ctx: SlashContext):
         conn = db.open_conn()
         try:
             query = (db.list_tournaments, None)

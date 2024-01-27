@@ -112,8 +112,8 @@ class Map(Extension):
             conn.close() 
 
     @slash_command(
-        name="map",
-        sub_cmd_name="list",
+        name="list",
+        sub_cmd_name="maps",
         sub_cmd_description="Lists all maps."
     )
     @slash_option(

@@ -7,7 +7,9 @@ from interactions import (
     Task,
     IntervalTrigger,
     listen,
-    Embed
+    Embed,
+    Permissions,
+    slash_default_member_permission
 )
 from interactions.api.events import Startup
 
@@ -83,11 +85,11 @@ class Twitch(Extension):
             conn.close() 
 
     @slash_command(
-        name="twitch",
-        sub_cmd_name="list",
+        name="list",
+        sub_cmd_name="twitch",
         sub_cmd_description="Lists all twitch channels in the database."
     )
-    async def twitch_list(self, ctx: SlashContext):
+    async def list(self, ctx: SlashContext):
 
         conn = db.open_conn()
 

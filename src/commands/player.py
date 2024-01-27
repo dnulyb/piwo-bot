@@ -101,7 +101,7 @@ class Player(Extension):
         sub_cmd_name="list",
         sub_cmd_description="Lists all players in the database."
     )
-    async def player_list(self, ctx: SlashContext):
+    async def list(self, ctx: SlashContext):
 
         conn = db.open_conn()
 
