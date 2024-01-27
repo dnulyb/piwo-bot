@@ -153,7 +153,7 @@ def get_streams():
 
 def stream_recently_live(stream):
 
-    time = requests.get('https://decapi.me/twitch/uptime/' + stream).content.decode('utf-8')
+    time = requests.get(twitch_uptime_url + stream).content.decode('utf-8')
 
     try:
 
