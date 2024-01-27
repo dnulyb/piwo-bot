@@ -246,11 +246,14 @@ def format_map_list(maps):
     embed = Embed()
     embed.title = "All maps in the database"
 
-    value = ""
-    for map in maps:
-        value += map + "\n"
+    names = ""
+    ids = ""
+    for (map, id) in maps:
+        names += map + "\n"
+        ids += id + "\n"
     
-    embed.add_field(name="Map", value=value, inline=False)
+    embed.add_field(name="Map", value=names, inline=True)
+    embed.add_field(name="id", value=ids, inline=True)
     return embed
 
 def format_tournament_map_list(maps):

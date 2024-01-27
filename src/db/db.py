@@ -149,9 +149,9 @@ add_to_mappack =        """ INSERT INTO Mappack(tournament_id, map_id)
 remove_from_mappack =   """ DELETE FROM Mappack
                             WHERE map_id=? """
 
-get_maps =              """ SELECT Map.name
+get_maps =              """ SELECT name, uid
                             FROM Map
-                            ORDER BY Map.name
+                            ORDER BY name
                         """
 
 get_tournament_maps =   """ SELECT Map.name, Map.uid
