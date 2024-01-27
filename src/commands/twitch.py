@@ -7,9 +7,7 @@ from interactions import (
     Task,
     IntervalTrigger,
     listen,
-    Embed,
-    Permissions,
-    slash_default_member_permission
+    Embed
 )
 from interactions.api.events import Startup
 
