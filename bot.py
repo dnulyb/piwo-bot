@@ -11,7 +11,7 @@ from dotenv import find_dotenv, load_dotenv, get_key
 dotenv_path = find_dotenv()
 load_dotenv(dotenv_path)
 TOKEN = get_key(dotenv_path, "DISCORD_TOKEN")
-GUILD_ID = get_key(dotenv_path, "GUILD_ID")
+#GUILD_ID = get_key(dotenv_path, "GUILD_ID")
 
 
 bot = Client(
