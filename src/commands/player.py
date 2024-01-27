@@ -247,12 +247,12 @@ def format_player(player):
     embed = Embed()
     embed.title = "Player info"
 
-    (nickname, account_id, country, official_roster) = player
+    (nickname, account_id, country, official_roster) = player[0]
     value = ""
     value += "Nickname: " + nickname + "\n"
     value += "Account id: " + account_id + "\n"
     value += "Country: " + country + "\n"
-    value += "Official roster: " + official_roster + "\n"
+    value += "Official roster: " + official_roster
 
     embed.add_field(name="\u200b", value=value, inline=False)
 
