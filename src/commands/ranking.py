@@ -98,25 +98,30 @@ def format_trophy_leaderboard(players):
 
     embed = Embed()
     embed.title = "Trophy rankings"
+    field_name = '\u200b'
 
     #Format everything nicely inside a code block
     # Pos WorldRank Player Trophies
     header_format = "{:^3s} {:^10s} {:^15s} {:^12s} \n"
     format =        "{:^3s} {:^10s} {:15s} {:^12s} \n"
 
-    everything = "```\n"
-    everything += header_format.format("Pos", "World rank", "Player", "Trophies")
+    i = 1
 
-    for i, player in enumerate(players, start=1):
+    for player in players:
+        value = "```\n"
+        value += header_format.format("Pos", "World rank", "Player", "Trophies")
+
         (name, trophies, world_rank) = player
         pos = str(i) + "."
         trophies = str(trophies)
         world_rank = str(world_rank)
-        everything += format.format(pos, world_rank, name, trophies)
-        
-    everything += "```"
+        value += format.format(pos, world_rank, name, trophies)
+        i += 1
 
-    field_name = '\u200b'
-    embed.add_field(name=field_name, value=everything, inline=True)
+        value += "```"
+
+        if(len(value) >= 900):
+            embed.add_field(name=field_name, value=value, inline=False)
+            value = ""
 
     return embed
