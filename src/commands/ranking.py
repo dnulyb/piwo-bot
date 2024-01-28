@@ -101,8 +101,8 @@ def format_trophy_leaderboard(players):
 
     #Format everything nicely inside a code block
     # Pos WorldRank Player Trophies
-    header_format = "{:^3s} {:^6s} {:^15s} {:^12s} \n"
-    format =        "{:^3s} {:^6s} {:15s} {:^12s} \n"
+    header_format = "{:^3s} {:^10s} {:^15s} {:^12s} \n"
+    format =        "{:^3s} {:^10s} {:15s} {:^12s} \n"
 
     everything = "```\n"
     everything += header_format.format("Pos", "World rank", "Player", "Trophies")
@@ -110,6 +110,8 @@ def format_trophy_leaderboard(players):
     for i, player in enumerate(players, start=1):
         (name, trophies, world_rank) = player
         pos = str(i) + "."
+        trophies = str(trophies)
+        world_rank = str(world_rank)
         everything += format.format(pos, world_rank, name, trophies)
         
     everything += "```"
