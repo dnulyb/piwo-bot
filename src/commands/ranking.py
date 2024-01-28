@@ -102,26 +102,35 @@ def format_trophy_leaderboard(players):
 
     #Format everything nicely inside a code block
     # Pos WorldRank Player Trophies
-    header_format = "{:^3s} {:^10s} {:^15s} {:^12s} \n"
-    format =        "{:^3s} {:^10s} {:15s} {:^12s} \n"
+    header_format = "{:^3s} {:^9s} {:^15s} {:^12s} \n"
+    format =        "{:^3s} {:^9s} {:15s} {:^12s} \n"
 
-    i = 1
-
-    for player in players:
-        value = "```\n"
-        value += header_format.format("Pos", "World rank", "Player", "Trophies")
-
+    value = ""
+    value += "```\n"
+    value += header_format.format("Pos", "World rank", "Player", "Trophies")
+    for i, player in enumerate(players, start=1):
+        
         (name, trophies, world_rank) = player
         pos = str(i) + "."
         trophies = str(trophies)
         world_rank = str(world_rank)
         value += format.format(pos, world_rank, name, trophies)
-        i += 1
 
-        value += "```"
-
+        # Have we almost reached the embed value limit?
         if(len(value) >= 900):
+            value += "```"
             embed.add_field(name=field_name, value=value, inline=False)
-            value = ""
+
+            # Are there more players?
+            if(i < len(players)):
+                value = ""
+                value += "```\n"
+                value += header_format.format("Pos", "World rank", "Player", "Trophies")
+            else:
+                #If not, we can just return
+                return embed
+
+    embed.add_field(name=field_name, value=value, inline=False)
+
 
     return embed
