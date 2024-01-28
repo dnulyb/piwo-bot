@@ -55,10 +55,10 @@ def get_trophy_counts():
     # Get player ids from db
     conn = db.open_conn()
     query = (db.get_specific_roster_players, ["cotd"])
-    players = db.retrieve_data(conn, query)
+    cotd_players = db.retrieve_data(conn, query)
     conn.close()
 
-    player_ids = list(zip(*players))[1]
+    player_ids = list(zip(*cotd_players))[1]
 
     player_list = []
     for player_id in player_ids:
@@ -78,7 +78,15 @@ def get_trophy_counts():
     res = requests.post(trophies_url, headers=headers, data=body)
     res = res.json()
 
-    return res
+    player_trophy_data = []
+    for (player_id, player_trophies, player_world_rank) in res:
+        for (cotd_player_name, cotd_player_id) in cotd_players:
+            if player_id == cotd_player_id:
+                player_trophy_data.append((cotd_player_name, player_trophies, player_world_rank))
+
+    sorted_results = sorted(player_trophy_data, key=lambda x:x[2])
+
+    return sorted_results
 
 
 def format_trophy_leaderboard(players):
