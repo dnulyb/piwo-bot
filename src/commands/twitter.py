@@ -7,7 +7,9 @@ from interactions import (
     SlashContext,
     Task,
     IntervalTrigger,
-    listen
+    listen,
+    check,
+    is_owner
 )
 from interactions.api.events import Startup
 
@@ -22,6 +24,40 @@ class Twitter(Extension):
 
     @Task.create(IntervalTrigger(minutes=30))
     async def check_tweets(self):
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_TWITTER_CHANNEL"))
+        channel = self.bot.get_channel(channel_id)
+
+        print("Checking for new tweets...")
+        tweets = check_for_new_tweets()
+
+        if(len(tweets) == 0):
+            # No new tweets
+            print("No new tweets found.")
+            return
+        else:
+            print(len(tweets), " tweets found! Posting...")
+
+        for tweet in tweets:
+
+            await channel.send(tweet)
+
+            # It's best to have at least some delay between posting new tweets
+            await asyncio.sleep(10)
+
+        print("Finished checking for new tweets.")
+
+    @slash_command(
+        name="twitter",
+        description="Set a Twitter account to get tweets posted in Discord.",
+        sub_cmd_name="force_check_tweets",
+        sub_cmd_description="Force check for new tweets."
+    )
+    @check(is_owner())
+    async def force_check_tweets(self):
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
