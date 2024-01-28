@@ -78,8 +78,12 @@ def get_trophy_counts():
     res = requests.post(trophies_url, headers=headers, data=body)
     res = res.json()
 
+    rankings = res["rankings"]
+    players = [(elem["accountId"], elem["countPoint"], elem["zones"][0]["ranking"]["position"])
+            for elem in rankings]
+
     player_trophy_data = []
-    for (player_id, player_trophies, player_world_rank) in res:
+    for (player_id, player_trophies, player_world_rank) in players:
         for (cotd_player_name, cotd_player_id) in cotd_players:
             if player_id == cotd_player_id:
                 player_trophy_data.append((cotd_player_name, player_trophies, player_world_rank))
