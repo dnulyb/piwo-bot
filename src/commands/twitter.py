@@ -52,12 +52,11 @@ class Twitter(Extension):
 
     @slash_command(
         name="twitter",
-        description="Set a Twitter account to get tweets posted in Discord.",
         sub_cmd_name="force_check_tweets",
         sub_cmd_description="Force check for new tweets."
     )
     @check(is_owner())
-    async def force_check_tweets(self):
+    async def force_check_tweets(self, ctx: SlashContext):
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
