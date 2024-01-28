@@ -11,6 +11,7 @@ from src.commands.tournament import get_tournament_id
 
 import requests
 from dotenv import find_dotenv, load_dotenv, get_key
+from math import floor
 
 map_record_url = "https://prod.trackmania.core.nadeo.online/mapRecords/"
 map_info_url = "https://prod.trackmania.core.nadeo.online/maps/?mapUidList="
@@ -202,10 +203,32 @@ def get_map_records(account_ids, map_ids, token):
 
     return records
 
-# Converts a record time of format "42690" to "42.690"
+# Converts a record time of format "42690" to "42.690", or "62690" to "01:02.690"
 def format_map_record(record):
-    record = str(record)
-    return record[:-3] + "." + record[-3:]
+
+    minutes = floor(record / 60000)
+    seconds = record - (minutes * 60000)
+
+    if(minutes == 0):
+        minutes = ""
+    elif(minutes < 10):
+        minutes = "0" + str(minutes) + ":"
+    else:
+        minutes = str(minutes) + ":"
+
+    if(seconds < 1000):
+        seconds = str(seconds)
+        seconds = "00" + "." + seconds[-3:]
+    elif(seconds < 10000):
+        seconds = str(seconds)
+        seconds = "0" + seconds[:-3] + "." + seconds[-3:]
+    else:
+        seconds = str(seconds)
+        seconds = seconds[:-3] + "." + seconds[-3:]
+
+    res = minutes + str(seconds)
+
+    return res
 
 
 
