@@ -125,7 +125,7 @@ def format_trophy_leaderboard(players):
             if(i < len(players)):
                 value = ""
                 value += "```\n"
-                value += header_format.format("Pos", "World rank", "Player", "Trophies")
+                #value += header_format.format("Pos", "World rank", "Player", "Trophies")
             else:
                 #If not, we can just return
                 return embed
