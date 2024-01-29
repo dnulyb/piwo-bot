@@ -76,7 +76,9 @@ class Cotd(Extension):
             for (cotd_player_name, cotd_player_id) in cotd_players:
                 if player_id == cotd_player_id:
                     totd_results.append((cotd_player_name, player_time))
-
+        
+        #Sort so that minutes come after seconds
+        sorted_results = sorted(totd_results, key=len)
         sorted_results = sorted(totd_results, key=lambda x:x[1])
 
         embed = format_totd_leaderboard(totd_name, sorted_results)
