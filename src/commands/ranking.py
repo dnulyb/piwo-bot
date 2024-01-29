@@ -130,6 +130,7 @@ def format_trophy_leaderboard(players):
                 #If not, we can just return
                 return embed
 
+    value += "```"
     embed.add_field(name=field_name, value=value, inline=False)
 
 
