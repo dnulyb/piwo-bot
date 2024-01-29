@@ -25,7 +25,8 @@ import math
 import json
 
 trophies_url = "https://live-services.trackmania.nadeo.live/api/token/leaderboard/trophy/player"
-mm_url = ""
+mm_url = "https://meet.trackmania.nadeo.club/api/matchmaking/2/leaderboard/players?"
+working_url = "https://meet.trackmania.nadeo.club/api/matchmaking/2/leaderboard/players?players[]=7b3c2e14-6390-4269-a9c4-f3229d37dec4&players[]=15da49c1-bd24-4c78-babf-1997119dbd4b&players[]=18a323dc-a56e-4f67-ba55-49230fbeb580&players[]=d299677d-c23c-4d44-813d-199c8106c8fb"
 
 class Ranking(Extension):
 
@@ -40,6 +41,19 @@ class Ranking(Extension):
         players = get_trophy_counts()
         embed = format_trophy_leaderboard(players)
         await ctx.send(embed=embed)
+
+    @slash_command(
+        name="ranking",
+        sub_cmd_name="mm",
+        sub_cmd_description="Shows the mm leaderboard."
+    )
+    @cooldown(Buckets.CHANNEL, 1, 900)
+    async def mm(self, ctx: SlashContext):
+        players = get_mm_ranks()
+        embed = format_mm_leaderboard(players)
+        await ctx.send(embed=embed)
+
+    
 
 
 # Uses the live audience
@@ -92,9 +106,70 @@ def get_trophy_counts():
 
     return sorted_results
 
+# Uses club audience
+def get_mm_ranks():
+
+    # Load variables from .env
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Get player ids from db
+    conn = db.open_conn()
+    query = (db.get_specific_roster_players, ["cotd"])
+    cotd_players = db.retrieve_data(conn, query)
+    conn.close()
+
+    player_ids = list(zip(*cotd_players))[1]
+
+    complete_url = mm_url
+    first = True
+    for player_id in player_ids:
+        if(first):
+            complete_url += "players[]="
+            first = False
+        else:
+            complete_url += "&players[]="
+
+        complete_url += player_id
+
+    #print(complete_url)
+
+    #headers = {
+    #    'Authorization': "nadeo_v1 t=" + token,
+    #    'User-Agent': user_agent
+    #}
+    #headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'}
+    # json=body did not work, data=body works
+        
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+    res = requests.get(working_url, headers=headers)
+    res = res.json()
+
+    rankings = res["results"]
+    players = [(elem["player"], elem["rank"], elem["score"])
+            for elem in rankings]
+
+    player_rank_data = []
+    for (player_id, player_world_rank, player_mm_score) in players:
+        # Ignore players that don't play mm
+        if(player_mm_score == 0):
+            continue
+        for (cotd_player_name, cotd_player_id) in cotd_players:
+            if player_id == cotd_player_id:
+                player_rank_data.append((cotd_player_name, player_world_rank, player_mm_score))
+
+    sorted_results = sorted(player_rank_data, key=lambda x:x[1])
+
+    return sorted_results
+
 
 def format_trophy_leaderboard(players):
-
 
     embed = Embed()
     embed.title = "Trophy rankings"
@@ -125,7 +200,47 @@ def format_trophy_leaderboard(players):
             if(i < len(players)):
                 value = ""
                 value += "```\n"
-                #value += header_format.format("Pos", "World rank", "Player", "Trophies")
+            else:
+                #If not, we can just return
+                return embed
+
+    value += "```"
+    embed.add_field(name=field_name, value=value, inline=False)
+
+
+    return embed
+
+def format_mm_leaderboard(players):
+
+    embed = Embed()
+    embed.title = "MM rankings"
+    field_name = '\u200b'
+
+    #Format everything nicely inside a code block
+    # Pos WorldRank Player Score
+    header_format = "{:^3s} {:^9s} {:^15s} {:^12s} \n"
+    format =        "{:^3s} {:^9s} {:15s} {:^12s} \n"
+
+    value = ""
+    value += "```\n"
+    value += header_format.format("Pos", "World rank", "Player", "Score")
+    for i, player in enumerate(players, start=1):
+        
+        (name, world_rank, score) = player
+        pos = str(i) + "."
+        score = str(score)
+        world_rank = str(world_rank)
+        value += format.format(pos, world_rank, name, score)
+
+        # Have we almost reached the embed value limit?
+        if(len(value) >= 900):
+            value += "```"
+            embed.add_field(name=field_name, value=value, inline=False)
+
+            # Are there more players?
+            if(i < len(players)):
+                value = ""
+                value += "```\n"
             else:
                 #If not, we can just return
                 return embed
