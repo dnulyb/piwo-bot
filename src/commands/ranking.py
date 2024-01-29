@@ -26,7 +26,6 @@ import json
 
 trophies_url = "https://live-services.trackmania.nadeo.live/api/token/leaderboard/trophy/player"
 mm_url = "https://meet.trackmania.nadeo.club/api/matchmaking/2/leaderboard/players?"
-working_url = "https://meet.trackmania.nadeo.club/api/matchmaking/2/leaderboard/players?players[]=7b3c2e14-6390-4269-a9c4-f3229d37dec4&players[]=15da49c1-bd24-4c78-babf-1997119dbd4b&players[]=18a323dc-a56e-4f67-ba55-49230fbeb580&players[]=d299677d-c23c-4d44-813d-199c8106c8fb"
 
 class Ranking(Extension):
 
@@ -134,21 +133,12 @@ def get_mm_ranks():
             complete_url += "&players[]="
 
         complete_url += player_id
-
-    #print(complete_url)
-
-    #headers = {
-    #    'Authorization': "nadeo_v1 t=" + token,
-    #    'User-Agent': user_agent
-    #}
-    #headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'}
-    # json=body did not work, data=body works
         
     headers = {
         'Authorization': "nadeo_v1 t=" + token,
         'User-Agent': user_agent
     }
-    res = requests.get(working_url, headers=headers)
+    res = requests.get(complete_url, headers=headers)
     res = res.json()
 
     rankings = res["results"]
