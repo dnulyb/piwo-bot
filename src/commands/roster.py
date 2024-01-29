@@ -266,7 +266,7 @@ def format_roster_list(rosters):
 
     res = {}
     for (roster, tournament) in rosters:
-        if roster in res:
+        if tournament in res:
             res[tournament].append(roster)
         else:
             res[tournament] = [roster]
@@ -275,6 +275,7 @@ def format_roster_list(rosters):
         value = ""
         for val in res[key]:
             value += val + "\n"
+        print(value)
         embed.add_field(name=key, value=value, inline=False)
 
     return embed
