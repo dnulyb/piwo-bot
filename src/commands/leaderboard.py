@@ -75,7 +75,7 @@ class Leaderboard(Extension):
                 conn.close()
                 return
 
-            print("Players: ", players)
+            #print("Players: ", players)
 
             player_names = []
             player_ids = []

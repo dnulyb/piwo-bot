@@ -275,7 +275,6 @@ def format_roster_list(rosters):
         value = ""
         for val in res[key]:
             value += val + "\n"
-        print(value)
         embed.add_field(name=key, value=value, inline=False)
 
     return embed

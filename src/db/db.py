@@ -143,7 +143,7 @@ get_n_map_times =       """ SELECT Player.nickname, Time.time
                             JOIN Time ON Time.map_id = Map.id
                             JOIN Player ON Player.id = Time.player_id
                             WHERE Map.name=?
-                            ORDER BY CAST (Time.time AS DECIMAL) ASC
+                            ORDER BY LENGTH(Time.time) ASC, CAST (Time.time AS DECIMAL) ASC
                             LIMIT ?
                         """
 
