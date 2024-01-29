@@ -79,7 +79,7 @@ class Cotd(Extension):
         
         #Sort so that minutes come after seconds
         sorted_results = sorted(totd_results, key=len)
-        sorted_results = sorted(totd_results, key=lambda x:x[1])
+        sorted_results = sorted(sorted_results, key=lambda x:x[1])
 
         embed = format_totd_leaderboard(totd_name, sorted_results)
 
