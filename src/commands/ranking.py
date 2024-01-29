@@ -4,24 +4,13 @@ from interactions import (
     SlashContext,
     Embed,
     cooldown,
-    Buckets,
-    check,
-    is_owner,
-    Task,
-    TimeTrigger,
-    listen
+    Buckets
 )
-from interactions.api.events import Startup
 
 import src.db.db as db
-from src.ubi.authentication import get_nadeo_access_token
-from src.commands.map import get_map_records, get_map_data, format_map_record
 
-from dotenv import find_dotenv, load_dotenv, get_key, set_key
+from dotenv import find_dotenv, load_dotenv, get_key
 import requests
-import re
-import time
-import math
 import json
 
 trophies_url = "https://live-services.trackmania.nadeo.live/api/token/leaderboard/trophy/player"
