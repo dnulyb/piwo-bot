@@ -114,6 +114,33 @@ class Map(Extension):
             conn.close() 
 
     @slash_command(
+        name="map",
+        sub_cmd_name="update_id",
+        sub_cmd_description="Update id for a map."
+    )
+    @slash_option(
+        name="name",
+        description="Name of the map.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="id",
+        description="The new id.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def update_id(self, ctx: SlashContext, name: str, id: str):
+
+        conn = db.open_conn()
+        query = [(db.update_map_id, (id, name))]
+        db.execute_queries(conn, query)
+        res = "Updated id for map: " + name + "," + id
+        conn.close()
+
+        await ctx.send(f"{res}")
+
+    @slash_command(
         name="list",
         sub_cmd_name="maps",
         sub_cmd_description="Lists all maps."

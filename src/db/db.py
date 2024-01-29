@@ -119,6 +119,10 @@ add_map =               """ INSERT INTO Map(name, uid)
 remove_map =            """ DELETE FROM Map
                             WHERE name=? """
 
+update_map_id=          """ UPDATE Map
+                            SET uid=?
+                            WHERE name=? """
+
 get_map_id =            """ SELECT id
                             FROM Map
                             WHERE name=? """
