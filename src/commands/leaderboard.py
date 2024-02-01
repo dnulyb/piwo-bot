@@ -175,7 +175,7 @@ class Leaderboard(Extension):
                 await ctx.send("Error retrieving leaderboard times: No times found.")
                 return
             
-            embed = format_leaderboard_embed(map_name, res)
+            embed = format_leaderboard_embed(map_name, res, roster)
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}")
@@ -278,10 +278,12 @@ class Leaderboard(Extension):
 
 #times: [(player, time)]
 #   where the first entry is the best time
-def format_leaderboard_embed(map_name, times):
+def format_leaderboard_embed(map_name, times, roster = None):
 
     embed = Embed()
     embed.title = "Leaderboard for map: " + map_name
+    if(roster is not None):
+        embed.description = "Showing times for roster: " + roster
     all_positions = ""
     all_players = ""
     all_times = ""
