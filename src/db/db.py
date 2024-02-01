@@ -162,7 +162,7 @@ get_n_map_times_from_roster = """
                                 JOIN Player ON Player.id = Time.player_id
                                 JOIN Participant ON Player.id = Participant.player_id
                                 WHERE Map.name=?
-                                WHERE Participant.roster_id=?
+                                AND Participant.roster_id=?
                                 ORDER BY LENGTH(Time.time) ASC, CAST (Time.time AS DECIMAL) ASC
                                 LIMIT ?
                                 """
