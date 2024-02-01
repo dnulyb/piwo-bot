@@ -162,7 +162,12 @@ class Leaderboard(Extension):
                 amount = 50
             
             if(roster is not None):
-                res = db.retrieve_data(conn, (db.get_n_map_times_from_roster, (map_name, roster, amount)))
+                roster_id = db.retrieve_data(conn, (db.get_roster_id, [roster]))
+                if(len(roster_id) == 0):
+                    await ctx.send(f"Error occurred while running command: Roster '{roster}' not found")
+                    return
+                roster_id = roster_id[0][0]
+                res = db.retrieve_data(conn, (db.get_n_map_times_from_roster, (map_name, roster_id, amount)))
             else:
                 res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, amount)))
 
