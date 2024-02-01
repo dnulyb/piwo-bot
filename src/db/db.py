@@ -112,6 +112,10 @@ get_tournament_id =     """ SELECT id
                             FROM Tournament
                             WHERE name=? """
 
+get_tournament_name =   """ SELECT name
+                            FROM Tournament
+                            WHERE id=? """
+
 
 add_map =               """ INSERT INTO Map(name, uid)
                             VALUES(?,?) """
@@ -151,6 +155,17 @@ get_n_map_times =       """ SELECT Player.nickname, Time.time
                             LIMIT ?
                         """
 
+get_n_map_times_from_roster = """
+                                SELECT Player.nickname, Time.time  
+                                FROM Map
+                                JOIN Time ON Time.map_id = Map.id
+                                JOIN Player ON Player.id = Time.player_id
+                                JOIN Participant ON Player.id = Participant.player_id
+                                WHERE Map.name=?
+                                WHERE Participant.roster_id=?
+                                ORDER BY LENGTH(Time.time) ASC, CAST (Time.time AS DECIMAL) ASC
+                                LIMIT ?
+                                """
 
 add_to_mappack =        """ INSERT INTO Mappack(tournament_id, map_id)
                             VALUES(?,?) """

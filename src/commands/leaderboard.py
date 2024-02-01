@@ -131,8 +131,8 @@ class Leaderboard(Extension):
 
     @slash_command(
         name="leaderboard",
-        sub_cmd_name="top_x",
-        sub_cmd_description="Retrieves the top X times for a map."
+        sub_cmd_name="map",
+        sub_cmd_description="Retrieves all times for a map. Players must be registered to a relevant tournament roster to show up."
     )
     @slash_option(
         name="map_name",
@@ -141,102 +141,30 @@ class Leaderboard(Extension):
         opt_type = OptionType.STRING
     )
     @slash_option(
-        name="x",
-        description="How many times you want to retrieve.",
-        required=True,
+        name="roster",
+        description="Limit the times to a certain roster.",
+        required=False,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="amount",
+        description="How many times you want to retrieve. Default = 50",
+        required=False,
         opt_type = OptionType.INTEGER   
     )
-    async def top_x(self, ctx: SlashContext, map_name: str, x: int):
+    async def map(self, ctx: SlashContext, map_name: str, roster: str = None, amount: int = 50):
 
         conn = db.open_conn()
 
         try:
-            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, x)))
-            if(len(res) == 0):
-                await ctx.send(f"Error occurred while running command: Times for map {map_name} not found")
-                return
+
+            if(amount > 50):
+                amount = 50
             
-            embed = format_leaderboard_embed(map_name, res)
-            await ctx.send(embed=embed)
-        except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
-        finally:
-            conn.close()
-
-    @slash_command(
-        name="leaderboard",
-        sub_cmd_name="top_5",
-        sub_cmd_description="Retrieves the top 5 times for a map."
-    )
-    @slash_option(
-        name="map_name",
-        description="Name of the map you want retrieve times maps for",
-        required=True,
-        opt_type = OptionType.STRING
-    )
-    async def top_5(self, ctx: SlashContext, map_name: str):
-
-        conn = db.open_conn()
-
-        try:
-            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 5)))
-            if(len(res) == 0):
-                await ctx.send(f"Error occurred while running command: Times for map {map_name} not found")
-                return
-
-            embed = format_leaderboard_embed(map_name, res)
-            await ctx.send(embed=embed)
-        except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
-        finally:
-            conn.close()
-
-    @slash_command(
-        name="leaderboard",
-        sub_cmd_name="top_10",
-        sub_cmd_description="Retrieves the top 10 times for a map."
-    )
-    @slash_option(
-        name="map_name",
-        description="Name of the map you want retrieve times maps for",
-        required=True,
-        opt_type = OptionType.STRING
-    )
-    async def top_10(self, ctx: SlashContext, map_name: str):
-
-        conn = db.open_conn()
-
-        try:
-            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 10)))
-            if(len(res) == 0):
-                await ctx.send(f"Error occurred while running command: Times for map {map_name} not found")
-                return
-            
-            embed = format_leaderboard_embed(map_name, res)
-            await ctx.send(embed=embed)
-        except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
-        finally:
-            conn.close()
-
-
-    @slash_command(
-        name="leaderboard",
-        sub_cmd_name="map",
-        sub_cmd_description="Retrieves all times for a map, that exists in the database. A maximum of 50 times will be retrieved."
-    )
-    @slash_option(
-        name="map_name",
-        description="Name of the map you want retrieve times maps for",
-        required=True,
-        opt_type = OptionType.STRING
-    )
-    async def map(self, ctx: SlashContext, map_name: str):
-
-        conn = db.open_conn()
-
-        try:
-            res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, 50)))
+            if(roster is not None):
+                res = db.retrieve_data(conn, (db.get_n_map_times_from_roster, (map_name, roster, amount)))
+            else:
+                res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, amount)))
 
             if len(res) == 0:
                 await ctx.send("Error retrieving leaderboard times: No times found.")
@@ -348,8 +276,7 @@ class Leaderboard(Extension):
 def format_leaderboard_embed(map_name, times):
 
     embed = Embed()
-    embed.title = map_name
-    embed.description = "Leaderboard for map: " + map_name
+    embed.title = "Leaderboard for map: " + map_name
     all_positions = ""
     all_players = ""
     all_times = ""
