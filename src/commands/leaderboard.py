@@ -132,7 +132,7 @@ class Leaderboard(Extension):
     @slash_command(
         name="leaderboard",
         sub_cmd_name="map",
-        sub_cmd_description="Retrieves all times for a map. Players must be registered to a relevant tournament roster to show up."
+        sub_cmd_description="Retrieves all times for a map. Shows map tournament players only."
     )
     @slash_option(
         name="map_name",
