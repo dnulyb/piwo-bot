@@ -100,7 +100,7 @@ class Twitch(Extension):
                 return
             
             embed = format_channel_list(res)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, ephemeral=True)
 
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)

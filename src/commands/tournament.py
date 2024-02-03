@@ -81,7 +81,7 @@ class Tournament(Extension):
             query = (db.list_tournaments, None)
             res = db.retrieve_data(conn, query)
             embed = format_tournament_list(res)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, ephemeral=True)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:

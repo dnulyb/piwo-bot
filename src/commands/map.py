@@ -178,7 +178,7 @@ class Map(Extension):
                     return
                 
                 embed = format_tournament_map_list(res)
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed, ephemeral=True)
 
 
             

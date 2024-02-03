@@ -84,7 +84,7 @@ class Roster(Extension):
             query = (db.list_rosters, None)
             res = db.retrieve_data(conn, query)
             embed = format_roster_list(res)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, ephemeral=True)
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
