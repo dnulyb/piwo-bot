@@ -48,7 +48,7 @@ class Twitch(Extension):
             await ctx.send(f"{res}")
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -78,7 +78,7 @@ class Twitch(Extension):
             await ctx.send(f"{res}")
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -96,14 +96,14 @@ class Twitch(Extension):
 
             res = get_streams()
             if(len(res) == 0):
-                await ctx.send("Error: No streams in database.")
+                await ctx.send("Error: No streams in database.", ephemeral=True)
                 return
             
             embed = format_channel_list(res)
             await ctx.send(embed=embed)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 

@@ -60,7 +60,7 @@ class Team(Extension):
 
         info_list = get_teaminfo_list()
         if(len(info_list) == 0):
-            await ctx.send("Error: No team info found in database.")
+            await ctx.send("Error: No team info found in database.", ephemeral=True)
             return
         
         embed = format_teaminfo_list(info_list)
@@ -98,7 +98,7 @@ class Team(Extension):
             await ctx.send("Team info updated: " + name)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close()
 
@@ -124,7 +124,7 @@ class Team(Extension):
             await ctx.send("Team info removed: " + name)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close()
 

@@ -62,7 +62,7 @@ class Player(Extension):
             await ctx.send(f"{res}")
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -92,7 +92,7 @@ class Player(Extension):
             await ctx.send(f"{res}")
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -112,7 +112,7 @@ class Player(Extension):
             query = [db.list_players, None]
             res = db.retrieve_data(conn, query)
             if(len(res) == 0):
-                await ctx.send("Error retrieving players: No players found.")
+                await ctx.send("Error retrieving players: No players found.", ephemeral=True)
                 return
             
             embed = format_player_list(res)
@@ -121,7 +121,7 @@ class Player(Extension):
             await ctx.send(embed=embed, ephemeral=True)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -147,7 +147,7 @@ class Player(Extension):
             query = (db.get_player_info, [nickname])
             res = db.retrieve_data(conn, query)
             if(len(res) == 0):
-                await ctx.send("Error retrieving player info: Player not found.")
+                await ctx.send("Error retrieving player info: Player not found.", ephemeral=True)
                 return
             
             embed = format_player(res)
@@ -156,7 +156,7 @@ class Player(Extension):
             await ctx.send(embed=embed, ephemeral=True)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -223,7 +223,7 @@ class Player(Extension):
             await ctx.send(f"{res}")
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -233,15 +233,33 @@ def format_player_list(players):
 
     embed = Embed()
     embed.title = "List of all players:"
+    field_name = '\u200b'
+
 
     value = ""
+    value += "```\n"
 
-    for (player, country, roster) in players:
+    for i, (player, country, roster) in enumerate(players, start=1):
         if (roster == None):
             roster = "None"
         value += player + ", " + country + ", " + roster + "\n"
 
-    embed.add_field(name="\u200b", value=value, inline=False)
+        # Have we almost reached the embed value limit?
+        if(len(value) >= 900):
+            value += "```"
+            embed.add_field(name=field_name, value=value, inline=False)
+
+            # Are there more players?
+            if(i < len(players)):
+                value = ""
+                value += "```\n"
+            else:
+                #If not, we can just return
+                return embed
+
+    value += "```"
+    embed.add_field(name=field_name, value=value, inline=False)
+
 
     return embed
 

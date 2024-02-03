@@ -147,7 +147,7 @@ class Cotd(Extension):
 
         results = get_cotd_quali_results()
         if(results == None):
-            await channel.send("Error retrieving cotd quali results: No quali could be found.")
+            await channel.send("Error retrieving cotd quali results: No quali could be found.", ephemeral=True)
             return
 
         (_, _, map_name) = get_totd_map_info()

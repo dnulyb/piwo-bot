@@ -37,7 +37,7 @@ class Roster(Extension):
             tournament_id = get_tournament_id(conn, tournament)
 
             if tournament_id == None:
-                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
+                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
                 conn.close()
                 return
 
@@ -46,7 +46,7 @@ class Roster(Extension):
             await ctx.send("Created roster: " + name + ", for tournament: " + tournament)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 
@@ -69,7 +69,7 @@ class Roster(Extension):
             db.execute_queries(conn, query)
             await ctx.send("Deleted roster: " + name)
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 
@@ -86,7 +86,7 @@ class Roster(Extension):
             embed = format_roster_list(res)
             await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 
@@ -116,7 +116,7 @@ class Roster(Extension):
             roster_id = db.retrieve_data(conn, (db.get_roster_id, [roster]))
 
             if(len(roster_id) == 0):
-                await ctx.send(f"Error occurred while running command: Roster '{roster}' not found")
+                await ctx.send(f"Error occurred while running command: Roster '{roster}' not found", ephemeral=True)
                 conn.close()
                 return
 
@@ -129,7 +129,7 @@ class Roster(Extension):
 
                 player_id = db.retrieve_data(conn, (db.get_player_id, [player]))
                 if(len(player_id) == 0):
-                    await ctx.send(f"Error occurred while running command: Player '{player}' not found")
+                    await ctx.send(f"Error occurred while running command: Player '{player}' not found", ephemeral=True)
                     conn.close()
                     return
                 
@@ -142,7 +142,7 @@ class Roster(Extension):
             await ctx.send("Added players to roster '" + roster + "': " + names)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 
@@ -172,7 +172,7 @@ class Roster(Extension):
             roster_id = db.retrieve_data(conn, (db.get_roster_id, [roster]))
 
             if(len(roster_id) == 0):
-                await ctx.send(f"Error occurred while running command: Roster '{roster}' not found")
+                await ctx.send(f"Error occurred while running command: Roster '{roster}' not found", ephemeral=True)
                 conn.close()
                 return
 
@@ -185,7 +185,7 @@ class Roster(Extension):
 
                 player_id = db.retrieve_data(conn, (db.get_player_id, [player]))
                 if(len(player_id) == 0):
-                    await ctx.send(f"Error occurred while running command: Player '{player}' not found")
+                    await ctx.send(f"Error occurred while running command: Player '{player}' not found", ephemeral=True)
                     conn.close()
                     return
                 
@@ -198,7 +198,7 @@ class Roster(Extension):
             await ctx.send("Removed players from roster '" + roster + "': " + names)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 
@@ -224,7 +224,7 @@ class Roster(Extension):
                 tournament_id = get_tournament_id(conn, tournament)
 
                 if tournament_id == None:
-                    await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
+                    await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
                     conn.close()
                     return
 
@@ -234,7 +234,7 @@ class Roster(Extension):
             embed = format_registered_players(res)
             await ctx.send(embed=embed, ephemeral=True)
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 

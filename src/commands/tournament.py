@@ -65,7 +65,7 @@ class Tournament(Extension):
             await ctx.send(f"{res}")
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
 
         finally:
             conn.close() 
@@ -83,7 +83,7 @@ class Tournament(Extension):
             embed = format_tournament_list(res)
             await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 

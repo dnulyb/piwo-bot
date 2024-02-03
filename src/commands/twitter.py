@@ -75,7 +75,7 @@ class Twitter(Extension):
             self.check_tweets.stop()
             await ctx.send("Tweets toggled OFF.")
         else:
-            await ctx.send("ERROR: Couldn't toggle tweets.")
+            await ctx.send("ERROR: Couldn't toggle tweets.", ephemeral=True)
 
     @listen(Startup)
     async def on_startup(self):

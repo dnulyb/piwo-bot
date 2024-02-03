@@ -51,7 +51,7 @@ class Map(Extension):
             tournament_id = get_tournament_id(conn, tournament)
 
             if tournament_id == None:
-                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
+                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
                 conn.close()
                 return
 
@@ -63,7 +63,7 @@ class Map(Extension):
             # Add the tournament and map to "Mappack" table
             map_database_id = db.retrieve_data(conn, (db.get_map_id, [map_name]))
             if(len(map_database_id) == 0):
-                await ctx.send(f"Error occurred while running command: Map '{map}' not found")
+                await ctx.send(f"Error occurred while running command: Map '{map}' not found", ephemeral=True)
                 conn.close()
                 return
             map_database_id = map_database_id[0][0]
@@ -73,7 +73,7 @@ class Map(Extension):
             await ctx.send("Added map to tournament '" + tournament + "': " + map_name)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 
@@ -95,7 +95,7 @@ class Map(Extension):
 
             map_database_id = db.retrieve_data(conn, (db.get_map_id, [map_name]))
             if(len(map_database_id) == 0):
-                await ctx.send(f"Error occurred while running command: Map '{map_name}' not found")
+                await ctx.send(f"Error occurred while running command: Map '{map_name}' not found", ephemeral=True)
                 conn.close()
                 return
             map_database_id = map_database_id[0][0]
@@ -109,7 +109,7 @@ class Map(Extension):
             db.execute_queries(conn, query)
             await ctx.send("Deleted map: " + map_name)
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 
@@ -159,7 +159,7 @@ class Map(Extension):
                 query = (db.get_maps, None)
                 res = db.retrieve_data(conn, query)
                 if(len(res) == 0):
-                    await ctx.send("Error while retrieving maps: No maps found.")
+                    await ctx.send("Error while retrieving maps: No maps found.", ephemeral=True)
                     return
                 
                 embed = format_map_list(res)
@@ -168,13 +168,13 @@ class Map(Extension):
                 tournament_id = get_tournament_id(conn, tournament)
 
                 if tournament_id == None:
-                    await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
+                    await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
                     conn.close()
                     return
                 query = (db.get_tournament_maps, [tournament_id])
                 res = db.retrieve_data(conn, query)
                 if(len(res) == 0):
-                    await ctx.send("Error while retrieving maps: No maps found.")
+                    await ctx.send("Error while retrieving maps: No maps found.", ephemeral=True)
                     return
                 
                 embed = format_tournament_map_list(res)
@@ -183,7 +183,7 @@ class Map(Extension):
 
             
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close() 
 

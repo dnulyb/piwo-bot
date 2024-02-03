@@ -9,7 +9,7 @@ add_roster =            """ INSERT INTO Roster(name, tournament_id)
                             VALUES(?,?) """
 
 remove_roster =         """ DELETE FROM Roster
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 list_rosters =          """ SELECT Roster.name, Tournament.name
                             FROM Roster
@@ -20,7 +20,7 @@ get_specific_roster_players = """   SELECT Player.nickname, Player.account_id
                                     FROM Participant
                                     JOIN Player ON Participant.player_id = Player.id
                                     JOIN Roster ON Participant.roster_id = Roster.id
-                                    WHERE Roster.name=?
+                                    WHERE Roster.name=? COLLATE NOCASE
                                     ORDER BY Player.nickname
                                 """
 
@@ -42,13 +42,13 @@ get_tournament_roster_players = """
 
 get_roster_id =         """ SELECT id
                             FROM Roster
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 add_player =            """ INSERT INTO Player(nickname, account_id, country, official_roster, extra)
                             VALUES(?,?,?,?,?) """
 
 remove_player =         """ DELETE FROM Player
-                            WHERE nickname=? """
+                            WHERE nickname=? COLLATE NOCASE"""
 
 list_players =          """ SELECT nickname, country, official_roster
                             FROM Player 
@@ -56,33 +56,33 @@ list_players =          """ SELECT nickname, country, official_roster
 
 update_player_name= """ UPDATE Player
                             SET nickname=?
-                            WHERE nickname=? """
+                            WHERE nickname=? COLLATE NOCASE"""
 
 update_player_account_id= """ UPDATE Player
                             SET account_id=?
-                            WHERE nickname=? """
+                            WHERE nickname=? COLLATE NOCASE"""
 
 update_player_country = """ UPDATE Player
                             SET country=?
-                            WHERE nickname=? """
+                            WHERE nickname=? COLLATE NOCASE"""
 
 update_player_official_roster = """ UPDATE Player
                                     SET official_roster=?
-                                    WHERE nickname=? """
+                                    WHERE nickname=? COLLATE NOCASE"""
 
 update_player_extra =           """ UPDATE Player
                                     SET extra=?
-                                    WHERE nickname=? """
+                                    WHERE nickname=? COLLATE NOCASE"""
 
 get_player_info =           """ SELECT nickname, account_id, country, official_roster
                                 FROM Player
-                                WHERE nickname=?
+                                WHERE nickname=? COLLATE NOCASE
                             """
                             
 
 get_player_id =         """ SELECT id
                             FROM Player
-                            WHERE nickname=? """
+                            WHERE nickname=? COLLATE NOCASE"""
 
 get_player_id_by_account_id = """ SELECT id
                             FROM Player
@@ -90,7 +90,7 @@ get_player_id_by_account_id = """ SELECT id
 
 get_players_by_official_roster = """ SELECT nickname, country, extra
                                      FROM Player
-                                     WHERE official_roster=?
+                                     WHERE official_roster=? COLLATE NOCASE
                                      ORDER BY (Player.id)
                                  """
 
@@ -98,7 +98,7 @@ add_tournament =        """ INSERT INTO Tournament(name)
                             VALUES(?) """
 
 remove_tournament =     """ DELETE FROM Tournament
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 list_tournaments =      """ SELECT name, auto_update
                             FROM Tournament 
@@ -106,11 +106,11 @@ list_tournaments =      """ SELECT name, auto_update
 
 auto_update_tournament = """ UPDATE Tournament
                              SET auto_update=?
-                             WHERE name=? """
+                             WHERE name=? COLLATE NOCASE"""
 
 get_tournament_id =     """ SELECT id
                             FROM Tournament
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 get_tournament_name =   """ SELECT name
                             FROM Tournament
@@ -121,15 +121,15 @@ add_map =               """ INSERT INTO Map(name, uid)
                             VALUES(?,?) """
 
 remove_map =            """ DELETE FROM Map
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 update_map_id=          """ UPDATE Map
                             SET uid=?
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 get_map_id =            """ SELECT id
                             FROM Map
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 get_map_db_id_by_map_id = """ SELECT id
                             FROM Map
@@ -150,7 +150,7 @@ get_n_map_times =       """ SELECT Player.nickname, Time.time
                             FROM Map
                             JOIN Time ON Time.map_id = Map.id
                             JOIN Player ON Player.id = Time.player_id
-                            WHERE Map.name=?
+                            WHERE Map.name=? COLLATE NOCASE
                             ORDER BY LENGTH(Time.time) ASC, CAST (Time.time AS DECIMAL) ASC
                             LIMIT ?
                         """
@@ -161,7 +161,7 @@ get_n_map_times_from_roster = """
                                 JOIN Time ON Time.map_id = Map.id
                                 JOIN Player ON Player.id = Time.player_id
                                 JOIN Participant ON Player.id = Participant.player_id
-                                WHERE Map.name=?
+                                WHERE Map.name=? COLLATE NOCASE
                                 AND Participant.roster_id=?
                                 ORDER BY LENGTH(Time.time) ASC, CAST (Time.time AS DECIMAL) ASC
                                 LIMIT ?
@@ -192,11 +192,11 @@ add_to_teaminfo =       """ INSERT INTO TeamInfo(name, info)
                                 UPDATE SET info=excluded.info """
 
 remove_teaminfo =       """ DELETE FROM TeamInfo
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 get_teaminfo =          """ SELECT info
                             FROM TeamInfo
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 get_teaminfo_list =     """ SELECT name, info
                             FROM TeamInfo
@@ -207,7 +207,7 @@ add_twitch_channel =    """ INSERT INTO TwitchChannel(name)
                         """
 
 remove_twitch_channel = """ DELETE FROM TwitchChannel
-                            WHERE name=? """
+                            WHERE name=? COLLATE NOCASE"""
 
 get_twitch_list =       """ SELECT name
                             FROM TwitchChannel

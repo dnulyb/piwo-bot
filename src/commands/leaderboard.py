@@ -40,7 +40,7 @@ class Leaderboard(Extension):
         await ctx.defer()
 
         if(tournament == None):
-            await ctx.send("Error updating: no tournament provided")
+            await ctx.send("Error updating: no tournament provided", ephemeral=True)
             return
 
         conn = db.open_conn()
@@ -52,13 +52,13 @@ class Leaderboard(Extension):
             tournament_id = get_tournament_id(conn, tournament)
 
             if tournament_id == None:
-                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found")
+                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
                 conn.close()
                 return
             
             maps = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
             if(len(maps) == 0):
-                await ctx.send(f"Error occurred while running command: No maps found for tournament '{tournament}'")
+                await ctx.send(f"Error occurred while running command: No maps found for tournament '{tournament}'", ephemeral=True)
                 conn.close()
                 return
 
@@ -71,7 +71,7 @@ class Leaderboard(Extension):
             # Get tournament player ids 
             players = db.retrieve_data(conn, (db.get_tournament_roster_players, [tournament_id]))
             if(len(players) == 0):
-                await ctx.send(f"Error occurred while running command: No players found for tournament '{tournament}'")
+                await ctx.send(f"Error occurred while running command: No players found for tournament '{tournament}'", ephemeral=True)
                 conn.close()
                 return
 
@@ -100,7 +100,7 @@ class Leaderboard(Extension):
                 player_id = db.retrieve_data(conn, (db.get_player_id_by_account_id, [player_ubi_id]))
 
                 if(len(player_id) == 0):
-                    await ctx.send(f"Error occurred while running command: Player '{player_ubi_id}' not found")
+                    await ctx.send(f"Error occurred while running command: Player '{player_ubi_id}' not found", ephemeral=True)
                     conn.close()
                     return
                     
@@ -109,7 +109,7 @@ class Leaderboard(Extension):
                 map_id = db.retrieve_data(conn, (db.get_map_db_id_by_map_id, [map_ubi_id]))
 
                 if(len(map_id) == 0):
-                    await ctx.send(f"Error occurred while running command: Map '{map_ubi_id}' not found")
+                    await ctx.send(f"Error occurred while running command: Map '{map_ubi_id}' not found", ephemeral=True)
                     conn.close()
                     return
                     
@@ -124,7 +124,7 @@ class Leaderboard(Extension):
             await ctx.send(f"Updated times for tournament: " + tournament)
 
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close()
 
@@ -164,7 +164,7 @@ class Leaderboard(Extension):
             if(roster is not None):
                 roster_id = db.retrieve_data(conn, (db.get_roster_id, [roster]))
                 if(len(roster_id) == 0):
-                    await ctx.send(f"Error occurred while running command: Roster '{roster}' not found")
+                    await ctx.send(f"Error occurred while running command: Roster '{roster}' not found", ephemeral=True)
                     return
                 roster_id = roster_id[0][0]
                 res = db.retrieve_data(conn, (db.get_n_map_times_from_roster, (map_name, roster_id, amount)))
@@ -172,13 +172,13 @@ class Leaderboard(Extension):
                 res = db.retrieve_data(conn, (db.get_n_map_times, (map_name, amount)))
 
             if len(res) == 0:
-                await ctx.send("Error retrieving leaderboard times: No times found.")
+                await ctx.send("Error retrieving leaderboard times: No times found.", ephemeral=True)
                 return
             
             embed = format_leaderboard_embed(map_name, res, roster)
             await ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}")
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
         finally:
             conn.close()
 
@@ -204,12 +204,12 @@ class Leaderboard(Extension):
                     tournament_id = get_tournament_id(conn, tournament_name)
 
                     if tournament_id == None:
-                        print("Error occurred in update_tournaments_automatically: Tournament id not found")
+                        print("Error occurred in update_tournaments_automatically: Tournament id not found", ephemeral=True)
                         continue
                     
                     maps = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
                     if(len(maps) == 0):
-                        print("Error occurred in update_tournaments_automatically: Tournament maps not found")
+                        print("Error occurred in update_tournaments_automatically: Tournament maps not found", ephemeral=True)
                         continue
 
                     map_names = []
@@ -221,7 +221,7 @@ class Leaderboard(Extension):
                     # Get tournament player ids 
                     players = db.retrieve_data(conn, (db.get_tournament_roster_players, [tournament_id]))
                     if(len(players) == 0):
-                        print("Error occurred in update_tournaments_automatically: Tournament players not found")
+                        print("Error occurred in update_tournaments_automatically: Tournament players not found", ephemeral=True)
                         continue
 
                     player_names = []
@@ -244,7 +244,7 @@ class Leaderboard(Extension):
                         player_id = db.retrieve_data(conn, (db.get_player_id_by_account_id, [player_ubi_id]))
 
                         if(len(player_id) == 0):
-                            print("Error occurred in update_tournaments_automatically: Tournament player ids not found")
+                            print("Error occurred in update_tournaments_automatically: Tournament player ids not found", ephemeral=True)
                             continue
                             
                         player_id = player_id[0][0]
@@ -252,7 +252,7 @@ class Leaderboard(Extension):
                         map_id = db.retrieve_data(conn, (db.get_map_db_id_by_map_id, [map_ubi_id]))
 
                         if(len(map_id) == 0):
-                            print("Error occurred in update_tournaments_automatically: Tournament maps not found")
+                            print("Error occurred in update_tournaments_automatically: Tournament maps not found", ephemeral=True)
                             continue
                             
                         map_id = map_id[0][0]
