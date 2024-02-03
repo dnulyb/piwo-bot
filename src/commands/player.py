@@ -237,7 +237,6 @@ def format_player_list(players):
 
 
     value = ""
-    value += "```\n"
 
     for i, (player, country, roster) in enumerate(players, start=1):
         if (roster == None):
@@ -246,18 +245,15 @@ def format_player_list(players):
 
         # Have we almost reached the embed value limit?
         if(len(value) >= 900):
-            value += "```"
             embed.add_field(name=field_name, value=value, inline=False)
 
             # Are there more players?
             if(i < len(players)):
                 value = ""
-                value += "```\n"
             else:
                 #If not, we can just return
                 return embed
 
-    value += "```"
     embed.add_field(name=field_name, value=value, inline=False)
 
 
