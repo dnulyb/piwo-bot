@@ -131,6 +131,10 @@ get_map_id =            """ SELECT id
                             FROM Map
                             WHERE name=? COLLATE NOCASE"""
 
+get_map_uid =            """ SELECT uid
+                            FROM Map
+                            WHERE name=? COLLATE NOCASE"""
+
 get_map_db_id_by_map_id = """ SELECT id
                             FROM Map
                             WHERE uid=? """
@@ -172,6 +176,14 @@ add_to_mappack =        """ INSERT INTO Mappack(tournament_id, map_id)
 
 remove_from_mappack =   """ DELETE FROM Mappack
                             WHERE map_id=? """
+
+get_tournament_from_map =   """
+                                SELECT Tournament.id
+                                FROM Map
+                                JOIN Mappack ON Map.id = Mappack.map_id
+                                JOIN Tournament ON Mappack.tournament_id = Tournament.id
+                                WHERE Map.name=? COLLATE NOCASE
+                                """
 
 get_maps =              """ SELECT name, uid
                             FROM Map

@@ -292,6 +292,11 @@ def get_map_data(map_uids):
     return map_data
 
 
+def get_map_uid_from_db(conn, map_name):
+
+    return db.retrieve_data(conn, (db.get_map_uid, [map_name]))[0][0]
+
+
 def format_map_list(maps):
 
     embed = Embed()

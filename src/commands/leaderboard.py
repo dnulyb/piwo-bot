@@ -15,7 +15,7 @@ from interactions.api.events import Startup
 
 import src.db.db as db
 from src.ubi.authentication import get_nadeo_access_token
-from src.commands.map import get_map_records
+from src.commands.map import get_map_records, get_map_uid_from_db
 from src.commands.tournament import get_tournament_id
 
 import asyncio
@@ -34,7 +34,7 @@ class Leaderboard(Extension):
         required=True,
         opt_type = OptionType.STRING
     )
-    @cooldown(Buckets.GUILD, 1, 30)
+    @cooldown(Buckets.GUILD, 1, 5)
     async def update(self, ctx: SlashContext, tournament: str = None):
 
         await ctx.defer()
@@ -121,7 +121,7 @@ class Leaderboard(Extension):
 
             print("Nadeo data for tournament: " + tournament + ", added to database.")
 
-            await ctx.send(f"Updated times for tournament: " + tournament)
+            await ctx.send(f"Updated times for tournament: " + tournament, ephemeral=True)
 
         except Exception as e:
             await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
@@ -157,6 +157,9 @@ class Leaderboard(Extension):
         conn = db.open_conn()
 
         try:
+
+            #Make sure map is updated
+            update_map_leaderboard(conn, map_name)
 
             if(amount > 50):
                 amount = 50
@@ -301,3 +304,61 @@ def format_leaderboard_embed(map_name, times, roster = None):
     embed.add_field(name="Time", value=all_times, inline=True)
 
     return embed
+
+
+def update_map_leaderboard(conn, map_name):
+
+    #map id
+    map_id = get_map_uid_from_db(conn, map_name)
+    map_ids = []
+    map_ids.append(map_id)
+
+    #tournament id
+    tournament_id = db.retrieve_data(conn, (db.get_tournament_from_map, [map_name]))
+
+    if (len(tournament_id) == 0):
+        raise Exception("Tournament id not found")
+    tournament_id = tournament_id[0][0]
+
+    # Get player ids 
+    players = db.retrieve_data(conn, (db.get_tournament_roster_players, [tournament_id]))
+    if(len(players) == 0):
+        raise Exception("Players not found")
+
+
+    player_names = []
+    player_ids = []
+    player_roster = []
+    for (name, id, roster) in players:
+        player_names.append(name)
+        player_ids.append(id)
+        player_roster.append(roster)
+
+            
+    # get data from nadeo and format it nicely
+    token = get_nadeo_access_token()
+    res = get_map_records(player_ids, map_ids, token)
+        
+    # update db 
+    queries = []
+    for [time, player_ubi_id, map_ubi_id] in res:
+
+        player_id = db.retrieve_data(conn, (db.get_player_id_by_account_id, [player_ubi_id]))
+
+        if(len(player_id) == 0):
+            print("Error occurred in update_tournaments_automatically: Tournament player ids not found", ephemeral=True)
+            continue
+            
+        player_id = player_id[0][0]
+
+        map_id = db.retrieve_data(conn, (db.get_map_db_id_by_map_id, [map_ubi_id]))
+
+        if(len(map_id) == 0):
+            print("Error occurred in update_tournaments_automatically: Tournament maps not found", ephemeral=True)
+            continue
+            
+        map_id = map_id[0][0]
+
+        queries.append((db.add_time, (player_id, map_id, time)))
+
+    db.execute_queries(conn, queries)
