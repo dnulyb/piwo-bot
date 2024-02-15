@@ -243,7 +243,12 @@ def format_map_record(record):
     else:
         minutes = str(minutes) + ":"
 
-    if(seconds < 1000):
+    
+    if(seconds < 100):
+        seconds = str(seconds)
+        # Adding an extra '0' in front if the seconds are only 2 digits
+        seconds = "00" + ".0" + seconds[-3:]
+    elif(seconds < 1000):
         seconds = str(seconds)
         seconds = "00" + "." + seconds[-3:]
     elif(seconds < 10000):
