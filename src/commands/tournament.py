@@ -245,7 +245,7 @@ class Tournament(Extension):
             google_sheet_write_batch(ranges, all_players, True, sheet_name, sheet_number, credentials)
 
             # always send reply
-            res = "Updated google sheet: " + sheet_name + ", with data sheet number: " + sheet_number + ", for tournament: " + tournament
+            res = "Updated google sheet: " + sheet_name + ", with data sheet number: " + str(sheet_number) + ", for tournament: " + tournament
             await ctx.send(f"{res}")
 
         except Exception as e:
