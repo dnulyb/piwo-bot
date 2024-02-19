@@ -40,6 +40,12 @@ get_tournament_roster_players = """
                                 ORDER BY Roster.name, Player.nickname
                                 """
 
+get_tournament_rosters =    """
+                            SELECT name
+                            FROM Roster
+                            WHERE Roster.tournament_id=?
+                            """
+
 get_roster_id =         """ SELECT id
                             FROM Roster
                             WHERE name=? COLLATE NOCASE"""
@@ -198,6 +204,24 @@ get_tournament_maps =   """ SELECT Map.name, Map.uid
                             ORDER BY Map.name
                         """
 
+get_player_tournament_times =   """
+                                SELECT player_id, map_id, time
+                                FROM Time
+                                WHERE map_id IN
+                                    (SELECT map_id
+                                        FROM Mappack
+                                        WHERE tournament_id = ?
+                                    )
+                                AND player_id = ?
+                                """
+
+get_player_time =   """
+                    SELECT time
+                    FROM Time
+                    WHERE map_id = ?
+                    AND player_id = ?
+                    """
+
 add_to_teaminfo =       """ INSERT INTO TeamInfo(name, info)
                             VALUES(?,?) 
                                 ON CONFLICT (name) DO
@@ -225,6 +249,15 @@ get_twitch_list =       """ SELECT name
                             FROM TwitchChannel
                         """
 
+add_gsheet =            """INSERT INTO GoogleSheet(sheet_name, sheet_number, tournament_id)
+                           VALUES(?,?,?)
+                        """
+remove_gsheet =         """ DELETE FROM GoogleSheet
+                            WHERE sheet_name=? COLLATE NOCASE"""
+
+get_gsheet =            """ SELECT sheet_name, sheet_number
+                            FROM GoogleSheet
+                            WHERE tournament_id=?"""
 
 def open_conn():
     conn = sqlite3.connect(db_file)

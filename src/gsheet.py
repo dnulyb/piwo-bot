@@ -23,6 +23,21 @@ def google_sheet_write(range, values, rows, spreadsheet_name, sheet_number, cred
         wks.update_values(crange=range, values=[values], majordim='COLUMNS')
 
 
+def google_sheet_write_batch(ranges, values, rows, spreadsheet_name, sheet_number, credentials_filename):
+
+    # Authorize with google
+    gc = pygsheets.authorize(service_account_file=credentials_filename)
+
+    # Get working sheet
+    sheets = gc.open(spreadsheet_name)
+    wks = sheets[sheet_number]
+
+    # Update sheet with the new values
+    if rows:
+        wks.update_values_batch(ranges=ranges, values=values)
+    else:
+        wks.update_values_batch(ranges=ranges, values=values, majordim='COLUMNS')
+
 # Writes the 'values' list to the given spreadsheet.
 # Will insert at the first non-empty row.
 # Assumes there are no empty rows in between non-empty rows.

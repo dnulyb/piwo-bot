@@ -68,4 +68,13 @@ CREATE TABLE IF NOT EXISTS "TwitchChannel" (
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 
+CREATE TABLE IF NOT EXISTS "GoogleSheet" (
+	"id"	INTEGER,
+	"sheet_name"	TEXT NOT NULL UNIQUE,
+	"sheet_number" 	INTEGER NOT NULL,
+	"tournament_id"	INTEGER NOT NULL,
+	FOREIGN KEY("tournament_id") REFERENCES "Tournament"("id") ON DELETE CASCADE,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+
 COMMIT;
