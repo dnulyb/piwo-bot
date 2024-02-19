@@ -138,6 +138,17 @@ class Tournament(Extension):
         finally:
             conn.close() 
 
+    @slash_command(
+        name="tournament",
+        sub_cmd_name="gsheet_update",
+        sub_cmd_description="Update the google sheet for a tournament."
+    )
+    @slash_option(
+        name="tournament",
+        description="Name of the tournament",
+        required=True,
+        opt_type = OptionType.STRING
+    )
     async def gsheet_update(self, ctx: SlashContext, tournament: str):
 
         conn = db.open_conn()
