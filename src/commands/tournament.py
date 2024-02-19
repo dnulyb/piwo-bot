@@ -127,7 +127,7 @@ class Tournament(Extension):
 
             query = [(db.add_gsheet, (sheet_name, sheet_number, tournament_id))]
             db.execute_queries(conn, query)
-            res = "Added google sheet: " + sheet_name + ", with data sheet number: " + sheet_number + ", to tournament: " + tournament
+            res = "Added google sheet: " + sheet_name + ", with data sheet number: " + str(sheet_number) + ", to tournament: " + tournament
 
             # always send reply
             await ctx.send(f"{res}")
