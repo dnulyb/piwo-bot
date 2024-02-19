@@ -151,6 +151,8 @@ class Tournament(Extension):
     )
     async def gsheet_update(self, ctx: SlashContext, tournament: str):
 
+        await ctx.defer()
+
         conn = db.open_conn()
 
         try:
@@ -234,7 +236,7 @@ class Tournament(Extension):
             #Write update time
             now = datetime.now()
             dmY_HMS = now.strftime("%d/%m/%Y %H:%M:%S")
-            google_sheet_write("A1", [dmY_HMS], True, sheet_name, sheet_number, credentials)
+            google_sheet_write("A1", ["Latest update (UTC): " + dmY_HMS], True, sheet_name, sheet_number, credentials)
 
             #Write map names
             google_sheet_write("B1:Z1", map_names, True, sheet_name, sheet_number, credentials)
