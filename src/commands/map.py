@@ -224,14 +224,18 @@ def get_map_records(account_ids, map_ids, token):
                     elem["mapId"]] 
                 for elem in res]
     
-    # Format time correctly
-    for record in records:
-        record[0] = format_map_record(record[0])
-
     return records
 
 # Converts a record time of format "42690" to "42.690", or "62690" to "01:02.690"
 def format_map_record(record):
+
+    #Check if time is formatted with minutes (ex. 01:01.110)
+    #   If so, format as seconds
+    minutes = record.split(":")[0]
+    if(minutes != record):
+        seconds = float(record.split(":")[1])
+        minutes = int(minutes)
+        record = str(seconds + 60 * minutes)
 
     minutes = floor(record / 60000)
     seconds = record - (minutes * 60000)

@@ -75,6 +75,7 @@ class Cotd(Extension):
         for (player_time, player_id, _) in totd_data:
             for (cotd_player_name, cotd_player_id) in cotd_players:
                 if player_id == cotd_player_id:
+                    player_time = format_map_record(player_time)
                     totd_results.append((cotd_player_name, player_time))
         
         #Sort so that minutes come after seconds

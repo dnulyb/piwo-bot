@@ -15,7 +15,7 @@ from interactions.api.events import Startup
 
 import src.db.db as db
 from src.ubi.authentication import get_nadeo_access_token
-from src.commands.map import get_map_records, get_map_uid_from_db
+from src.commands.map import get_map_records, get_map_uid_from_db, format_map_record
 from src.commands.tournament import get_tournament_id
 
 import asyncio
@@ -294,6 +294,10 @@ def format_leaderboard_embed(map_name, times, roster = None):
     for i, time in enumerate(times, start=1):
 
         (nickname, record) = time
+
+        # Format time correctly
+        record = format_map_record(record)
+
         pos = str(i) + "."
         all_positions += pos + "\n"
         all_players += nickname + "\n"
