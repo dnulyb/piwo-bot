@@ -343,5 +343,15 @@ def retrieve_data(conn, query):
     return res
 
 
+# Returns None if the tournament cannot be found
+def get_tournament_db_id(conn, tournament):
+
+    tournament_id = retrieve_data(conn, (get_tournament_id, [tournament]))
+    if(len(tournament_id) == 0):
+        return None
+    
+    return tournament_id[0][0]
+
+
 
 

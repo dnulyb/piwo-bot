@@ -7,53 +7,11 @@ from interactions import (
     Embed
 )
 import src.db.db as db
-from math import floor
-
-
-# Converts a record time of format "42690" to "42.690", or "62690" to "01:02.690"
-def format_map_record(record):
-
-    #Check if time is formatted with minutes (ex. 01:01.110)
-    #   If so, format as seconds
-    minutes = record.split(":")[0]
-    if(minutes != record):
-        seconds = float(record.split(":")[1])
-        minutes = int(minutes)
-        record = str(seconds + 60 * minutes)
-
-    minutes = floor(record / 60000)
-    seconds = record - (minutes * 60000)
-
-    if(minutes == 0):
-        minutes = ""
-    elif(minutes < 10):
-        minutes = "0" + str(minutes) + ":"
-    else:
-        minutes = str(minutes) + ":"
-
-    
-    if(seconds < 100):
-        seconds = str(seconds)
-        # Adding an extra '0' in front if the seconds are only 2 digits
-        seconds = "00" + ".0" + seconds[-3:]
-    elif(seconds < 1000):
-        seconds = str(seconds)
-        seconds = "00" + "." + seconds[-3:]
-    elif(seconds < 10000):
-        seconds = str(seconds)
-        seconds = "0" + seconds[:-3] + "." + seconds[-3:]
-    else:
-        seconds = str(seconds)
-        seconds = seconds[:-3] + "." + seconds[-3:]
-
-    res = minutes + str(seconds)
-
-    return res
-
-from src.commands.tournament import get_tournament_id
+from src.db.db import get_tournament_db_id
 
 import requests
 from dotenv import find_dotenv, load_dotenv, get_key
+from math import floor
 
 map_record_url = "https://prod.trackmania.core.nadeo.online/mapRecords/"
 map_info_url = "https://prod.trackmania.core.nadeo.online/maps/?mapUidList="
@@ -268,7 +226,47 @@ def get_map_records(account_ids, map_ids, token):
     
     return records
 
+# Converts a record time of format "42690" to "42.690", or "62690" to "01:02.690"
+def format_map_record(record):
 
+    #Check if time is formatted with minutes (ex. 01:01.110)
+    #   If so, format as seconds
+    record_string = str(record)
+    minutes = record_string.split(":")[0]
+    if(minutes != record_string):
+        seconds = float(record_string.split(":")[1])
+        minutes = int(minutes)
+        record_string = str(seconds + 60 * minutes)
+        record = float(record_string)
+
+    minutes = floor(record / 60000)
+    seconds = record - (minutes * 60000)
+
+    if(minutes == 0):
+        minutes = ""
+    elif(minutes < 10):
+        minutes = "0" + str(minutes) + ":"
+    else:
+        minutes = str(minutes) + ":"
+
+    
+    if(seconds < 100):
+        seconds = str(seconds)
+        # Adding an extra '0' in front if the seconds are only 2 digits
+        seconds = "00" + ".0" + seconds[-3:]
+    elif(seconds < 1000):
+        seconds = str(seconds)
+        seconds = "00" + "." + seconds[-3:]
+    elif(seconds < 10000):
+        seconds = str(seconds)
+        seconds = "0" + seconds[:-3] + "." + seconds[-3:]
+    else:
+        seconds = str(seconds)
+        seconds = seconds[:-3] + "." + seconds[-3:]
+
+    res = minutes + str(seconds)
+
+    return res
 
 
 
