@@ -239,6 +239,9 @@ def format_map_record(record):
         record_string = str(seconds + 60 * minutes)
         record = int(record_string)
 
+    else:
+        record = int(record)
+
     minutes = floor(record / 60000)
     seconds = record - (minutes * 60000)
 
