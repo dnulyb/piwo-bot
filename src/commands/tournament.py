@@ -7,7 +7,18 @@ from interactions import (
     OptionType,
     Embed
 )
+
 import src.db.db as db
+#TODO: move this to db file
+# Returns None if the tournament cannot be found
+def get_tournament_id(conn, tournament):
+
+    tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
+    if(len(tournament_id) == 0):
+        return None
+    
+    return tournament_id[0][0]
+
 from dotenv import find_dotenv, load_dotenv, get_key
 from src.gsheet import google_sheet_write, google_sheet_write_batch
 from src.ubi.authentication import get_nadeo_access_token
@@ -326,14 +337,7 @@ class Tournament(Extension):
         finally:
             conn.close() 
 
-# Returns None if the tournament cannot be found
-def get_tournament_id(conn, tournament):
 
-    tournament_id = db.retrieve_data(conn, (db.get_tournament_id, [tournament]))
-    if(len(tournament_id) == 0):
-        return None
-    
-    return tournament_id[0][0]
 
 def format_tournament_list(tournaments):
 
