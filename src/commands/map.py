@@ -237,9 +237,8 @@ def format_map_record(record):
         seconds = float(record_string.split(":")[1])
         minutes = int(minutes)
         record_string = str(seconds + 60 * minutes)
-        record = float(record_string)
+        record = int(record_string)
 
-    record = float(record)
     minutes = floor(record / 60000)
     seconds = record - (minutes * 60000)
 
