@@ -48,7 +48,7 @@ class Map(Extension):
 
         try:
             # Get tournament id
-            tournament_id = get_tournament_id(conn, tournament)
+            tournament_id = get_tournament_db_id(conn, tournament)
 
             if tournament_id == None:
                 await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
@@ -165,7 +165,7 @@ class Map(Extension):
                 embed = format_map_list(res)
                 await ctx.send(embed=embed)
             else:
-                tournament_id = get_tournament_id(conn, tournament)
+                tournament_id = get_tournament_db_id(conn, tournament)
 
                 if tournament_id == None:
                     await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
@@ -239,6 +239,7 @@ def format_map_record(record):
         record_string = str(seconds + 60 * minutes)
         record = float(record_string)
 
+    record = float(record)
     minutes = floor(record / 60000)
     seconds = record - (minutes * 60000)
 
