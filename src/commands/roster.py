@@ -245,17 +245,23 @@ def format_registered_players(players):
     embed.title = "Registered players"
 
     res = {}
-    for (player, _, roster) in players:
+    for (player, account_id, roster) in players:
         if roster in res:
-            res[roster].append(player)
+            res[roster].append((player, account_id))
         else:
-            res[roster] = [player]
+            res[roster] = [(player, account_id)]
 
     for key in res:
-        value = ""
-        for val in res[key]:
-            value += val + "\n"
-        embed.add_field(name=key, value=value, inline=False)
+        all_players = ""
+        all_account_ids = ""
+        for (player, account_id) in res[key]:
+            all_players += player + "\n"
+            all_account_ids += account_id + "\n"
+
+        embed.add_field(name=key, value='\u200b', inline=False)
+        embed.add_field(name="Player", value=all_players, inline=True)
+        embed.add_field(name="Account id", value=all_account_ids, inline=True)
+
 
     return embed
 

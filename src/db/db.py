@@ -1,7 +1,12 @@
 import sqlite3
 import os.path
+from dotenv import find_dotenv, load_dotenv, get_key
 
-db_file = os.path.join(os.path.dirname(__file__), "team.sqlite")
+# Create db file path
+dotenv_path = find_dotenv()
+load_dotenv(dotenv_path)
+db_filename = get_key(dotenv_path, "DB_FILE")
+db_file = os.path.join(os.path.dirname(__file__), db_filename)
 db_init_sql = os.path.join(os.path.dirname(__file__), "team.sql")
 
 #TODO: Figure out a better way to do this
@@ -272,6 +277,7 @@ def init():
         print("db file created")
     except FileExistsError:
         print("db file already exists, no new file created")
+        return
 
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
