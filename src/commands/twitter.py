@@ -6,10 +6,9 @@ from interactions import (
     SlashCommandChoice,
     SlashContext,
     Task,
-    IntervalTrigger,
-    listen
+    IntervalTrigger
 )
-from interactions.api.events import Startup
+#from interactions.api.events import Startup
 
 import asyncio
 import feedparser as fp
@@ -77,10 +76,13 @@ class Twitter(Extension):
         else:
             await ctx.send("ERROR: Couldn't toggle tweets.", ephemeral=True)
 
+    # Nitter shut down, so no point of checking
+    """
     @listen(Startup)
     async def on_startup(self):
         await self.check_tweets()
         self.check_tweets.start()
+    """
 
 
 def check_for_new_tweets():
