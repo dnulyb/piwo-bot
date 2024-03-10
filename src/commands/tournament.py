@@ -12,7 +12,7 @@ from src.db.db import get_tournament_db_id
 from dotenv import find_dotenv, load_dotenv, get_key
 from src.gsheet import google_sheet_write, google_sheet_write_batch
 from src.ubi.authentication import get_nadeo_access_token
-from src.commands.map import get_map_records
+from src.commands.map import get_map_records, format_map_record
 
 from datetime import datetime
 
@@ -306,12 +306,8 @@ def update_sheet(tournament):
                     player_time = "999.999"
                 else:
                     player_time = player_time[0][0]
+                    player_time = format_map_record(player_time)
 
-                minutes = player_time.split(":")[0]
-                if(minutes != player_time):
-                    seconds = float(player_time.split(":")[1])
-                    minutes = int(minutes)
-                    player_time = str(seconds + 60 * minutes)
                 player_times.append(player_time)
 
             all_players.append((player, player_times))
