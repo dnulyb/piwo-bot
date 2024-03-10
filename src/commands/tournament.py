@@ -156,178 +156,207 @@ class Tournament(Extension):
 
         await ctx.defer()
 
-        conn = db.open_conn()
+        (res, ephemeral) = update_sheet(tournament)
+        await ctx.send(f"{res}", ephemeral=ephemeral)
 
-        try:
 
-            # Update tournament times
-            # load everything that should be updated from db:
-            # Get tournament map ids
-            tournament_id = get_tournament_db_id(conn, tournament)
+def update_tournament_times(tournament):
 
-            if tournament_id == None:
-                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
-                conn.close()
-                return
+    conn = db.open_conn()
+
+    # Update tournament times
+    # load everything that should be updated from db:
+    # Get tournament map ids
+    tournament_id = get_tournament_db_id(conn, tournament)
+
+    if tournament_id == None:
+        conn.close()
+        msg = f"Error occurred while running command: Tournament '{tournament}' not found"
+        ephemeral = True
+        return (msg, ephemeral)
+    
+    maps = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
+    if(len(maps) == 0):
+        conn.close()
+        msg = f"Error occurred while running command: No maps found for tournament '{tournament}'"
+        ephemeral = True
+        return (msg, ephemeral)
+
+    map_names = []
+    map_ids = []
+    for (map_name, map_id) in maps:
+        map_names.append(map_name)
+        map_ids.append(map_id)
+
+    # Get tournament player ids 
+    players = db.retrieve_data(conn, (db.get_tournament_roster_players, [tournament_id]))
+    if(len(players) == 0):
+        conn.close()
+        msg = f"Error occurred while running command: No players found for tournament '{tournament}'"
+        ephemeral = True
+        return (msg, ephemeral)
+
+    #print("Players: ", players)
+
+    player_names = []
+    player_ids = []
+    player_roster = []
+    for (name, id, roster) in players:
+        player_names.append(name)
+        player_ids.append(id)
+        player_roster.append(roster)
+
             
-            maps = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
-            if(len(maps) == 0):
-                await ctx.send(f"Error occurred while running command: No maps found for tournament '{tournament}'", ephemeral=True)
-                conn.close()
-                return
+    # get data from nadeo and format it nicely
+    print("Retrieving nadeo data for tournament: " + tournament)
 
-            map_names = []
-            map_ids = []
-            for (map_name, map_id) in maps:
-                map_names.append(map_name)
-                map_ids.append(map_id)
+    token = get_nadeo_access_token()
+    res = get_map_records(player_ids, map_ids, token)
+    #print(res)
+        
+    # update db 
+    queries = []
+    for [time, player_ubi_id, map_ubi_id] in res:
 
-            # Get tournament player ids 
-            players = db.retrieve_data(conn, (db.get_tournament_roster_players, [tournament_id]))
-            if(len(players) == 0):
-                await ctx.send(f"Error occurred while running command: No players found for tournament '{tournament}'", ephemeral=True)
-                conn.close()
-                return
+        player_id = db.retrieve_data(conn, (db.get_player_id_by_account_id, [player_ubi_id]))
 
-            #print("Players: ", players)
-
-            player_names = []
-            player_ids = []
-            player_roster = []
-            for (name, id, roster) in players:
-                player_names.append(name)
-                player_ids.append(id)
-                player_roster.append(roster)
-
-                    
-            # get data from nadeo and format it nicely
-            print("Retrieving nadeo data for tournament: " + tournament)
-
-            token = get_nadeo_access_token()
-            res = get_map_records(player_ids, map_ids, token)
-            #print(res)
-                
-            # update db 
-            queries = []
-            for [time, player_ubi_id, map_ubi_id] in res:
-
-                player_id = db.retrieve_data(conn, (db.get_player_id_by_account_id, [player_ubi_id]))
-
-                if(len(player_id) == 0):
-                    await ctx.send(f"Error occurred while running command: Player '{player_ubi_id}' not found", ephemeral=True)
-                    conn.close()
-                    return
-                    
-                player_id = player_id[0][0]
-
-                map_id = db.retrieve_data(conn, (db.get_map_db_id_by_map_id, [map_ubi_id]))
-
-                if(len(map_id) == 0):
-                    await ctx.send(f"Error occurred while running command: Map '{map_ubi_id}' not found", ephemeral=True)
-                    conn.close()
-                    return
-                    
-                map_id = map_id[0][0]
-
-                queries.append((db.add_time, (player_id, map_id, time)))
-
-            db.execute_queries(conn, queries)
-
-            print("Nadeo data for tournament: " + tournament + ", added to database.")
-
-            # Get sheet info
-            sheet_info = db.retrieve_data(conn, (db.get_gsheet, [tournament_id]))
-            if(sheet_info == []):
-                await ctx.send(f"Error occurred while running command: Tournament sheet not found", ephemeral=True)
-                return
+        if(len(player_id) == 0):
+            conn.close()
+            msg = f"Error occurred while running command: Player '{player_ubi_id}' not found"
+            ephemeral = True
+            return (msg, ephemeral)
             
-            (sheet_name, sheet_number) = sheet_info[0]
+        player_id = player_id[0][0]
 
-            # Collect all player map times
-            rosters_list = db.retrieve_data(conn, (db.get_tournament_rosters, [tournament_id]))
-            maps_list = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
+        map_id = db.retrieve_data(conn, (db.get_map_db_id_by_map_id, [map_ubi_id]))
 
-            maps = []
-            map_names = []
-            for (map_name, map_uid) in maps_list:
-                map_id = db.retrieve_data(conn, (db.get_map_id, [map_name]))
-                maps.append(map_id[0][0])
-                map_names.append(map_name)
+        if(len(map_id) == 0):
+            conn.close()
+            msg = f"Error occurred while running command: Map '{map_ubi_id}' not found"
+            ephemeral = True
+            return (msg, ephemeral)
+            
+        map_id = map_id[0][0]
 
-            rosters = []
-            players = []
-            for roster in rosters_list:
-                rosters.append(roster[0])
+        queries.append((db.add_time, (player_id, map_id, time)))
 
-                roster_players = db.retrieve_data(conn, (db.get_specific_roster_players, [roster[0]]))
-                for player in roster_players:
-                    players.append(player[0])
+    db.execute_queries(conn, queries)
 
-            all_players = []
-            for player in players:
-
-                player_id = db.retrieve_data(conn, (db.get_player_id, [player]))
-                player_id = player_id[0][0]
+    print("Nadeo data for tournament: " + tournament + ", added to database.")
 
 
-                player_times = []
-                for map in maps:
-                    player_time = db.retrieve_data(conn, (db.get_player_time, (map, player_id)))
-                    if(player_time == []):
-                        player_time = "999.999"
-                    else:
-                        player_time = player_time[0][0]
+# Returns (msg, epemeral)
+#   msg:        message to send to discord
+#   ephemeral:  if the message should be ephemeral (aka visible to only the person who used the command)
+def update_sheet(tournament):
 
-                    minutes = player_time.split(":")[0]
-                    if(minutes != player_time):
-                        seconds = float(player_time.split(":")[1])
-                        minutes = int(minutes)
-                        player_time = str(seconds + 60 * minutes)
-                    player_times.append(player_time)
+    conn = db.open_conn()
 
-                all_players.append((player, player_times))
+    try:
 
-            sorted_players = sorted(all_players, key=lambda x:(str.casefold(x[0])))
+        tournament_id = get_tournament_db_id(conn, tournament)
 
-            #Write row of player times to gsheet
-            dotenv_path = find_dotenv()
-            load_dotenv(dotenv_path)
+        if tournament_id == None:
+            conn.close()
+            msg = f"Error occurred while running command: Tournament '{tournament}' not found"
+            ephemeral = True
+            return (msg, ephemeral)
 
-            credentials = get_key(dotenv_path, "CREDENTIALS_FILE")
-            start_col = "A"
-            start_row = 2
+        
+        # Get sheet info
+        sheet_info = db.retrieve_data(conn, (db.get_gsheet, [tournament_id]))
+        if(sheet_info == []):
+            msg = f"Error occurred while running command: Tournament sheet not found"
+            ephemeral = True
+            return (msg, ephemeral)
+        
+        (sheet_name, sheet_number) = sheet_info[0]
 
-            ranges = []
-            all_players = []
-            for (player_name, player_times) in sorted_players:
+        # Collect all player map times
+        rosters_list = db.retrieve_data(conn, (db.get_tournament_rosters, [tournament_id]))
+        maps_list = db.retrieve_data(conn, (db.get_tournament_maps, [tournament_id]))
 
-                range = start_col + str(start_row) + ":Z" + str(start_row)
-                ranges.append(range)
-                all_players.append([[player_name] + player_times])
-                start_row += 1
+        maps = []
+        map_names = []
+        for (map_name, map_uid) in maps_list:
+            map_id = db.retrieve_data(conn, (db.get_map_id, [map_name]))
+            maps.append(map_id[0][0])
+            map_names.append(map_name)
 
-            #Write update time
-            now = datetime.now()
-            dmY_HMS = now.strftime("%d/%m/%Y %H:%M:%S")
-            google_sheet_write("A1", ["Latest update (UTC): " + dmY_HMS], True, sheet_name, sheet_number, credentials)
+        rosters = []
+        players = []
+        for roster in rosters_list:
+            rosters.append(roster[0])
 
-            #Write map names
-            google_sheet_write("B1:Z1", map_names, True, sheet_name, sheet_number, credentials)
+            roster_players = db.retrieve_data(conn, (db.get_specific_roster_players, [roster[0]]))
+            for player in roster_players:
+                players.append(player[0])
 
-            #Write data
-            google_sheet_write_batch(ranges, all_players, True, sheet_name, sheet_number, credentials)
+        all_players = []
+        for player in players:
 
-            # always send reply
-            res = "Updated google sheet: " + sheet_name + ", with data sheet number: " + str(sheet_number) + ", for tournament: " + tournament
-            await ctx.send(f"{res}")
-
-        except Exception as e:
-            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
-
-        finally:
-            conn.close() 
+            player_id = db.retrieve_data(conn, (db.get_player_id, [player]))
+            player_id = player_id[0][0]
 
 
+            player_times = []
+            for map in maps:
+                player_time = db.retrieve_data(conn, (db.get_player_time, (map, player_id)))
+                if(player_time == []):
+                    player_time = "999.999"
+                else:
+                    player_time = player_time[0][0]
+
+                minutes = player_time.split(":")[0]
+                if(minutes != player_time):
+                    seconds = float(player_time.split(":")[1])
+                    minutes = int(minutes)
+                    player_time = str(seconds + 60 * minutes)
+                player_times.append(player_time)
+
+            all_players.append((player, player_times))
+
+        sorted_players = sorted(all_players, key=lambda x:(str.casefold(x[0])))
+
+        #Write row of player times to gsheet
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        credentials = get_key(dotenv_path, "CREDENTIALS_FILE")
+        start_col = "A"
+        start_row = 2
+
+        ranges = []
+        all_players = []
+        for (player_name, player_times) in sorted_players:
+
+            range = start_col + str(start_row) + ":Z" + str(start_row)
+            ranges.append(range)
+            all_players.append([[player_name] + player_times])
+            start_row += 1
+
+        #Write update time
+        now = datetime.now()
+        dmY_HMS = now.strftime("%d/%m/%Y %H:%M:%S")
+        google_sheet_write("A1", ["Latest update (UTC): " + dmY_HMS], True, sheet_name, sheet_number, credentials)
+
+        #Write map names
+        google_sheet_write("B1:Z1", map_names, True, sheet_name, sheet_number, credentials)
+
+        #Write data
+        google_sheet_write_batch(ranges, all_players, True, sheet_name, sheet_number, credentials)
+
+        # always send reply
+        conn.close()
+        msg = "Updated google sheet: " + sheet_name + ", with data sheet number: " + str(sheet_number) + ", for tournament: " + tournament
+        ephemeral = False
+        return (msg, ephemeral)
+
+    except Exception as e:
+        conn.close()
+        msg = f"Error occurred while running command: {e}"
+        ephemeral = True
+        return (msg, ephemeral)
 
 def format_tournament_list(tournaments):
 
