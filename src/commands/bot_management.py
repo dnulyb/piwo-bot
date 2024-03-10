@@ -46,6 +46,13 @@ class BotManagement(Extension):
         await ctx.send("Shutting down the bot.", ephemeral=True)
         await self.bot.stop()
 
+    @check(is_owner())
+    async def send_message_reply(self, channel_id, message_id, content):
+        channel = self.bot.get_channel(channel_id)
+        message = await channel.fetch_message(message_id)
+        await message.reply(content=content)
+
+
     @slash_command(
         name="bot",
         sub_cmd_name="reload_extension",
