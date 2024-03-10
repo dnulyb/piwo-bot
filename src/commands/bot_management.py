@@ -46,11 +46,36 @@ class BotManagement(Extension):
         await ctx.send("Shutting down the bot.", ephemeral=True)
         await self.bot.stop()
 
+    @slash_command(
+        name="bot",
+        description="Bot management commands.",
+        sub_cmd_name="send_message_reply",
+        sub_cmd_description="Replies to the given message"
+    )
+    @slash_option(
+        name="channel_id",
+        description="ID of the channel the message is in.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="message_id",
+        description="ID of the message to reply to.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="content",
+        description="Content to send.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
     @check(is_owner())
-    async def send_message_reply(self, channel_id, message_id, content):
+    async def send_message_reply(self, ctx: SlashContext, channel_id, message_id, content):
         channel = self.bot.get_channel(channel_id)
         message = await channel.fetch_message(message_id)
         await message.reply(content=content)
+        await ctx.send("message sent as reply.")
 
 
     @slash_command(
