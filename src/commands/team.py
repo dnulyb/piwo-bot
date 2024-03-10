@@ -4,8 +4,12 @@ from interactions import (
     slash_option,
     OptionType,
     SlashContext,
-    Embed
+    Embed,
+    listen,
+    Task,
+    TimeTrigger
 )
+from interactions.api.events import Startup
 
 import src.db.db as db
 
@@ -138,6 +142,25 @@ class Team(Extension):
         embed = format_team_intro_embed()
 
         await ctx.send(embed=embed)
+
+
+    @Task.create(TimeTrigger(hour=23, minute=0)) #midnight CET
+    async def roster_update_trigger(self):
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        roster_channel_id = get_key(dotenv_path, ("DISCORD_ROSTER_CHANNEL"))
+        roster_channel_message_id = get_key(dotenv_path, ("DISCORD_ROSTER_MESSAGE"))
+        channel = self.bot.get_channel(roster_channel_id)
+        message = await channel.fetch_message(roster_channel_message_id)
+
+        embed = format_team_intro_embed()
+        await message.edit(content="", embed=embed)
+    
+    @listen(Startup)
+    async def on_startup(self):
+        self.roster_update_trigger.start()
     
 def format_team_intro_embed():
 

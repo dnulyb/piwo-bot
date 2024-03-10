@@ -277,7 +277,6 @@ def init():
         print("db file created")
     except FileExistsError:
         print("db file already exists, no new file created")
-        return
 
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
