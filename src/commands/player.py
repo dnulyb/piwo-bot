@@ -239,9 +239,10 @@ def format_player_list(players):
     value = ""
 
     for i, (player, country, roster) in enumerate(players, start=1):
-        if (country == None):
-            country == "None"
-        if (roster == None):
+        print(player, country, roster)
+        if (country is None):
+            country = "None"
+        if (roster is None):
             roster = "None"
         value += player + ", " + country + ", " + roster + "\n"
 
@@ -267,6 +268,13 @@ def format_player(player):
     embed.title = "Player info"
 
     (nickname, account_id, country, official_roster) = player[0]
+    if (account_id is None):
+        account_id = "None"
+    if (country is None):
+        country = "None"
+    if (official_roster is None):
+        official_roster = "None"
+
     value = ""
     value += "Nickname: " + nickname + "\n"
     value += "Account id: " + account_id + "\n"

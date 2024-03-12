@@ -258,14 +258,15 @@ def format_registered_players(players):
             all_players += player + "\n"
             all_account_ids += account_id + "\n"
 
-        # Have we almost reached the embed value limit?
-        if(len(all_account_ids) >= 900):
-            embed.add_field(name=key, value='\u200b', inline=False)
-            embed.add_field(name="Player", value=all_players, inline=True)
-            embed.add_field(name="Account id", value=all_account_ids, inline=True)
+            # Have we almost reached the embed value limit?
+            if(len(all_players) >= 900
+            or len(all_account_ids) >= 900):
+                embed.add_field(name=key, value='\u200b', inline=False)
+                embed.add_field(name="Player", value=all_players, inline=True)
+                embed.add_field(name="Account id", value=all_account_ids, inline=True)
 
-            all_players = ""
-            all_account_ids = ""
+                all_players = ""
+                all_account_ids = ""
 
         embed.add_field(name=key, value='\u200b', inline=False)
         embed.add_field(name="Player", value=all_players, inline=True)
