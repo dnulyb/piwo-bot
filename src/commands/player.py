@@ -239,7 +239,7 @@ def format_player_list(players):
     value = ""
 
     for i, (player, country, roster) in enumerate(players, start=1):
-        print(player, country, roster)
+
         if (country is None):
             country = "None"
         if (roster is None):
