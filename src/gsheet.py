@@ -18,9 +18,9 @@ def google_sheet_write(range, values, rows, spreadsheet_name, sheet_number, cred
 
     # Update sheet with the new values
     if rows:
-        wks.update_values(crange=range, values=[values])
+        wks.update_values(crange=range, values=[values], parse = True)
     else:
-        wks.update_values(crange=range, values=[values], majordim='COLUMNS')
+        wks.update_values(crange=range, values=[values], majordim='COLUMNS', parse = True)
 
 
 def google_sheet_write_batch(ranges, values, rows, spreadsheet_name, sheet_number, credentials_filename):
@@ -34,9 +34,9 @@ def google_sheet_write_batch(ranges, values, rows, spreadsheet_name, sheet_numbe
 
     # Update sheet with the new values
     if rows:
-        wks.update_values_batch(ranges=ranges, values=values)
+        wks.update_values_batch(ranges=ranges, values=values, parse = True)
     else:
-        wks.update_values_batch(ranges=ranges, values=values, majordim='COLUMNS')
+        wks.update_values_batch(ranges=ranges, values=values, majordim='COLUMNS', parse = True)
 
 # Writes the 'values' list to the given spreadsheet.
 # Will insert at the first non-empty row.
