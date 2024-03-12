@@ -156,6 +156,8 @@ class Tournament(Extension):
 
         await ctx.defer()
 
+        update_tournament_times(tournament)
+
         (res, ephemeral) = update_sheet(tournament)
         await ctx.send(f"{res}", ephemeral=ephemeral)
 
@@ -306,7 +308,7 @@ def update_sheet(tournament):
                     player_time = "999.999"
                 else:
                     player_time = player_time[0][0]
-                    player_time = format_map_record(player_time)
+                    #player_time = format_map_record(player_time)
 
                 player_times.append(player_time)
 
