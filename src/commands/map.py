@@ -227,7 +227,8 @@ def get_map_records(account_ids, map_ids, token):
     return records
 
 # Converts a record time of format "42690" to "42.690", or "62690" to "01:02.690"
-def format_map_record(record):
+#   mins: Bool, if there should be minutes in formatting or not. Default: True
+def format_map_record(record, mins=True):
 
     #Check if time is formatted with minutes (ex. 01:01.110)
     #   If so, format as seconds
@@ -242,17 +243,38 @@ def format_map_record(record):
     else:
         record = int(record)
 
-    minutes = floor(record / 60000)
-    seconds = record - (minutes * 60000)
+    if(mins):
 
-    if(minutes == 0):
-        minutes = ""
-    elif(minutes < 10):
-        minutes = "0" + str(minutes) + ":"
-    else:
-        minutes = str(minutes) + ":"
+        minutes = floor(record / 60000)
+        seconds = record - (minutes * 60000)
 
+        if(minutes == 0):
+            minutes = ""
+        elif(minutes < 10):
+            minutes = "0" + str(minutes) + ":"
+        else:
+            minutes = str(minutes) + ":"
+
+        
+        if(seconds < 100):
+            seconds = str(seconds)
+            # Adding an extra '0' in front if the seconds are only 2 digits
+            seconds = "00" + ".0" + seconds[-3:]
+        elif(seconds < 1000):
+            seconds = str(seconds)
+            seconds = "00" + "." + seconds[-3:]
+        elif(seconds < 10000):
+            seconds = str(seconds)
+            seconds = "0" + seconds[:-3] + "." + seconds[-3:]
+        else:
+            seconds = str(seconds)
+            seconds = seconds[:-3] + "." + seconds[-3:]
+
+        res = minutes + str(seconds)
+
+        return res
     
+    seconds = record
     if(seconds < 100):
         seconds = str(seconds)
         # Adding an extra '0' in front if the seconds are only 2 digits
@@ -267,9 +289,8 @@ def format_map_record(record):
         seconds = str(seconds)
         seconds = seconds[:-3] + "." + seconds[-3:]
 
-    res = minutes + str(seconds)
+    return seconds
 
-    return res
 
 
 
