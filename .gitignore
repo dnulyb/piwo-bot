@@ -5,6 +5,7 @@ notes
 main.py
 *.txt
 *.json
+src/other/data.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
