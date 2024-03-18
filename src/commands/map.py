@@ -79,6 +79,54 @@ class Map(Extension):
 
     @slash_command(
         name="map",
+        description="Map management commands.",
+        sub_cmd_name="add_existing",
+        sub_cmd_description="Adds a map that already exists in the database, to a tournament."
+    )
+    @slash_option(
+        name="tournament",
+        description="Name of the tournament you want to add the map to",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    @slash_option(
+        name="map_name",
+        description="Name of the map you want to add.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def add_existing(self, ctx: SlashContext, tournament: str, map_name: str):
+
+        conn = db.open_conn()
+
+        try:
+            # Get tournament id
+            tournament_id = get_tournament_db_id(conn, tournament)
+
+            if tournament_id == None:
+                await ctx.send(f"Error occurred while running command: Tournament '{tournament}' not found", ephemeral=True)
+                conn.close()
+                return
+
+            # Add the tournament and map to "Mappack" table
+            map_database_id = db.retrieve_data(conn, (db.get_map_id, [map_name]))
+            if(len(map_database_id) == 0):
+                await ctx.send(f"Error occurred while running command: Map '{map}' not found", ephemeral=True)
+                conn.close()
+                return
+            map_database_id = map_database_id[0][0]
+        
+            db.execute_queries(conn, [(db.add_to_mappack, (tournament_id, map_database_id))])
+
+            await ctx.send("Added map to tournament '" + tournament + "': " + map_name)
+
+        except Exception as e:
+            await ctx.send(f"Error occurred while running command: {e}", ephemeral=True)
+        finally:
+            conn.close() 
+
+    @slash_command(
+        name="map",
         sub_cmd_name="delete",
         sub_cmd_description="Delete a map."
     )
