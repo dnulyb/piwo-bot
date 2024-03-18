@@ -7,7 +7,7 @@ from src.gsheet import google_sheet_write, google_sheet_write_batch
 from src.ubi.authentication import authenticate, check_token_refresh, get_nadeo_access_token
 from src.commands.map import get_map_records, format_map_record
 
-import src.other.data as data
+#import src.other.data as data
 
 map_name_regex = r"(?i)(?<!\$)((?P<d>\$+)(?P=d))?((?<=\$)(?!\$)|(\$([a-f\d]{1,3}|[ionmwsztg<>]|[lhp](\[[^\]]+\])?)))"
 
@@ -178,7 +178,7 @@ for (_, _, map_uid) in sorted_map_info:
 
 
 print(map_leaderboard_infos)
-"""
+
 
 #player info
 players = list(zip(data.player_name_list, data.player_id_list))
@@ -231,6 +231,7 @@ all_mapinfo = list(zip(sorted_map_info, data.map_leaderboard_info_list))
 
 #Write player times to google sheet
 
+"""
 """
 ranges = []
 start_col = "A"
