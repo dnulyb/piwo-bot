@@ -13,8 +13,10 @@ from dotenv import find_dotenv, load_dotenv, get_key
 from src.gsheet import google_sheet_write, google_sheet_write_batch
 from src.ubi.authentication import get_nadeo_access_token
 from src.commands.map import get_map_records, format_map_record
+from src.other.map_analysis import get_map_infos, get_map_leaderboard_info
 
 from datetime import datetime
+import time
 
 
 class Tournament(Extension):
@@ -280,10 +282,29 @@ def update_sheet(tournament):
 
         maps = []
         map_names = []
+        map_ids = []
         for (map_name, map_uid) in maps_list:
             map_id = db.retrieve_data(conn, (db.get_map_id, [map_name]))
             maps.append(map_id[0][0])
             map_names.append(map_name)
+            map_ids.append(map_uid)
+
+        map_infos = get_map_infos(map_ids)
+        sorted_map_info = []
+        for map_id in map_ids:
+            for map_info in map_infos:
+                if(map_id == map_info[1]):
+                    sorted_map_info.append(map_info)
+
+        map_wrs = []
+        map_wrs.append("WR")
+        for (_, _, map_uid) in sorted_map_info:
+
+            (wr, _, _, _) = get_map_leaderboard_info(map_uid)
+            wr = format_map_record(wr, False)
+            map_wrs.append((wr))
+
+            time.sleep(0.5)
 
         rosters = []
         players = []
@@ -314,7 +335,8 @@ def update_sheet(tournament):
 
             all_players.append((player, player_times))
 
-        sorted_players = sorted(all_players, key=lambda x:(str.casefold(x[0])))
+        #sorted_players = sorted(all_players, key=lambda x:(str.casefold(x[0])))
+        sorted_players = all_players
 
         #Write row of player times to gsheet
         dotenv_path = find_dotenv()
@@ -322,7 +344,7 @@ def update_sheet(tournament):
 
         credentials = get_key(dotenv_path, "CREDENTIALS_FILE")
         start_col = "A"
-        start_row = 2
+        start_row = 3
 
         ranges = []
         all_players = []
@@ -340,6 +362,9 @@ def update_sheet(tournament):
 
         #Write map names
         google_sheet_write("B1:Z1", map_names, True, sheet_name, sheet_number, credentials)
+
+        #Write map wrs
+        google_sheet_write("A2:Z2", map_wrs, True, sheet_name, sheet_number, credentials)
 
         #Write data
         google_sheet_write_batch(ranges, all_players, True, sheet_name, sheet_number, credentials)
