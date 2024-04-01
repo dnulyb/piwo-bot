@@ -135,7 +135,7 @@ class Cotd(Extension):
 
     # Time trigger is UTC by default
     #@Task.create(TimeTrigger(hour=18, minute=1)) #cotd start time
-    @Task.create(TimeTrigger(hour=18, minute=17)) #cotd quali end time
+    @Task.create(TimeTrigger(hour=17, minute=17)) #cotd quali end time
     async def cotd_trigger(self):
 
         print("Cotd quali should be over now.")
