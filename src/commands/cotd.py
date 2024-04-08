@@ -202,8 +202,8 @@ def format_cotd_quali_results(map_name, results):
     embed.description = "Map: " + map_name
 
     #Format everything nicely inside a code block
-    header_format = "{:^3s} {:^5s} {:^15s} {:^10s} \n"
-    format =        "{:^3s} {:^5s} {:15s} {:^10s} \n"
+    header_format = "{:^3s} {:^5s} {:^15s} {:^16s} \n"
+    format =        "{:^3s} {:^5s} {:15s} {:^16s} \n"
 
     everything = "```\n"
     everything += header_format.format("Div", "Rank", "Player", "Time")
@@ -233,8 +233,8 @@ def format_totd_leaderboard(map_name, players):
     embed.description = "Map: " + map_name
 
     #Format everything nicely inside a code block
-    header_format = "{:^3s} {:^15s} {:^10s} \n"
-    format =        "{:^3s} {:15s} {:^10s} \n"
+    header_format = "{:^3s} {:^15s} {:^16s} \n"
+    format =        "{:^3s} {:15s} {:^16s} \n"
 
     everything = "```\n"
     everything += header_format.format("Pos", "Player", "Time")
