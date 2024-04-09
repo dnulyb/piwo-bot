@@ -95,7 +95,7 @@ def get_map_leaderboard_info(map_uid):
     scores = res["tops"][0]["top"]
     scores = [score["score"] for score in scores]
 
-    score_count = length(scores)
+    score_count = len(scores)
     wr = None
     top10 = None
     top50 = None
