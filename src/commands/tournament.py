@@ -302,7 +302,7 @@ def update_sheet(tournament):
 
             (wr, _, _, _) = get_map_leaderboard_info(map_uid)
             if wr is None:
-                map_wrs.append("")
+                map_wrs.append((""))
             else:
                 wr = format_map_record(wr, False)
                 map_wrs.append((wr))
