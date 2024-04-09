@@ -94,10 +94,21 @@ def get_map_leaderboard_info(map_uid):
     #Extract the relevant scores
     scores = res["tops"][0]["top"]
     scores = [score["score"] for score in scores]
-    wr = scores[0]
-    top10 = scores[9]
-    top50 = scores[49]
-    top100 = scores[99]
+
+    score_count = length(scores)
+    wr = None
+    top10 = None
+    top50 = None
+    top100 = None
+
+    if(score_count > 0):
+        wr = scores[0]
+    if(score_count >= 10):
+        top10 = scores[9]
+    if(score_count >= 50):
+        top50 = scores[49]
+    if(score_count >= 100):
+        top100 = scores[99]
 
     return(wr, top10, top50, top100)
 

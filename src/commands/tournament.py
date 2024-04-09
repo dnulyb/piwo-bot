@@ -301,8 +301,11 @@ def update_sheet(tournament):
         for (_, _, map_uid) in sorted_map_info:
 
             (wr, _, _, _) = get_map_leaderboard_info(map_uid)
-            wr = format_map_record(wr, False)
-            map_wrs.append((wr))
+            if wr is None:
+                map_wrs.append("")
+            else:
+                wr = format_map_record(wr, False)
+                map_wrs.append((wr))
 
             time.sleep(0.5)
 
