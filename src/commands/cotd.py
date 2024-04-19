@@ -27,6 +27,9 @@ import math
 totd_url = "https://live-services.trackmania.nadeo.live/api/token/campaign/month?length=1&offset=0"
 cotd_url = "https://meet.trackmania.nadeo.club/api/cup-of-the-day/current"
 challenge_url = "https://meet.trackmania.nadeo.club/api/challenges/"
+competition_rounds_url = "https://meet.trackmania.nadeo.club/api/competitions/"
+competition_matches_url = "https://meet.trackmania.nadeo.club/api/rounds/"
+competition_match_results_url = "https://meet.trackmania.nadeo.club/api/matches/"
 
 map_name_regex = r"(?i)(?<!\$)((?P<d>\$+)(?P=d))?((?<=\$)(?!\$)|(\$([a-f\d]{1,3}|[ionmwsztg<>]|[lhp](\[[^\]]+\])?)))"
 
@@ -106,7 +109,7 @@ class Cotd(Extension):
     
 
     @check(is_owner())
-    @cooldown(Buckets.GUILD, 1, 1800)
+    @cooldown(Buckets.GUILD, 1, 30)
     @slash_command(
         name="cotd",
         description="COTD info.",
@@ -131,6 +134,34 @@ class Cotd(Extension):
 
         #await ctx.send("Posting cotd quali results:")
         print("Sending cotd quali results to channel")
+        await ctx.send(embed=embed)
+
+    @check(is_owner())
+    @cooldown(Buckets.GUILD, 1, 30)
+    @slash_command(
+        name="cotd",
+        description="COTD info.",
+        sub_cmd_name="ko_results",
+        sub_cmd_description="Shows results for today's COTD KO."
+    )
+    async def ko_results(self, ctx: SlashContext):
+
+        await ctx.defer()
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        results = get_cotd_ko_results(False)
+        if(results == None):
+            await ctx.send("No cotd ko could be found, try again around cotd time.")
+            return
+
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_ko_results(map_name, results)
+
+        #await ctx.send("Posting cotd quali results:")
+        print("Sending cotd KO results to channel")
         await ctx.send(embed=embed)
 
     # Time trigger is UTC by default
@@ -161,7 +192,128 @@ class Cotd(Extension):
     @listen(Startup)
     async def on_startup(self):
         self.cotd_trigger.start()
+        self.cotd_ko_trigger.start()
 
+    @Task.create(TimeTrigger(hour=17, minute=45)) #approximate cotd ko end time
+    async def cotd_ko_trigger(self):
+
+        print("Cotd ko should be over now.")
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = self.bot.get_channel(channel_id)
+
+        results = get_cotd_ko_results()
+        if(results == None):
+            await channel.send("Error retrieving cotd ko results: No ko could be found.", ephemeral=True)
+            return
+
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_ko_results(map_name, results)
+
+        print("Sending cotd KO results to channel")
+        await channel.send(embed=embed)
+
+def get_cotd_ko_results(tryagain=True):
+
+    # Get cotd matches from the competition id
+    (_, competition_id) = get_cotd_ids()
+    time.sleep(1)
+    rounds_id = get_cotd_rounds(competition_id)
+    time.sleep(1)
+
+    finished = False
+    if(tryagain):
+        attempts = 0
+    else:
+        attempts = 30
+    while(1):
+
+        finished = True
+        attempts += 1
+        print("get_cotd_ko_results attempt: " + str(attempts))
+
+        cotd_matches = get_cotd_matches(rounds_id)
+        
+        match_ids = []
+        for match in cotd_matches['matches']:
+
+            match_id = match['id']
+            match_complete = match['isCompleted'] #bool
+
+            match_ids.append(match_id)
+            if(not match_complete):
+                print("attempt: " + str(attempts)+ ", cotd match: " + str(match_id) + " is not complete, trying again later")
+                match_ids.clear()
+                finished = False
+                break
+
+
+        if(finished):
+
+            print("Finished getting cotd matches, in " + str(attempts) + " attempts")
+
+            # Get cotd players
+            conn = db.open_conn()
+            query = (db.get_specific_roster_players, ["cotd"])
+            cotd_players = db.retrieve_data(conn, query)
+            conn.close()
+
+            # Get match results for each div 
+            results = []
+            for (div, match_id) in enumerate(match_ids, start=1):
+
+                match_results = get_cotd_match_result(match_id)
+                players = match_results['results']
+                for player in players:
+
+                    player_id = player['participant']
+                    player_rank = player['rank']
+
+                    for (cotd_player_name, cotd_player_id) in cotd_players:
+                        if player_id == cotd_player_id:
+
+                            #print("PIWO COTD PLAYER TODAY: " + cotd_player_name + ", RANK: " + str(player_rank))
+                            results.append((div, player_rank, cotd_player_name))
+                            
+            # Return results     
+            return results
+
+        if(attempts >= 30):
+            print("Failed to get todays cotd: not finished in time")
+            return None
+
+        # Not finished yet, waiting 1 minute until next attempt
+        time.sleep(60)
+
+
+
+def format_cotd_ko_results(map_name, results):
+
+    embed = Embed()
+    embed.title = "COTD KO results:"
+    embed.description = "Map: " + map_name
+
+    #Format everything nicely inside a code block
+    header_format = "{:^3s} {:^5s} {:^15s} \n"
+    format =        "{:^3s} {:^5s} {:15s} \n"
+
+    everything = "```\n"
+    everything += header_format.format("Div", "Rank", "Player")
+
+    for result in results:
+        (div, rank, player) = result
+        everything += format.format(str(div), str(rank), player)
+        
+    everything += "```"
+
+    field_name = '\u200b'
+    embed.add_field(name=field_name, value=everything, inline=True)
+
+    return embed
 
 
 # Players have to be in the roster "cotd" to be included in results
@@ -221,6 +373,9 @@ def format_cotd_quali_results(map_name, results):
     return embed
 
 
+
+
+
 def div(pos):
     return math.ceil(pos/64)
 
@@ -261,18 +416,18 @@ def get_all_cotd_players():
     # We need 4 requests, 100 + 100 + 100 + 20
     # Adding some sleeps in between requests.
 
-    id = get_cotd_challenge_id()
-    if(id == None):
+    (challenge_id, _) = get_cotd_ids()
+    if(challenge_id == None):
         return None
-    #id = 7169 # main cotd 2024-01-23 
+    #challenge_id = 7169 # main cotd 2024-01-23 
 
-    top100 = get_cotd_players(id, 100, 0)
+    top100 = get_cotd_players(challenge_id, 100, 0)
     time.sleep(1)
-    top101_200 = get_cotd_players(id, 100, 100)
+    top101_200 = get_cotd_players(challenge_id, 100, 100)
     time.sleep(1)
-    top201_300 = get_cotd_players(id, 100, 200)
+    top201_300 = get_cotd_players(challenge_id, 100, 200)
     time.sleep(1)
-    top301_320 = get_cotd_players(id, 20, 300)
+    top301_320 = get_cotd_players(challenge_id, 20, 300)
 
     return top100 + top101_200 + top201_300 + top301_320
 
@@ -320,7 +475,7 @@ def get_cotd_players(challenge_id, length, offset):
 # This switches to the next cotd quali when the last one 
 #   has finished a while ago, maybe 3-4 hours after.
 # Beware that it will get response 204 - no content, if there's no recent quali.
-def get_cotd_challenge_id():
+def get_cotd_ids():
 
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
@@ -339,12 +494,99 @@ def get_cotd_challenge_id():
     try:
         res = res.json()
     except Exception as e:
-        print("get_cotd_challenge_id did not receive valid json, returning None. Exception: ",e)
+        print("get_cotd_ids did not receive valid json, returning None. Exception: ",e)
         return None
 
     challenge_id = res['challenge']['id']
-    return challenge_id
+    competition_id = res['competition']['id']
+    return (challenge_id, competition_id)
 
+
+def get_cotd_rounds(competition_id):
+
+    complete_url = competition_rounds_url + \
+                    str(competition_id) + \
+                    "/rounds"
+    
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Using the NadeoLiveServices audience
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Send get request
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(complete_url, headers=headers)
+    try:
+        res = res.json()
+    except Exception as e:
+        print("get_cotd_rounds did not receive valid json, returning None. Exception: ",e)
+        return None
+    
+    rounds_id = res[0]['id']
+    return rounds_id
+
+def get_cotd_matches(rounds_id):
+
+    complete_url = competition_matches_url + \
+                    str(rounds_id) + \
+                    "/matches?length=5&offset=0"
+    
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Using the NadeoLiveServices audience
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Send get request
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(complete_url, headers=headers)
+    try:
+        res = res.json()
+    except Exception as e:
+        print("get_cotd_rounds did not receive valid json, returning None. Exception: ",e)
+        return None
+    
+    return res #returns the full match json
+
+
+def get_cotd_match_result(match_id):
+
+    complete_url = competition_match_results_url + \
+                    str(match_id) + \
+                    "/results?length=64&offset=0"
+    
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Using the NadeoLiveServices audience
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Send get request
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(complete_url, headers=headers)
+    try:
+        res = res.json()
+    except Exception as e:
+        print("get_cotd_rounds did not receive valid json, returning None. Exception: ",e)
+        return None
+    
+    return res #returns the full match json
 
 # Return: (map_id, map_uid, map_name)
 def get_totd_map_info():
