@@ -402,7 +402,7 @@ def format_totd_leaderboard(map_name, players):
         if(len(everything) >= 900):
             everything += "```"
             field_name = '\u200b'
-            embed.add_field(name=field_name, value=everything, inline=True)
+            embed.add_field(name=field_name, value=everything, inline=False)
 
             everything = "```\n"
             everything += header_format.format("Pos", "Player", "Time")
@@ -410,7 +410,7 @@ def format_totd_leaderboard(map_name, players):
     everything += "```"
 
     field_name = '\u200b'
-    embed.add_field(name=field_name, value=everything, inline=True)
+    embed.add_field(name=field_name, value=everything, inline=False)
 
     return embed
 
