@@ -39,7 +39,8 @@ class BotManagement(Extension):
         name="bot",
         description="Bot management commands.",
         sub_cmd_name="shutdown",
-        sub_cmd_description="Shuts down the bot."
+        sub_cmd_description="Shuts down the bot.",
+        dm_permission=False
     )
     @check(is_owner())
     async def shutdown(self, ctx: SlashContext):
@@ -50,7 +51,8 @@ class BotManagement(Extension):
         name="bot",
         description="Bot management commands.",
         sub_cmd_name="send_message_reply",
-        sub_cmd_description="Replies to the given message"
+        sub_cmd_description="Replies to the given message",
+        dm_permission=False
     )
     @slash_option(
         name="channel_id",
@@ -81,7 +83,8 @@ class BotManagement(Extension):
     @slash_command(
         name="bot",
         sub_cmd_name="reload_extension",
-        sub_cmd_description="Reloads a bot extension."
+        sub_cmd_description="Reloads a bot extension.",
+        dm_permission=False
     )
     @slash_option(
         name="name",
@@ -103,7 +106,8 @@ class BotManagement(Extension):
     @slash_command(
         name="bot",
         sub_cmd_name="ping",
-        sub_cmd_description="Replies to pings."
+        sub_cmd_description="Replies to pings.",
+        dm_permission=False
     )
     @cooldown(Buckets.GUILD, 1, 60)
     async def ping(self, ctx: SlashContext):
@@ -117,7 +121,8 @@ class BotManagement(Extension):
     @slash_command(
         name="bot",
         sub_cmd_name="discord_channel_id_update",
-        sub_cmd_description="Update discord channels etc. that the bot will use for various purposes."
+        sub_cmd_description="Update discord channels etc. that the bot will use for various purposes.",
+        dm_permission=False
     )
     @slash_option(
         name="action",

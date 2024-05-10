@@ -25,7 +25,8 @@ class Tournament(Extension):
         name="tournament",
         description="Tournament management commands.",
         sub_cmd_name="manage",
-        sub_cmd_description="Tournament management"
+        sub_cmd_description="Tournament management",
+        dm_permission=False
     )
     @slash_option(
         name="action",
@@ -82,7 +83,8 @@ class Tournament(Extension):
     @slash_command(
         name="list",
         sub_cmd_name="tournaments",
-        sub_cmd_description="Lists all tournaments."
+        sub_cmd_description="Lists all tournaments.",
+        dm_permission=False
     )
     async def list(self, ctx: SlashContext):
         conn = db.open_conn()
@@ -99,7 +101,8 @@ class Tournament(Extension):
     @slash_command(
         name="tournament",
         sub_cmd_name="gsheet_add",
-        sub_cmd_description="Register a google sheet to a tournament."
+        sub_cmd_description="Register a google sheet to a tournament.",
+        dm_permission=False
     )
     @slash_option(
         name="tournament",
@@ -146,7 +149,8 @@ class Tournament(Extension):
     @slash_command(
         name="tournament",
         sub_cmd_name="gsheet_update",
-        sub_cmd_description="Update the google sheet for a tournament. Also updates the tournament map times."
+        sub_cmd_description="Update the google sheet for a tournament. Also updates the tournament map times.",
+        dm_permission=False
     )
     @slash_option(
         name="tournament",

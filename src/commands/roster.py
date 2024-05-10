@@ -15,7 +15,8 @@ class Roster(Extension):
         name="roster",
         description="Roster management commands.",
         sub_cmd_name="create",
-        sub_cmd_description="Create a roster."
+        sub_cmd_description="Create a roster.",
+        dm_permission=False
     )
     @slash_option(
         name="name",
@@ -53,7 +54,8 @@ class Roster(Extension):
     @slash_command(
         name="roster",
         sub_cmd_name="delete",
-        sub_cmd_description="Delete a roster."
+        sub_cmd_description="Delete a roster.",
+        dm_permission=False
     )
     @slash_option(
         name="name",
@@ -76,7 +78,8 @@ class Roster(Extension):
     @slash_command(
         name="list",
         sub_cmd_name="rosters",
-        sub_cmd_description="Lists all rosters."
+        sub_cmd_description="Lists all rosters.",
+        dm_permission=False
     )
     async def list(self, ctx: SlashContext):
         conn = db.open_conn()
@@ -93,7 +96,8 @@ class Roster(Extension):
     @slash_command(
         name="roster",
         sub_cmd_name="add",
-        sub_cmd_description="Adds players to a roster. Separate player names by commas, example: 'p1,p2,p3'."
+        sub_cmd_description="Adds players to a roster. Separate player names by commas, example: 'p1,p2,p3'.",
+        dm_permission=False
     )
     @slash_option(
         name="roster",
@@ -149,7 +153,8 @@ class Roster(Extension):
     @slash_command(
         name="roster",
         sub_cmd_name="remove_players",
-        sub_cmd_description="Removes players from a roster. Separate player names by commas, example: 'p1,p2,p3'."
+        sub_cmd_description="Removes players from a roster. Separate player names by commas, example: 'p1,p2,p3'.",
+        dm_permission=False
     )
     @slash_option(
         name="roster",
@@ -205,7 +210,8 @@ class Roster(Extension):
     # Keep this as its own base command for now
     @slash_command(
         name="registered_players",
-        description="Shows all players registered to a roster."
+        description="Shows all players registered to a roster.",
+        dm_permission=False
     )
     @slash_option(
         name="tournament",

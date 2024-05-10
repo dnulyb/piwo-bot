@@ -21,7 +21,8 @@ class Team(Extension):
         name="team",
         description="Team management, update team info etc.",
         sub_cmd_name="roster_message_update",
-        sub_cmd_description="Updates the roster message in the roster channel."
+        sub_cmd_description="Updates the roster message in the roster channel.",
+        dm_permission=False
     )
     async def roster_message_update(self, ctx: SlashContext):
 
@@ -41,7 +42,8 @@ class Team(Extension):
     @slash_command(
         name="team",
         sub_cmd_name="send_message_to_roster_channel",
-        sub_cmd_description="Sends a placeholder message to the roster channel."
+        sub_cmd_description="Sends a placeholder message to the roster channel.",
+        dm_permission=False
     )
     async def send_message_to_roster_channel(self, ctx: SlashContext):
 
@@ -58,7 +60,8 @@ class Team(Extension):
     @slash_command(
         name="team",
         sub_cmd_name="info_list",
-        sub_cmd_description="Get all stored team info."
+        sub_cmd_description="Get all stored team info.",
+        dm_permission=False
     )
     async def info_list(self, ctx: SlashContext):
 
@@ -74,7 +77,8 @@ class Team(Extension):
     @slash_command(
         name="team",
         sub_cmd_name="info_update",
-        sub_cmd_description="Add or update team info."
+        sub_cmd_description="Add or update team info.",
+        dm_permission=False
     )
     @slash_option(
         name="name",
@@ -109,7 +113,8 @@ class Team(Extension):
     @slash_command(
         name="team",
         sub_cmd_name="info_remove",
-        sub_cmd_description="Remove team info."
+        sub_cmd_description="Remove team info.",
+        dm_permission=False
     )
     @slash_option(
         name="name",
@@ -135,7 +140,8 @@ class Team(Extension):
     @slash_command(
         name="team",
         sub_cmd_name="introduction",
-        sub_cmd_description="Get the full team introduction."
+        sub_cmd_description="Get the full team introduction.",
+        dm_permission=False
     )
     async def introduction(self, ctx: SlashContext):
 

@@ -22,7 +22,8 @@ class Map(Extension):
         name="map",
         description="Map management commands.",
         sub_cmd_name="add",
-        sub_cmd_description="Adds a map to a tournament."
+        sub_cmd_description="Adds a map to a tournament.",
+        dm_permission=False
     )
     @slash_option(
         name="tournament",
@@ -81,7 +82,8 @@ class Map(Extension):
         name="map",
         description="Map management commands.",
         sub_cmd_name="add_existing",
-        sub_cmd_description="Adds a map that already exists in the database, to a tournament."
+        sub_cmd_description="Adds a map that already exists in the database, to a tournament.",
+        dm_permission=False
     )
     @slash_option(
         name="tournament",
@@ -128,7 +130,8 @@ class Map(Extension):
     @slash_command(
         name="map",
         sub_cmd_name="delete",
-        sub_cmd_description="Delete a map."
+        sub_cmd_description="Delete a map.",
+        dm_permission=False
     )
     @slash_option(
         name="map_name",
@@ -164,7 +167,8 @@ class Map(Extension):
     @slash_command(
         name="map",
         sub_cmd_name="update_id",
-        sub_cmd_description="Update id for a map."
+        sub_cmd_description="Update id for a map.",
+        dm_permission=False
     )
     @slash_option(
         name="name",
@@ -191,7 +195,8 @@ class Map(Extension):
     @slash_command(
         name="list",
         sub_cmd_name="maps",
-        sub_cmd_description="Lists all maps."
+        sub_cmd_description="Lists all maps.",
+        dm_permission=False
     )
     @slash_option(
         name="tournament",

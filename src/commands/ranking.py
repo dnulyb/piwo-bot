@@ -22,7 +22,8 @@ class Ranking(Extension):
         name="ranking",
         description="Rankings for trophies / mm / etc.",
         sub_cmd_name="trophies",
-        sub_cmd_description="Shows the trophy count leaderboard."
+        sub_cmd_description="Shows the trophy count leaderboard.",
+        dm_permission=False
     )
     @cooldown(Buckets.CHANNEL, 1, 3600)
     async def trophies(self, ctx: SlashContext):
@@ -33,7 +34,8 @@ class Ranking(Extension):
     @slash_command(
         name="ranking",
         sub_cmd_name="mm",
-        sub_cmd_description="Shows the mm leaderboard."
+        sub_cmd_description="Shows the mm leaderboard.",
+        dm_permission=False
     )
     @cooldown(Buckets.CHANNEL, 1, 900)
     async def mm(self, ctx: SlashContext):

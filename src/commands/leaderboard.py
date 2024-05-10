@@ -27,7 +27,8 @@ class Leaderboard(Extension):
         name="leaderboard",
         description="Leaderboards for maps, tournaments etc.",
         sub_cmd_name="update",
-        sub_cmd_description="Updates tournament leaderboard."
+        sub_cmd_description="Updates tournament leaderboard.",
+        dm_permission=False
     )
     @slash_option(
         name="tournament",
@@ -133,7 +134,8 @@ class Leaderboard(Extension):
     @slash_command(
         name="leaderboard",
         sub_cmd_name="map",
-        sub_cmd_description="Retrieves all times for a map. Shows map tournament players only."
+        sub_cmd_description="Retrieves all times for a map. Shows map tournament players only.",
+        dm_permission=False
     )
     @slash_option(
         name="map_name",

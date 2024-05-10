@@ -40,7 +40,8 @@ class Cotd(Extension):
         name="totd",
         description="TOTD info.",
         sub_cmd_name="leaderboard",
-        sub_cmd_description="Updates TOTD times, and shows the current leaderboard."
+        sub_cmd_description="Updates TOTD times, and shows the current leaderboard.",
+        dm_permission=False
     )
     @cooldown(Buckets.GUILD, 1, 60)
     async def leaderboard(self, ctx: SlashContext):
@@ -91,7 +92,8 @@ class Cotd(Extension):
     @slash_command(
         name="totd",
         sub_cmd_name="map_info",
-        sub_cmd_description="Retrieves and stores info about todays TOTD in the bot."
+        sub_cmd_description="Retrieves and stores info about todays TOTD in the bot.",
+        dm_permission=False
     )
     @cooldown(Buckets.GUILD, 1, 1800)
     async def map_info(self, ctx: SlashContext):
@@ -114,7 +116,8 @@ class Cotd(Extension):
         name="cotd",
         description="COTD info.",
         sub_cmd_name="quali_results",
-        sub_cmd_description="Shows results for today's COTD qualification."
+        sub_cmd_description="Shows results for today's COTD qualification.",
+        dm_permission=False
     )
     async def quali_results(self, ctx: SlashContext):
 
@@ -142,7 +145,8 @@ class Cotd(Extension):
         name="cotd",
         description="COTD info.",
         sub_cmd_name="ko_results",
-        sub_cmd_description="Shows results for today's COTD KO."
+        sub_cmd_description="Shows results for today's COTD KO.",
+        dm_permission=False
     )
     async def ko_results(self, ctx: SlashContext):
 

@@ -15,7 +15,8 @@ class Player(Extension):
         name="player",
         description="Player management commands.",
         sub_cmd_name="add",
-        sub_cmd_description="Add a player to the database."
+        sub_cmd_description="Add a player to the database.",
+        dm_permission=False
     )
     @slash_option(
         name="nickname",
@@ -70,7 +71,8 @@ class Player(Extension):
     @slash_command(
         name="player",
         sub_cmd_name="remove",
-        sub_cmd_description="Remove a player from the database."
+        sub_cmd_description="Remove a player from the database.",
+        dm_permission=False
     )
     @slash_option(
         name="nickname",
@@ -101,7 +103,8 @@ class Player(Extension):
         name="list",
         description="List all database entries of a certain type.",
         sub_cmd_name="players",
-        sub_cmd_description="Lists all players in the database."
+        sub_cmd_description="Lists all players in the database.",
+        dm_permission=False
     )
     async def list(self, ctx: SlashContext):
 
@@ -130,7 +133,8 @@ class Player(Extension):
         name="info",
         description="Get info about various things in the database.",
         sub_cmd_name="player",
-        sub_cmd_description="Get info about a player in the database."
+        sub_cmd_description="Get info about a player in the database.",
+        dm_permission=False
     )
     @slash_option(
         name="nickname",
@@ -164,7 +168,8 @@ class Player(Extension):
     @slash_command(
         name="player",
         sub_cmd_name="update",
-        sub_cmd_description="Update info for a player."
+        sub_cmd_description="Update info for a player.",
+        dm_permission=False
     )
     @slash_option(
         name="nickname",

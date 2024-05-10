@@ -26,7 +26,8 @@ class Twitch(Extension):
         name="twitch",
         description="Manage Twitch channels to follow for updates when they go live.",
         sub_cmd_name="add",
-        sub_cmd_description="Add a twitch channel to track for live notifications."
+        sub_cmd_description="Add a twitch channel to track for live notifications.",
+        dm_permission=False
     )
     @slash_option(
         name="channel_name",
@@ -56,7 +57,8 @@ class Twitch(Extension):
     @slash_command(
         name="twitch",
         sub_cmd_name="remove",
-        sub_cmd_description="Remove a twitch channel from live notifications tracking."
+        sub_cmd_description="Remove a twitch channel from live notifications tracking.",
+        dm_permission=False
     )
     @slash_option(
         name="channel_name",
@@ -86,7 +88,8 @@ class Twitch(Extension):
     @slash_command(
         name="list",
         sub_cmd_name="twitch",
-        sub_cmd_description="Lists all twitch channels in the database."
+        sub_cmd_description="Lists all twitch channels in the database.",
+        dm_permission=False
     )
     async def list(self, ctx: SlashContext):
 
