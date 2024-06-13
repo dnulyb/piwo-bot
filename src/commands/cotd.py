@@ -457,8 +457,8 @@ def get_cotd_players(challenge_id, length, offset):
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    # Using the NadeoClubServices audience
-    token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
+    # Using the NadeoLiveServices audience
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
     user_agent = get_key(dotenv_path, ("USER_AGENT"))
 
     complete_challenge_url = challenge_url + str(challenge_id) + \
@@ -493,8 +493,8 @@ def get_cotd_ids():
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    # Using the NadeoClubServices audience
-    token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
+    # Using the NadeoLiveServices audience
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
     user_agent = get_key(dotenv_path, ("USER_AGENT"))
 
     # Send get request

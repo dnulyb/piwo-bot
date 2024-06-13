@@ -52,17 +52,6 @@ def authenticate():
     set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
-    #Another nadeo request with "NadeoClubServices" audience
-    nadeo_body = {
-        'audience':'NadeoClubServices'
-    }
-    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
-    nadeo_res = nadeo_res.json()
-
-    access_token = nadeo_res['accessToken']
-    refresh_token = nadeo_res['refreshToken']
-    set_key(dotenv_path, "NADEO_CLUBSERVICES_ACCESS_TOKEN", str(access_token))
-    set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
 
     #Another nadeo request with "NadeoLiveServices" audience
     nadeo_body = {
@@ -101,31 +90,6 @@ def refresh_access_token():
     set_key(dotenv_path, "NADEO_ACCESS_TOKEN", str(access_token))
     set_key(dotenv_path, "NADEO_REFRESH_TOKEN", str(refresh_token))
 
-
-def refresh_club_access_token():
-
-    dotenv_path = find_dotenv()
-    load_dotenv(dotenv_path)
-
-    user_agent = get_key(dotenv_path, ("USER_AGENT"))
-
-    # ClubServices
-    refresh_token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_REFRESH_TOKEN"))
-    nadeo_headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'nadeo_v1 t=' + refresh_token,
-        'User-Agent': user_agent
-    }
-    nadeo_res = requests.post(nadeo_refresh_url, headers=nadeo_headers)
-    nadeo_res = nadeo_res.json()
-
-    try:
-        access_token = nadeo_res['accessToken']
-        refresh_token = nadeo_res['refreshToken']
-        set_key(dotenv_path, "NADEO_CLUBSERVICES_ACCESS_TOKEN", str(access_token))
-        set_key(dotenv_path, "NADEO_CLUBSERVICES_REFRESH_TOKEN", str(refresh_token))
-    except KeyError as e:
-        print(f"Refresh club services token: {e}")
 
 def refresh_live_access_token():
 
@@ -176,23 +140,6 @@ def check_token_refresh():
         print("check_token_refresh: No token refresh needed")
 
 
-    #club
-    token = get_nadeo_club_access_token()
-    (expiration, refresh_possible_after) = decode_access_token(token)
-    
-    current_time = int(datetime.now().timestamp())
-    if(current_time > expiration):
-        #Authentication required
-        authenticate()
-        print("check_token_refresh: Authenticated")
-    elif(current_time > refresh_possible_after):
-        #Just refresh the token
-        refresh_club_access_token()
-        print("check_token_refresh: CLUB token refreshed")
-    else:
-        print("check_token_refresh: No CLUB token refresh needed")
-
-
     #live
     token = get_nadeo_live_access_token()
     (expiration, refresh_possible_after) = decode_access_token(token)
@@ -216,11 +163,6 @@ def get_nadeo_access_token():
     load_dotenv(dotenv_path)
     return get_key(dotenv_path, ("NADEO_ACCESS_TOKEN"))
 
-def get_nadeo_club_access_token():
-
-    dotenv_path = find_dotenv()
-    load_dotenv(dotenv_path)
-    return get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
 
 def get_nadeo_live_access_token():
 

@@ -96,14 +96,14 @@ def get_trophy_counts():
 
     return sorted_results
 
-# Uses club audience
+# Uses live audience
 def get_mm_ranks():
 
     # Load variables from .env
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    token = get_key(dotenv_path, ("NADEO_CLUBSERVICES_ACCESS_TOKEN"))
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
     user_agent = get_key(dotenv_path, ("USER_AGENT"))
 
     # Get player ids from db
