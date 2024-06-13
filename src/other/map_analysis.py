@@ -1,6 +1,5 @@
 import requests
 from dotenv import find_dotenv, load_dotenv, get_key
-import time
 import re
 
 from src.gsheet import google_sheet_write, google_sheet_write_batch
@@ -182,7 +181,7 @@ for (_, _, map_uid) in sorted_map_info:
     playercount = get_map_playercount(map_uid)
     map_leaderboard_infos.append((wr, top10, top50, top100, playercount))
 
-    time.sleep(0.5)
+    sleep(0.5)
 
     count = count + 1
     print(count)

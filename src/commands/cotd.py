@@ -20,8 +20,9 @@ from src.commands.map import get_map_records, get_map_data, format_map_record
 from dotenv import find_dotenv, load_dotenv, get_key, set_key
 import requests
 import re
-import time
 import math
+import asyncio
+
 
 
 totd_url = "https://live-services.trackmania.nadeo.live/api/token/campaign/month?length=1&offset=0"
@@ -126,7 +127,7 @@ class Cotd(Extension):
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
 
-        results = get_cotd_quali_results()
+        results = await get_cotd_quali_results()
         if(results == None):
             await ctx.send("No cotd quali could be found, try again around cotd time.")
             return
@@ -155,7 +156,7 @@ class Cotd(Extension):
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
 
-        results = get_cotd_ko_results(False)
+        results = await get_cotd_ko_results(True)
         if(results == None):
             await ctx.send("No cotd ko could be found, try again around cotd time.")
             return
@@ -181,7 +182,7 @@ class Cotd(Extension):
         channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
         channel = self.bot.get_channel(channel_id)
 
-        results = get_cotd_quali_results()
+        results = await get_cotd_quali_results()
         if(results == None):
             await channel.send("Error retrieving cotd quali results: No quali could be found.", ephemeral=True)
             return
@@ -209,7 +210,7 @@ class Cotd(Extension):
         channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
         channel = self.bot.get_channel(channel_id)
 
-        results = get_cotd_ko_results()
+        results = await get_cotd_ko_results()
         if(results == None):
             await channel.send("Error retrieving cotd ko results: No ko could be found.", ephemeral=True)
             return
@@ -221,13 +222,13 @@ class Cotd(Extension):
         print("Sending cotd KO results to channel")
         await channel.send(embed=embed)
 
-def get_cotd_ko_results(tryagain=True):
+async def get_cotd_ko_results(tryagain=True):
 
     # Get cotd matches from the competition id
     (_, competition_id) = get_cotd_ids()
-    time.sleep(1)
+    await asyncio.sleep(1)
     rounds_id = get_cotd_rounds(competition_id)
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     finished = False
     if(tryagain):
@@ -291,7 +292,7 @@ def get_cotd_ko_results(tryagain=True):
             return None
 
         # Not finished yet, waiting 1 minute until next attempt
-        time.sleep(60)
+        await asyncio.sleep(60)
 
 
 
@@ -321,14 +322,14 @@ def format_cotd_ko_results(map_name, results):
 
 
 # Players have to be in the roster "cotd" to be included in results
-def get_cotd_quali_results():
+async def get_cotd_quali_results():
 
     conn = db.open_conn()
     query = (db.get_specific_roster_players, ["cotd"])
     cotd_players = db.retrieve_data(conn, query)
     conn.close()
 
-    players = get_all_cotd_players()
+    players = await get_all_cotd_players()
     if(players == None):
         return None
 
@@ -422,7 +423,7 @@ def format_totd_leaderboard(map_name, players):
 # Retrieves all cotd players that got div5 or better in quali
 #   (div5 or better is 64*5=320 people)
 # This function can be quite slow due to sleeps
-def get_all_cotd_players():
+async def get_all_cotd_players():
 
     # Let's say div5 or better, so 320 players
     # We need 4 requests, 100 + 100 + 100 + 20
@@ -434,11 +435,11 @@ def get_all_cotd_players():
     #challenge_id = 7169 # main cotd 2024-01-23 
 
     top100 = get_cotd_players(challenge_id, 100, 0)
-    time.sleep(1)
+    await asyncio.sleep(1)
     top101_200 = get_cotd_players(challenge_id, 100, 100)
-    time.sleep(1)
+    await asyncio.sleep(1)
     top201_300 = get_cotd_players(challenge_id, 100, 200)
-    time.sleep(1)
+    await asyncio.sleep(1)
     top301_320 = get_cotd_players(challenge_id, 20, 300)
 
     return top100 + top101_200 + top201_300 + top301_320

@@ -209,7 +209,7 @@ class Leaderboard(Extension):
                     update_tournament_times(tournament_name)
 
                     # Update gsheet (if exists)
-                    update_sheet(tournament_name)
+                    await update_sheet(tournament_name)
 
                     await asyncio.sleep(1) # Stagger next update slightly
 

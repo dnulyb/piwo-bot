@@ -16,7 +16,7 @@ from src.commands.map import get_map_records, format_map_record
 from src.other.map_analysis import get_map_infos, get_map_leaderboard_info
 
 from datetime import datetime
-import time
+import asyncio
 
 
 class Tournament(Extension):
@@ -164,7 +164,7 @@ class Tournament(Extension):
 
         update_tournament_times(tournament)
 
-        (res, ephemeral) = update_sheet(tournament)
+        (res, ephemeral) = await update_sheet(tournament)
         await ctx.send(f"{res}", ephemeral=ephemeral)
 
 
@@ -256,7 +256,7 @@ def update_tournament_times(tournament):
 # Returns (msg, epemeral)
 #   msg:        message to send to discord
 #   ephemeral:  if the message should be ephemeral (aka visible to only the person who used the command)
-def update_sheet(tournament):
+async def update_sheet(tournament):
 
     conn = db.open_conn()
 
@@ -311,7 +311,7 @@ def update_sheet(tournament):
                 wr = format_map_record(wr, False)
                 map_wrs.append((wr))
 
-            time.sleep(0.5)
+            await asyncio.sleep(1)
 
         rosters = []
         players = []
