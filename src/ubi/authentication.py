@@ -10,8 +10,8 @@ ubi_appid = "86263886-327a-4328-ac69-527f0d20a237"
 nadeo_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices"
 nadeo_refresh_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh"
 
-# Authenticates with Ubisoft and stores Nadeo access token
-#   in .env
+# Authenticates with Ubisoft and stores Nadeo access token,
+#   and Nadeo liveservices token, in .env
 def authenticate():
 
     dotenv_path = find_dotenv()
@@ -125,6 +125,13 @@ def check_token_refresh():
 
     # Normal token
     token = get_nadeo_access_token()
+
+    # Make sure token is not empty
+    if(token == ""):
+        authenticate()
+        print("check_token_refresh: Authenticated")
+        return
+
     (expiration, refresh_possible_after) = decode_access_token(token)
 
     current_time = int(datetime.now().timestamp())
@@ -132,6 +139,8 @@ def check_token_refresh():
         #Authentication required
         authenticate()
         print("check_token_refresh: Authenticated")
+        return
+    
     elif(current_time > refresh_possible_after):
         #Just refresh the token
         refresh_access_token()
@@ -142,6 +151,13 @@ def check_token_refresh():
 
     #live
     token = get_nadeo_live_access_token()
+
+    # Make sure token is not empty
+    if(token == ""):
+        authenticate()
+        print("check_token_refresh: Authenticated")
+        return
+
     (expiration, refresh_possible_after) = decode_access_token(token)
     
     current_time = int(datetime.now().timestamp())
