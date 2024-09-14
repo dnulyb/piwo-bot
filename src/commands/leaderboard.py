@@ -16,7 +16,7 @@ from interactions.api.events import Startup
 import src.db.db as db
 from src.db.db import get_tournament_db_id
 from src.ubi.authentication import get_nadeo_access_token
-from src.commands.map import get_map_records, get_map_uid_from_db, format_map_record
+from src.commands.map import get_map_records, get_all_map_records, get_map_uid_from_db, format_map_record
 from src.commands.tournament import update_sheet, update_tournament_times
 
 import asyncio
@@ -92,7 +92,7 @@ class Leaderboard(Extension):
             print("Retrieving nadeo data for tournament: " + tournament)
 
             token = get_nadeo_access_token()
-            res = get_map_records(player_ids, map_ids, token)
+            res = get_all_map_records(player_ids, map_ids, token)
             #print(res)
                 
             # update db 
@@ -206,7 +206,7 @@ class Leaderboard(Extension):
                 try:
 
                     # Update tournament leaderboard
-                    update_tournament_times(tournament_name)
+                    await update_tournament_times(tournament_name)
 
                     # Update gsheet (if exists)
                     await update_sheet(tournament_name)
@@ -260,8 +260,6 @@ def update_map_leaderboard(conn, map_name):
 
     #map id
     map_id = get_map_uid_from_db(conn, map_name)
-    map_ids = []
-    map_ids.append(map_id)
 
     #tournament id
     tournament_id = db.retrieve_data(conn, (db.get_tournament_from_map, [map_name]))
@@ -287,7 +285,7 @@ def update_map_leaderboard(conn, map_name):
             
     # get data from nadeo and format it nicely
     token = get_nadeo_access_token()
-    res = get_map_records(player_ids, map_ids, token)
+    res = get_map_records(player_ids, map_id, token)
         
     # update db 
     queries = []

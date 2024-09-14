@@ -10,10 +10,11 @@ import src.db.db as db
 from src.db.db import get_tournament_db_id
 
 import requests
+import asyncio
 from dotenv import find_dotenv, load_dotenv, get_key
 from math import floor
 
-map_record_url = "https://prod.trackmania.core.nadeo.online/mapRecords/"
+map_record_url = "https://prod.trackmania.core.nadeo.online/v2/mapRecords/"
 map_info_url = "https://prod.trackmania.core.nadeo.online/maps/?mapUidList="
 
 class Map(Extension):
@@ -241,23 +242,32 @@ class Map(Extension):
             conn.close() 
 
 
-# Get map records for a list of accounts and a list of map ids
-def get_map_records(account_ids, map_ids, token):
+async def get_all_map_records(account_ids, map_ids, token):
+
+    all_records = []
+    for map_id in map_ids:
+
+        map_records = get_map_records(account_ids, map_id, token)
+        all_records = all_records + map_records
+        await asyncio.sleep(0.5)
+
+    return all_records
+
+
+# Get map records for a list of accounts and a single map id
+def get_map_records(account_ids, map_id, token):
 
     # Load variables from .env
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
-    token = get_key(dotenv_path, ("NADEO_ACCESS_TOKEN"))
     user_agent = get_key(dotenv_path, ("USER_AGENT"))
 
     # Build url
     account_id_str = ','.join(account_ids)
-    map_id_str = ','.join(map_ids)
-
     complete_url = map_record_url + \
                     "?accountIdList=" + account_id_str + \
-                    "&mapIdList=" + map_id_str
+                    "&mapId=" + map_id
     
     # Send get request
 
@@ -274,7 +284,7 @@ def get_map_records(account_ids, map_ids, token):
     # Record format: time, accountId, mapId
     records = [[elem["recordScore"]["time"],
                     elem["accountId"],
-                    elem["mapId"]] 
+                    elem["mapId"]]
                 for elem in res]
     
     return records

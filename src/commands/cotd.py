@@ -68,13 +68,13 @@ class Cotd(Extension):
         for (_, id) in cotd_players:
             player_ids.append(id)
 
-        map_ids = [totd_id]
+        map_id = totd_id
 
         # get data from nadeo and format it nicely
         print("Retrieving nadeo TOTD data")
 
         token = get_nadeo_access_token()
-        totd_data = get_map_records(player_ids, map_ids, token)
+        totd_data = get_map_records(player_ids, map_id, token)
 
         totd_results = []
         for (player_time, player_id, _) in totd_data:

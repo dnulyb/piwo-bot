@@ -12,7 +12,7 @@ from src.db.db import get_tournament_db_id
 from dotenv import find_dotenv, load_dotenv, get_key
 from src.gsheet import google_sheet_write, google_sheet_write_batch
 from src.ubi.authentication import get_nadeo_access_token
-from src.commands.map import get_map_records, format_map_record
+from src.commands.map import get_all_map_records, format_map_record
 from src.other.map_analysis import get_map_infos, get_map_leaderboard_info
 
 from datetime import datetime
@@ -162,13 +162,13 @@ class Tournament(Extension):
 
         await ctx.defer()
 
-        update_tournament_times(tournament)
+        await update_tournament_times(tournament)
 
         (res, ephemeral) = await update_sheet(tournament)
         await ctx.send(f"{res}", ephemeral=ephemeral)
 
 
-def update_tournament_times(tournament):
+async def update_tournament_times(tournament):
 
     conn = db.open_conn()
 
@@ -219,8 +219,7 @@ def update_tournament_times(tournament):
     print("Retrieving nadeo data for tournament: " + tournament)
 
     token = get_nadeo_access_token()
-    res = get_map_records(player_ids, map_ids, token)
-    #print(res)
+    res = await get_all_map_records(player_ids, map_ids, token)
         
     # update db 
     queries = []
