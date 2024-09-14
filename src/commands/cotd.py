@@ -313,6 +313,14 @@ def format_cotd_ko_results(map_name, results):
         (div, rank, player) = result
         everything += format.format(str(div), str(rank), player)
         
+        if(len(everything) >= 900):
+            everything += "```"
+            field_name = '\u200b'
+            embed.add_field(name=field_name, value=everything, inline=False)
+
+            everything = "```\n"
+            everything += header_format.format("Div", "Rank", "Player")
+
     everything += "```"
 
     field_name = '\u200b'
