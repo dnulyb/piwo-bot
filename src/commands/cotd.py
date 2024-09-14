@@ -370,6 +370,14 @@ def format_cotd_quali_results(map_name, results):
         division = div(rank)
         everything += format.format(str(division), str(rank), name, time)
         
+        if(len(everything) >= 900):
+            everything += "```"
+            field_name = '\u200b'
+            embed.add_field(name=field_name, value=everything, inline=False)
+
+            everything = "```\n"
+            everything += header_format.format("Div", "Rank", "Player", "Time")
+
     everything += "```"
 
     field_name = '\u200b'
