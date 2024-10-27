@@ -23,7 +23,18 @@ import re
 import math
 import asyncio
 
+#Returns the hour cotd will start, in UTC
+def cotd_hour():
+    
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
 
+    daylight_savings = get_key(dotenv_path, ("DAYLIGHT_SAVINGS"))
+
+    if(daylight_savings == "1"):
+        return 17
+    
+    return 18
 
 totd_url = "https://live-services.trackmania.nadeo.live/api/token/campaign/month?length=1&offset=0"
 cotd_url = "https://meet.trackmania.nadeo.club/api/cup-of-the-day/current"
@@ -33,6 +44,8 @@ competition_matches_url = "https://meet.trackmania.nadeo.club/api/rounds/"
 competition_match_results_url = "https://meet.trackmania.nadeo.club/api/matches/"
 
 map_name_regex = r"(?i)(?<!\$)((?P<d>\$+)(?P=d))?((?<=\$)(?!\$)|(\$([a-f\d]{1,3}|[ionmwsztg<>]|[lhp](\[[^\]]+\])?)))"
+
+print(cotd_hour())
 
 class Cotd(Extension):
 
@@ -171,7 +184,7 @@ class Cotd(Extension):
 
     # Time trigger is UTC by default
     #@Task.create(TimeTrigger(hour=18, minute=1)) #cotd start time
-    @Task.create(TimeTrigger(hour=17, minute=17)) #cotd quali end time
+    @Task.create(TimeTrigger(hour=cotd_hour(), minute=17)) #cotd quali end time
     async def cotd_trigger(self):
 
         print("Cotd quali should be over now.")
@@ -199,7 +212,7 @@ class Cotd(Extension):
         self.cotd_trigger.start()
         self.cotd_ko_trigger.start()
 
-    @Task.create(TimeTrigger(hour=17, minute=45)) #approximate cotd ko end time
+    @Task.create(TimeTrigger(hour=cotd_hour(), minute=45)) #approximate cotd ko end time
     async def cotd_ko_trigger(self):
 
         print("Cotd ko should be over now.")

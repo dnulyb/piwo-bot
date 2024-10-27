@@ -19,7 +19,7 @@ import src.db.db as db
 from src.ubi.authentication import check_token_refresh
 
 import pkgutil
-from dotenv import find_dotenv, load_dotenv, set_key
+from dotenv import find_dotenv, load_dotenv, set_key, get_key
 
 """
 #custom check example
@@ -163,6 +163,28 @@ class BotManagement(Extension):
                 await ctx.send("Invalid info name")
 
         await ctx.send("Updated: " + action + ", with: " + value)
+
+    @slash_command(
+        name="bot",
+        sub_cmd_name="toggle_daylight_savings",
+        sub_cmd_description="Toggle daylight savings on or off.",
+        dm_permission=False
+    )
+    async def toggle_daylight_savings(self, ctx: SlashContext):
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        daylight_savings = get_key(dotenv_path, ("DAYLIGHT_SAVINGS"))
+
+        if(daylight_savings == "1"):
+            set_key(dotenv_path, "DAYLIGHT_SAVINGS", "0")
+            await ctx.send("Toggled daylight savings time OFF.")
+
+        else:
+            set_key(dotenv_path, "DAYLIGHT_SAVINGS", "1")
+            await ctx.send("Toggled daylight savings time ON.")
+
 
     @listen(Startup)
     async def on_startup(self):
