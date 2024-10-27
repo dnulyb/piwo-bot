@@ -115,7 +115,7 @@ class Twitch(Extension):
     @Task.create(IntervalTrigger(minutes=10))
     async def check_recently_started_streams(self):
 
-        print("Checking for recently started streams...")
+        #print("Checking for recently started streams...")
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
@@ -132,7 +132,7 @@ class Twitch(Extension):
                 # Add some delay between posting streams
                 await asyncio.sleep(1)
 
-        print("Finished checking for recently started streams.")
+        #print("Finished checking for recently started streams.")
 
     @listen(Startup)
     async def on_startup(self):

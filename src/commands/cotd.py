@@ -45,8 +45,6 @@ competition_match_results_url = "https://meet.trackmania.nadeo.club/api/matches/
 
 map_name_regex = r"(?i)(?<!\$)((?P<d>\$+)(?P=d))?((?<=\$)(?!\$)|(\$([a-f\d]{1,3}|[ionmwsztg<>]|[lhp](\[[^\]]+\])?)))"
 
-print(cotd_hour())
-
 class Cotd(Extension):
 
     #Get updated totd leaderboard
@@ -294,7 +292,6 @@ async def get_cotd_ko_results(tryagain=True):
                     for (cotd_player_name, cotd_player_id) in cotd_players:
                         if player_id == cotd_player_id:
 
-                            #print("PIWO COTD PLAYER TODAY: " + cotd_player_name + ", RANK: " + str(player_rank))
                             results.append((div, player_rank, cotd_player_name))
                             
             # Return results     

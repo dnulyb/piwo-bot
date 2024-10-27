@@ -28,12 +28,12 @@ class Twitter(Extension):
         channel_id = get_key(dotenv_path, ("DISCORD_TWITTER_CHANNEL"))
         channel = self.bot.get_channel(channel_id)
 
-        print("Checking for new tweets...")
+        #print("Checking for new tweets...")
         tweets = check_for_new_tweets()
 
         if(len(tweets) == 0):
             # No new tweets
-            print("No new tweets found.")
+            #print("No new tweets found.")
             return
         else:
             print(len(tweets), " tweets found! Posting...")

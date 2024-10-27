@@ -192,7 +192,7 @@ class Leaderboard(Extension):
     @Task.create(IntervalTrigger(minutes=35))
     async def update_tournaments_automatically(self):
 
-        print("Updating tournaments automatically: ")
+        #print("Updating tournaments automatically: ")
 
         conn = db.open_conn()
         query = (db.list_tournaments, None)
@@ -201,7 +201,7 @@ class Leaderboard(Extension):
         for (tournament_name, autoupdate) in tournaments:
             if autoupdate == 1:
                 
-                print("Trying to update tournament: " + tournament_name + "...")
+                #print("Trying to update tournament: " + tournament_name + "...")
                 #Perform update
                 try:
 
@@ -218,7 +218,7 @@ class Leaderboard(Extension):
                     print(f"Exception occurred in update_tournaments_automatically: {e}")
 
         conn.close()
-        print("Finished updating tournaments automatically.")
+        #print("Finished updating tournaments automatically.")
 
     @listen(Startup)
     async def on_startup(self):

@@ -115,7 +115,7 @@ class BotManagement(Extension):
 
     @Task.create(IntervalTrigger(minutes=30))
     async def update_nadeo_token(self):
-        print("Checking if Nadeo access token needs an update...")
+        #print("Checking if Nadeo access token needs an update...")
         check_token_refresh()
 
     @slash_command(
