@@ -203,7 +203,7 @@ class Cotd(Extension):
         await channel.send(embed=embed)
 
     @Task.create(TimeTrigger(hour=cotd_hour()-1, minute=56)) #roughly totd end time
-    async def cotd_trigger(self):
+    async def totd_trigger(self):
 
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
@@ -227,6 +227,7 @@ class Cotd(Extension):
     async def on_startup(self):
         self.cotd_trigger.start()
         self.cotd_ko_trigger.start()
+        self.totd_trigger.start()
 
     @Task.create(TimeTrigger(hour=cotd_hour(), minute=45)) #approximate cotd ko end time
     async def cotd_ko_trigger(self):
