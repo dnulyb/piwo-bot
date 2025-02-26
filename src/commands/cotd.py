@@ -15,11 +15,10 @@ from interactions.api.events import Startup
 
 import src.db.db as db
 from src.ubi.authentication import get_nadeo_access_token
-from src.commands.map import get_map_records, get_map_data, format_map_record
+from src.commands.map import get_map_records, get_map_data, format_map_record, clean_map_name, get_all_team_map_records, format_map_records_embed
 
 from dotenv import find_dotenv, load_dotenv, get_key, set_key
 import requests
-import re
 import math
 import asyncio
 
@@ -42,8 +41,6 @@ challenge_url = "https://meet.trackmania.nadeo.club/api/challenges/"
 competition_rounds_url = "https://meet.trackmania.nadeo.club/api/competitions/"
 competition_matches_url = "https://meet.trackmania.nadeo.club/api/rounds/"
 competition_match_results_url = "https://meet.trackmania.nadeo.club/api/matches/"
-
-map_name_regex = r"(?i)(?<!\$)((?P<d>\$+)(?P=d))?((?<=\$)(?!\$)|(\$([a-f\d]{1,3}|[ionmwsztg<>]|[lhp](\[[^\]]+\])?)))"
 
 class Cotd(Extension):
 
@@ -203,6 +200,27 @@ class Cotd(Extension):
         embed = format_cotd_quali_results(map_name, results)
 
         print("Sending cotd quali results to channel")
+        await channel.send(embed=embed)
+
+    @Task.create(TimeTrigger(hour=cotd_hour()-1, minute=56)) #roughly totd end time
+    async def cotd_trigger(self):
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = self.bot.get_channel(channel_id)
+
+        (_, map_uid, map_name) = get_totd_map_info()
+
+        infos = await get_all_team_map_records(map_uid)
+        if(infos == None):
+            await channel.send("No totd leaderboard could be found.")
+            return
+
+        embed = format_map_records_embed(map_name, infos)
+
+        print("Sending totd results to channel")
         await channel.send(embed=embed)
 
     @listen(Startup)
@@ -668,5 +686,3 @@ def get_totd_map_info():
     return (map_id, map_uid, map_name)
 
 
-def clean_map_name(map_name):
-    return re.sub(map_name_regex, "", map_name)

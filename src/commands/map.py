@@ -11,11 +11,14 @@ from src.db.db import get_tournament_db_id
 
 import requests
 import asyncio
+import re
 from dotenv import find_dotenv, load_dotenv, get_key
 from math import floor
 
 map_record_url = "https://prod.trackmania.core.nadeo.online/v2/mapRecords/"
 map_info_url = "https://prod.trackmania.core.nadeo.online/maps/?mapUidList="
+
+map_name_regex = r"(?i)(?<!\$)((?P<d>\$+)(?P=d))?((?<=\$)(?!\$)|(\$([a-f\d]{1,3}|[ionmwsztg<>]|[lhp](\[[^\]]+\])?)))"
 
 class Map(Extension):
 
@@ -241,6 +244,36 @@ class Map(Extension):
         finally:
             conn.close() 
 
+    @slash_command(
+        name="map",
+        description="Map management commands.",
+        sub_cmd_name="team_leaderboard",
+        sub_cmd_description="Shows the leaderboard ranks of players in the team. (times in top250 only)",
+        dm_permission=False
+    )
+    @slash_option(
+        name="map_uid",
+        description="uid of the map you want to see the team leaderboard for.",
+        required=True,
+        opt_type = OptionType.STRING
+    )
+    async def team_leaderboard(self, ctx: SlashContext, map_uid: str):
+
+        await ctx.defer()
+
+        infos = await get_all_team_map_records(map_uid)
+        if(infos == None):
+            await ctx.send("No leaderboard could be found.")
+            return
+        
+        [[_, _, map_name]] = get_map_data([map_uid])
+        map_name = clean_map_name(map_name)
+
+        embed = format_map_records_embed(map_name, infos)
+
+        await ctx.send(embed=embed)
+
+
 
 async def get_all_map_records(account_ids, map_ids, token):
 
@@ -288,6 +321,85 @@ def get_map_records(account_ids, map_id, token):
                 for elem in res]
     
     return records
+
+
+# Get map records for everyone in the team (aka everyone in "cotd" roster)
+# Only times in the top250 are retrieved 
+async def get_all_team_map_records(map_uid):
+
+    # Get team roster players from db
+    conn = db.open_conn()
+    query = (db.get_specific_roster_players, ["cotd"])
+    team_players = db.retrieve_data(conn, query)
+    conn.close()
+
+    # Get map records from nadeo
+    top100 = get_map_records_from_uid(map_uid, 100, 0)
+    await asyncio.sleep(1)
+    top101_200 = get_map_records_from_uid(map_uid, 100, 100)
+    await asyncio.sleep(1)
+    top201_250 = get_map_records_from_uid(map_uid, 50, 200)
+
+    all_records = top100 + top101_200 + top201_250
+
+    team_records = []
+    # Filter out all non-team players
+    for (id, pos, score) in all_records:
+        for (team_player_name, team_player_id) in team_players:
+            if id == team_player_id:
+                team_records.append((pos, team_player_name, score))
+
+
+    return team_records
+
+
+# Retrieves leaderboard infos (accountid, position, score) from a map uid
+def get_map_records_from_uid(map_uid, length, offset):
+
+    leaderboard_url = "https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/"
+    groupUid = "Personal_Best"
+    onlyWorld = "true"
+
+    if(length > 100):
+        length = 100
+
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Using the NadeoLiveServices audience
+    token = get_key(dotenv_path, ("NADEO_LIVESERVICES_ACCESS_TOKEN"))
+    user_agent = get_key(dotenv_path, ("USER_AGENT"))
+
+    # Build url
+    complete_url = leaderboard_url + \
+                    groupUid + \
+                    "/map/" + \
+                    map_uid + \
+                    "/top?length=" + \
+                    str(length) + \
+                    "&onlyWorld=" + \
+                    onlyWorld + \
+                    "&offset=" + \
+                    str(offset)
+    
+    # Send get request
+    headers = {
+        'Authorization': "nadeo_v1 t=" + token,
+        'User-Agent': user_agent
+    }
+
+    res = requests.get(complete_url, headers=headers)
+    res = res.json()
+
+    #Extract the relevant info
+    scores = res["tops"][0]["top"]
+    scores = [[score["accountId"],
+              score["position"],
+              format_map_record(score["score"])]
+              for score in scores]
+    
+    return scores
+
 
 # Converts a record time of format "42690" to "42.690", or "62690" to "01:02.690"
 #   mins: Bool, if there should be minutes in formatting or not. Default: True
@@ -431,3 +543,29 @@ def format_tournament_map_list(maps):
     return embed
 
 
+#infos: [(pos, name, score)]
+#   where the first entry is the best time
+def format_map_records_embed(map_name, infos):
+
+    embed = Embed()
+    embed.title = "Leaderboard for map: " + map_name
+    all_positions = ""
+    all_players = ""
+    all_times = ""
+
+    for info in infos:
+
+        (pos, name, score) = info
+
+        all_positions += str(pos) + "\n"
+        all_players += name + "\n"
+        all_times += score + "\n"
+
+    embed.add_field(name="Pos", value=all_positions, inline=True)
+    embed.add_field(name="Player", value=all_players, inline=True)
+    embed.add_field(name="Time", value=all_times, inline=True)
+
+    return embed
+
+def clean_map_name(map_name):
+    return re.sub(map_name_regex, "", map_name)
