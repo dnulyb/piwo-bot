@@ -245,8 +245,8 @@ class Map(Extension):
             conn.close() 
 
     @slash_command(
-        name="map",
-        description="Map management commands.",
+        name="lb",
+        description="leaderboard commands",
         sub_cmd_name="team_leaderboard",
         sub_cmd_description="Shows the leaderboard ranks of players in the team. (times in top250 only)",
         dm_permission=False
