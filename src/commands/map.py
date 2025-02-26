@@ -551,8 +551,8 @@ def format_map_records_embed(map_name, infos):
     embed.title = "Leaderboard for map: " + map_name
 
     #Format everything nicely inside a code block
-    header_format = "{:^3s} {:^15s} {:^16s} \n"
-    format =        "{:^3s} {:15s} {:^16s} \n"
+    header_format = "{:^4s} {:^15s} {:^16s} \n"
+    format =        "{:^4s} {:15s} {:^16s} \n"
 
     everything = "```\n"
     everything += header_format.format("Pos", "Player", "Time")
