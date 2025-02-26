@@ -549,21 +549,31 @@ def format_map_records_embed(map_name, infos):
 
     embed = Embed()
     embed.title = "Leaderboard for map: " + map_name
-    all_positions = ""
-    all_players = ""
-    all_times = ""
+
+    #Format everything nicely inside a code block
+    header_format = "{:^3s} {:^15s} {:^16s} \n"
+    format =        "{:^3s} {:15s} {:^16s} \n"
+
+    everything = "```\n"
+    everything += header_format.format("Pos", "Player", "Time")
 
     for info in infos:
 
         (pos, name, score) = info
+        everything += format.format(str(pos), name, score)
 
-        all_positions += str(pos) + "\n"
-        all_players += name + "\n"
-        all_times += score + "\n"
+        if(len(everything) >= 900):
+            everything += "```"
+            field_name = '\u200b'
+            embed.add_field(name=field_name, value=everything, inline=False)
 
-    embed.add_field(name="Pos", value=all_positions, inline=True)
-    embed.add_field(name="Player", value=all_players, inline=True)
-    embed.add_field(name="Time", value=all_times, inline=True)
+            everything = "```\n"
+            everything += header_format.format("Pos", "Player", "Time")
+
+    everything += "```"
+
+    field_name = '\u200b'
+    embed.add_field(name=field_name, value=everything, inline=True)
 
     return embed
 
