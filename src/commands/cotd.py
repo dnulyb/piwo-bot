@@ -35,6 +35,30 @@ def cotd_hour():
     
     return 18
 
+def cotn_hour():
+    
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    daylight_savings = get_key(dotenv_path, ("DAYLIGHT_SAVINGS"))
+
+    if(daylight_savings == "1"):
+        return 2
+    
+    return 3
+
+def cotm_hour():
+    
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    daylight_savings = get_key(dotenv_path, ("DAYLIGHT_SAVINGS"))
+
+    if(daylight_savings == "1"):
+        return 9
+    
+    return 10
+
 totd_url = "https://live-services.trackmania.nadeo.live/api/token/campaign/month?length=1&offset=0"
 cotd_url = "https://meet.trackmania.nadeo.club/api/cup-of-the-day/current"
 challenge_url = "https://meet.trackmania.nadeo.club/api/challenges/"
@@ -164,14 +188,14 @@ class Cotd(Extension):
         dotenv_path = find_dotenv()
         load_dotenv(dotenv_path)
 
-        results = await get_cotd_ko_results(True)
+        results = await get_cotd_ko_results(5, True)
         if(results == None):
             await ctx.send("No cotd ko could be found, try again around cotd time.")
             return
 
         (_, _, map_name) = get_totd_map_info()
         
-        embed = format_cotd_ko_results(map_name, results)
+        embed = format_cotd_ko_results("COTD KO results:", map_name, results)
 
         #await ctx.send("Posting cotd quali results:")
         print("Sending cotd KO results to channel")
@@ -227,6 +251,8 @@ class Cotd(Extension):
     async def on_startup(self):
         self.cotd_trigger.start()
         self.cotd_ko_trigger.start()
+        self.cotn_ko_trigger.start()
+        self.cotm_ko_trigger.start()
         self.totd_trigger.start()
 
     @Task.create(TimeTrigger(hour=cotd_hour(), minute=45)) #approximate cotd ko end time
@@ -240,19 +266,65 @@ class Cotd(Extension):
         channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
         channel = self.bot.get_channel(channel_id)
 
-        results = await get_cotd_ko_results()
+        results = await get_cotd_ko_results(5)
         if(results == None):
             await channel.send("Error retrieving cotd ko results: No ko could be found.", ephemeral=True)
             return
 
         (_, _, map_name) = get_totd_map_info()
         
-        embed = format_cotd_ko_results(map_name, results)
+        embed = format_cotd_ko_results("COTD KO results:", map_name, results)
 
         print("Sending cotd KO results to channel")
         await channel.send(embed=embed)
 
-async def get_cotd_ko_results(tryagain=True):
+    @Task.create(TimeTrigger(hour=cotn_hour(), minute=45)) #approximate cotn ko end time
+    async def cotn_ko_trigger(self):
+
+        print("Cotn ko should be over now.")
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = self.bot.get_channel(channel_id)
+
+        results = await get_cotd_ko_results(1)
+        if(results == None):
+            await channel.send("Error retrieving cotn ko results: No ko could be found.", ephemeral=True)
+            return
+
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_ko_results("COTN KO results:", map_name, results)
+
+        print("Sending cotn KO results to channel")
+        await channel.send(embed=embed)
+
+    @Task.create(TimeTrigger(hour=cotm_hour(), minute=45)) #approximate cotm ko end time
+    async def cotm_ko_trigger(self):
+
+        print("Cotm ko should be over now.")
+
+        dotenv_path = find_dotenv()
+        load_dotenv(dotenv_path)
+
+        channel_id = get_key(dotenv_path, ("DISCORD_COTD_CHANNEL"))
+        channel = self.bot.get_channel(channel_id)
+
+        results = await get_cotd_ko_results(1)
+        if(results == None):
+            await channel.send("Error retrieving cotm ko results: No ko could be found.", ephemeral=True)
+            return
+
+        (_, _, map_name) = get_totd_map_info()
+        
+        embed = format_cotd_ko_results("COTM KO results:", map_name, results)
+
+        print("Sending cotm KO results to channel")
+        await channel.send(embed=embed)
+
+async def get_cotd_ko_results(divs, tryagain=True):
 
     # Get cotd matches from the competition id
     (_, competition_id) = get_cotd_ids()
@@ -271,7 +343,7 @@ async def get_cotd_ko_results(tryagain=True):
         attempts += 1
         print("get_cotd_ko_results attempt: " + str(attempts))
 
-        cotd_matches = get_cotd_matches(rounds_id)
+        cotd_matches = get_cotd_matches(rounds_id, divs)
         
         match_ids = []
         for match in cotd_matches['matches']:
@@ -325,10 +397,10 @@ async def get_cotd_ko_results(tryagain=True):
 
 
 
-def format_cotd_ko_results(map_name, results):
+def format_cotd_ko_results(title, map_name, results):
 
     embed = Embed()
-    embed.title = "COTD KO results:"
+    embed.title = title
     embed.description = "Map: " + map_name
 
     #Format everything nicely inside a code block
@@ -589,11 +661,13 @@ def get_cotd_rounds(competition_id):
     rounds_id = res[0]['id']
     return rounds_id
 
-def get_cotd_matches(rounds_id):
+def get_cotd_matches(rounds_id, divs):
 
     complete_url = competition_matches_url + \
                     str(rounds_id) + \
-                    "/matches?length=5&offset=0"
+                    "/matches?length=" + \
+                    str(divs) + \
+                    "&offset=0"
     
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
