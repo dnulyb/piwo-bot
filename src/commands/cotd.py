@@ -43,9 +43,9 @@ def cotn_hour():
     daylight_savings = get_key(dotenv_path, ("DAYLIGHT_SAVINGS"))
 
     if(daylight_savings == "1"):
-        return 2
+        return 1
     
-    return 3
+    return 2
 
 def cotm_hour():
     
