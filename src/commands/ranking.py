@@ -14,7 +14,7 @@ import requests
 import json
 
 trophies_url = "https://live-services.trackmania.nadeo.live/api/token/leaderboard/trophy/player"
-mm_url = "https://meet.trackmania.nadeo.club/api/matchmaking/2/leaderboard/players?"
+mm_url = "https://meet.trackmania.nadeo.club/api/matchmaking/5/leaderboard/players?"
 
 class Ranking(Extension):
 
