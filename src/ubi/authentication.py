@@ -42,7 +42,7 @@ def authenticate():
     nadeo_body = {
         'audience':'NadeoLiveServices'
     }
-    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, json=nadeo_body)
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, auth=nadeo_auth, json=nadeo_body)
     nadeo_res = nadeo_res.json()
 
     access_token = nadeo_res['accessToken']
