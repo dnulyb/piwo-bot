@@ -25,12 +25,11 @@ def authenticate():
     
     nadeo_headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ' + nadeo_auth,
         'User-Agent': user_agent
     }
     # audience NadeoServices is used by default, so no need to specify audience in request body
 
-    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers)
+    nadeo_res = requests.post(nadeo_url, headers=nadeo_headers, auth=nadeo_auth)
     nadeo_res = nadeo_res.json()
 
     access_token = nadeo_res['accessToken']
