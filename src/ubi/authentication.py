@@ -5,9 +5,7 @@ import base64
 import json
 from datetime import datetime
 
-ubi_url = "https://public-ubiservices.ubi.com/v3/profiles/sessions"
-ubi_appid = "86263886-327a-4328-ac69-527f0d20a237"
-nadeo_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices"
+nadeo_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/basic"
 nadeo_refresh_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh"
 
 # Authenticates with Ubisoft and stores Nadeo access token,
@@ -18,28 +16,16 @@ def authenticate():
     load_dotenv(dotenv_path)
 
     user_agent = get_key(dotenv_path, ("USER_AGENT"))
-    login = get_key(dotenv_path, ("UBI_LOGIN"))
-    password = get_key(dotenv_path, ("UBI_PASSWORD"))
+    login = get_key(dotenv_path, ("SERVICE_ACCOUNT_LOGIN"))
+    password = get_key(dotenv_path, ("SERVICE_ACCOUNT_PASSWORD"))
 
-    # Get ubisoft authentication ticket
-    ubi_headers = {
-        'Content-Type': 'application/json',
-        'Ubi-AppId': ubi_appid,
-        'User-Agent': user_agent
-    }
-    ubi_auth = HTTPBasicAuth(login, password)
-
-    ubi_res = requests.post(ubi_url, headers=ubi_headers, auth=ubi_auth)
-    ubi_res = ubi_res.json()
-
-    # Now we have a ticket to use for authentication to Nadeo services
-    ticket = ubi_res['ticket']
+    nadeo_auth = HTTPBasicAuth(login, password)
 
     # Get nadeo access token
     
     nadeo_headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'ubi_v1 t=' + ticket,
+        'Authorization': 'Basic ' + nadeo_auth,
         'User-Agent': user_agent
     }
     # audience NadeoServices is used by default, so no need to specify audience in request body
